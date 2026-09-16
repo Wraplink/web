@@ -1,0 +1,99 @@
+{
+  "Navigation": {
+    "home": "Home",
+    "about": "About",
+    "market": "Market",
+    "pricing": "Pricing",
+    "contact": "Contact",
+    "login": "Login",
+    "register": "Register"
+  },
+
+  "HomePage": {
+    "badge": "Next Generation Gamer Network",
+
+    "heroTitle": "Play Faster.",
+    "heroTitleAccent": "Connect Smarter.",
+
+    "heroDescription": "WrapLink provides intelligent DNS routing, secure network acceleration, bandwidth management, and gamer-focused connectivity through a modern platform.",
+
+    "getStarted": "Get Started",
+    "viewPlans": "View Plans",
+
+    "features": {
+      "latencyTitle": "Ultra Low Latency",
+      "latencyDescription": "Smart routing reduces unnecessary network hops.",
+
+      "securityTitle": "Secure Connection",
+      "securityDescription": "Enterprise-grade protection with intelligent traffic control.",
+
+      "dnsTitle": "Global DNS",
+      "dnsDescription": "Optimized DNS for selected gaming services."
+    },
+
+    "stats": {
+      "edgeNodes": "Edge Nodes",
+      "connections": "Protected Connections",
+      "games": "Supported Games",
+      "uptime": "Uptime"
+    },
+
+    "featuresTitle": "Everything in One Platform",
+    "featuresDescription": "Designed for gamers, powered by enterprise infrastructure.",
+
+    "platform": {
+      "walletTitle": "Wallet",
+      "walletDescription": "Charge, pay, withdraw and track every transaction.",
+
+      "supportTitle": "Support Tickets",
+      "supportDescription": "Built-in customer support with ticket tracking.",
+
+      "marketTitle": "Marketplace",
+      "marketDescription": "Buy plans and services through a modern store.",
+
+      "connectionTitle": "Connection Management",
+      "connectionDescription": "DNS addresses, IP assignments and connection status.",
+
+      "bandwidthTitle": "Bandwidth Reports",
+      "bandwidthDescription": "Monitor usage with detailed analytics.",
+
+      "languageTitle": "Multi-language",
+      "languageDescription": "English and Persian interface."
+    },
+
+    "howItWorksTitle": "How WrapLink Works",
+
+    "steps": {
+      "register": "Create your account",
+      "plan": "Choose a connection plan",
+      "connection": "Receive your DNS and connection details",
+      "monitor": "Connect and monitor usage"
+    },
+
+    "pricingTitle": "Flexible Gamer Plans",
+    "pricingDescription": "Buy using Wallet, Crypto, Cart-to-Cart, or ISP payment.",
+    "explorePricing": "Explore Pricing",
+
+    "plans": {
+      "starter": "Starter Plan",
+      "pro": "Pro Plan",
+      "ultimate": "Ultimate Plan"
+    },
+
+    "ctaTitle": "Ready to Join WrapLink?",
+    "ctaDescription": "Create your account and experience the next generation of gamer networking.",
+    "createAccount": "Create Account"
+  },
+
+  "Footer": {
+    "description": "Next Generation Gamer Network Platform.",
+    "platform": "Platform",
+    "support": "Support",
+    "copyright": "© 2026 WrapLink. All rights reserved."
+  },
+
+  "LanguageSwitcher": {
+    "english": "English",
+    "persian": "Persian"
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "Navigation": {
+    "home": "خانه",
+    "about": "درباره ما",
+    "market": "فروشگاه",
+    "pricing": "تعرفه‌ها",
+    "contact": "تماس با ما",
+    "login": "ورود",
+    "register": "ثبت‌نام"
+  },
+
+  "HomePage": {
+    "badge": "نسل جدید شبکه مخصوص گیمرها",
+
+    "heroTitle": "سریع‌تر بازی کنید.",
+    "heroTitleAccent": "هوشمندانه‌تر متصل شوید.",
+
+    "heroDescription": "WrapLink مسیریابی هوشمند DNS، شتاب‌دهی امن شبکه، مدیریت پهنای باند و اتصال اختصاصی برای گیمرها را در یک پلتفرم مدرن ارائه می‌دهد.",
+
+    "getStarted": "شروع کنید",
+    "viewPlans": "مشاهده تعرفه‌ها",
+
+    "features": {
+      "latencyTitle": "تأخیر بسیار پایین",
+      "latencyDescription": "مسیریابی هوشمند، مسیرهای غیرضروری شبکه را کاهش می‌دهد.",
+
+      "securityTitle": "اتصال امن",
+      "securityDescription": "محافظت در سطح سازمانی با کنترل هوشمند ترافیک.",
+
+      "dnsTitle": "DNS جهانی",
+      "dnsDescription": "DNS بهینه‌شده برای سرویس‌های منتخب بازی."
+    },
+
+    "stats": {
+      "edgeNodes": "نودهای Edge",
+      "connections": "اتصال‌های محافظت‌شده",
+      "games": "بازی‌های پشتیبانی‌شده",
+      "uptime": "آپ‌تایم"
+    },
+
+    "featuresTitle": "همه امکانات در یک پلتفرم",
+    "featuresDescription": "طراحی‌شده برای گیمرها، ساخته‌شده بر پایه زیرساخت سازمانی.",
+
+    "platform": {
+      "walletTitle": "کیف پول",
+      "walletDescription": "شارژ، پرداخت، برداشت و مشاهده تمام تراکنش‌ها.",
+
+      "supportTitle": "تیکت پشتیبانی",
+      "supportDescription": "سیستم پشتیبانی داخلی با امکان پیگیری تیکت.",
+
+      "marketTitle": "فروشگاه",
+      "marketDescription": "خرید پلن‌ها و سرویس‌ها از طریق فروشگاه مدرن.",
+
+      "connectionTitle": "مدیریت اتصال",
+      "connectionDescription": "مشاهده DNS، IP و وضعیت اتصال.",
+
+      "bandwidthTitle": "گزارش مصرف",
+      "bandwidthDescription": "مشاهده و بررسی مصرف پهنای باند.",
+
+      "languageTitle": "چند زبانه",
+      "languageDescription": "رابط کاربری فارسی و انگلیسی."
+    },
+
+    "howItWorksTitle": "WrapLink چگونه کار می‌کند؟",
+
+    "steps": {
+      "register": "حساب کاربری ایجاد کنید",
+      "plan": "پلن اتصال خود را انتخاب کنید",
+      "connection": "اطلاعات DNS و اتصال را دریافت کنید",
+      "monitor": "متصل شوید و مصرف خود را مشاهده کنید"
+    },
+
+    "pricingTitle": "پلن‌های منعطف برای گیمرها",
+    "pricingDescription": "پرداخت با کیف پول، رمزارز، کارت به کارت یا ISP.",
+    "explorePricing": "مشاهده تعرفه‌ها",
+
+    "plans": {
+      "starter": "پلن Starter",
+      "pro": "پلن Pro",
+      "ultimate": "پلن Ultimate"
+    },
+
+    "ctaTitle": "آماده پیوستن به WrapLink هستید؟",
+    "ctaDescription": "حساب خود را ایجاد کنید و نسل جدید شبکه مخصوص گیمرها را تجربه کنید.",
+    "createAccount": "ایجاد حساب"
+  },
+
+  "Footer": {
+    "description": "پلتفرم نسل جدید شبکه مخصوص گیمرها.",
+    "platform": "پلتفرم",
+    "support": "پشتیبانی",
+    "copyright": "© 2026 WrapLink. تمامی حقوق محفوظ است."
+  },
+
+  "LanguageSwitcher": {
+    "english": "انگلیسی",
+    "persian": "فارسی"
+  }
+}
