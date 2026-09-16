@@ -95,5 +95,40 @@
   "LanguageSwitcher": {
     "english": "انگلیسی",
     "persian": "فارسی"
+  },
+  "AboutPage": {
+    "badge": "زیرساخت سازمانی مخصوص گیمرها",
+    "title": "ساخته‌شده برای گیمرها، طراحی‌شده در سطح سازمانی.",
+    "description": "WrapLink با ترکیب DNS هوشمند، شتاب‌دهی Edge، بهینه‌سازی ترافیک و زیرساخت سازمانی، تجربه بهتری برای بازی آنلاین فراهم می‌کند.",
+
+    "missionTitle": "ماموریت ما",
+    "missionText": "کاهش تأخیر، ساده‌سازی اتصال و ارائه شبکه‌ای پایدار برای گیمرها.",
+
+    "visionTitle": "چشم‌انداز ما",
+    "visionText": "تبدیل شدن به برترین پلتفرم اتصال گیمرها با فناوری Edge و مدیریت شفاف.",
+
+    "valuesTitle": "ارزش‌های اصلی",
+
+    "values": {
+      "performance": {
+        "title": "عملکرد در اولویت",
+        "description": "هر میلی‌ثانیه اهمیت دارد."
+      },
+      "security": {
+        "title": "امنیت از ابتدا",
+        "description": "محافظت در سطح سازمانی."
+      },
+      "transparency": {
+        "title": "شفافیت",
+        "description": "گزارش و قیمت‌گذاری شفاف."
+      },
+      "innovation": {
+        "title": "نوآوری",
+        "description": "بهبود مداوم."
+      }
+    },
+
+    "architectureTitle": "معماری سازمانی",
+    "architectureDescription": "WrapLink بر پایه Edge Nodeهای مقیاس‌پذیر، DNS هوشمند، APIهای امن و مدیریت متمرکز طراحی شده است."
   }
 }

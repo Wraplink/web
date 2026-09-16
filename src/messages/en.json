@@ -95,5 +95,40 @@
   "LanguageSwitcher": {
     "english": "English",
     "persian": "Persian"
+  },
+  "AboutPage": {
+    "badge": "Enterprise Gaming Network",
+    "title": "Built for Gamers. Engineered for Enterprise.",
+    "description": "WrapLink combines intelligent DNS routing, edge acceleration, traffic optimization and enterprise-grade infrastructure to deliver a better gaming experience.",
+
+    "missionTitle": "Our Mission",
+    "missionText": "Reduce latency, simplify connectivity and provide gamers with reliable global networking through intelligent infrastructure.",
+
+    "visionTitle": "Our Vision",
+    "visionText": "Become the leading gamer connectivity platform with enterprise-grade reliability, transparent management and global edge technology.",
+
+    "valuesTitle": "Core Values",
+
+    "values": {
+      "performance": {
+        "title": "Performance First",
+        "description": "Every millisecond matters."
+      },
+      "security": {
+        "title": "Security by Design",
+        "description": "Enterprise-level protection."
+      },
+      "transparency": {
+        "title": "Transparency",
+        "description": "Clear usage, pricing and reports."
+      },
+      "innovation": {
+        "title": "Innovation",
+        "description": "Constant improvement."
+      }
+    },
+
+    "architectureTitle": "Enterprise Architecture",
+    "architectureDescription": "WrapLink is designed around scalable edge nodes, intelligent DNS control, secure APIs and centralized management."
   }
 }

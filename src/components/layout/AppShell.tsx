@@ -34,6 +34,8 @@ export default function AppShell({children}: Props) {
         <NextIntlClientProvider
             locale={locale}
             messages={messages}
+            timeZone="UTC"
+
         >
             <ThemeBackground/>
 
