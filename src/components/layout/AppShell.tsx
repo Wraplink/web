@@ -30,6 +30,11 @@ export default function AppShell({children}: Props) {
             locale === "fa" ? "rtl" : "ltr";
     }, [locale]);
 
+    console.log("AppShell locale:", locale);
+    console.log(
+        "ForgotPassword title:",
+        messages.ForgotPasswordPage?.title
+    );
     return (
         <NextIntlClientProvider
             locale={locale}

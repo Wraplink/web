@@ -130,5 +130,142 @@
 
     "architectureTitle": "Enterprise Architecture",
     "architectureDescription": "WrapLink is designed around scalable edge nodes, intelligent DNS control, secure APIs and centralized management."
+  },"ContactPage": {
+  "badge": "We're Here to Help",
+  "title": "Contact WrapLink",
+  "description": "Need help with your connection, payments or account? Our support team is ready to assist.",
+
+  "form": {
+    "title": "Send a Message",
+    "name": "Full Name",
+    "email": "Email Address",
+    "subject": "Subject",
+    "message": "Message",
+    "send": "Send Message"
+  },
+
+  "info": {
+    "title": "Contact Information",
+    "email": "support@wraplink.ir",
+    "telegram": "@WrapLinkSupport",
+    "discord": "WrapLink Community",
+    "hours": "24/7 Support"
+  },
+
+  "supportTitle": "Need Immediate Help?",
+  "supportDescription": "Create a support ticket from your user dashboard after signing in."
+},
+  "PricingPage": {
+    "badge": "Choose Your Plan",
+    "title": "Flexible Plans for Every Gamer",
+    "description": "Select the bandwidth and duration that fits your gaming style.",
+
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+
+    "buy": "Buy Now",
+
+    "paymentTitle": "Supported Payments",
+
+    "payments": {
+      "wallet": "Wallet",
+      "crypto": "Crypto",
+      "cart": "Cart-to-Cart",
+      "isp": "ISP Payment"
+    },
+
+    "plans": {
+      "starter": {
+        "name": "Starter",
+        "description": "Perfect for casual gaming.",
+        "bandwidth": "50 GB",
+        "duration": "30 Days",
+        "price": "$5"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "Competitive gamers' favorite.",
+        "bandwidth": "200 GB",
+        "duration": "30 Days",
+        "price": "$12"
+      },
+      "ultimate": {
+        "name": "Ultimate",
+        "description": "Maximum performance and bandwidth.",
+        "bandwidth": "Unlimited",
+        "duration": "30 Days",
+        "price": "$25"
+      }
+    }
+  },
+  "LoginPage": {
+    "badge": "Secure Sign In",
+    "title": "Welcome Back",
+    "description": "Sign in to access your WrapLink dashboard.",
+
+    "email": "Email Address",
+    "password": "Password",
+    "remember": "Remember this device",
+    "forgot": "Forgot Password?",
+    "login": "Sign In",
+
+    "noAccount": "Don't have an account?",
+    "register": "Create one",
+
+    "securityTitle": "Protected Login",
+    "securityText": "Your account is protected with enterprise-grade authentication."
+  },
+  "RegisterPage": {
+    "badge": "Create Your Account",
+    "title": "Join WrapLink",
+    "description": "Create your account and start building a better gaming connection.",
+
+    "fullName": "Full Name",
+    "email": "Email Address",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+
+    "passwordHint": "Use at least 8 characters with uppercase, lowercase and numbers.",
+
+    "strength": "Password Strength",
+    "weak": "Weak",
+    "medium": "Medium",
+    "strong": "Strong",
+
+    "terms": "I agree to the Terms of Service and Privacy Policy.",
+    "register": "Create Account",
+
+    "alreadyAccount": "Already have an account?",
+    "login": "Sign In",
+
+    "securityTitle": "Your Account, Your Control",
+    "securityText": "Your WrapLink account will give you access to connections, plans, wallet, orders and support.",
+
+    "validation": {
+      "nameRequired": "Full name is required.",
+      "emailRequired": "Email address is required.",
+      "emailInvalid": "Please enter a valid email address.",
+      "passwordRequired": "Password is required.",
+      "passwordWeak": "Password must contain at least 8 characters, uppercase, lowercase and a number.",
+      "confirmRequired": "Please confirm your password.",
+      "passwordMismatch": "Passwords do not match.",
+      "termsRequired": "You must accept the terms."
+    }
+  },
+  "ForgotPasswordPage": {
+    "title": "Forgot your password?",
+    "description": "Enter the email address associated with your WrapLink account and we'll send you instructions to reset your password.",
+    "email": "Email address",
+    "emailPlaceholder": "you@example.com",
+    "submit": "Send Reset Link",
+    "backToLogin": "Back to Login",
+    "rememberPassword": "Remember your password?",
+    "login": "Sign in",
+    "successTitle": "Check your email",
+    "successDescription": "If an account exists for this email address, you will receive password reset instructions shortly.",
+    "errors": {
+      "emailRequired": "Please enter your email address.",
+      "emailInvalid": "Please enter a valid email address."
+    }
   }
 }

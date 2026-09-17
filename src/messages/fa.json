@@ -130,5 +130,143 @@
 
     "architectureTitle": "معماری سازمانی",
     "architectureDescription": "WrapLink بر پایه Edge Nodeهای مقیاس‌پذیر، DNS هوشمند، APIهای امن و مدیریت متمرکز طراحی شده است."
+  },
+  "ContactPage": {
+    "badge": "همیشه کنار شما هستیم",
+    "title": "تماس با WrapLink",
+    "description": "برای مشکلات اتصال، پرداخت یا حساب کاربری، تیم پشتیبانی آماده کمک به شماست.",
+
+    "form": {
+      "title": "ارسال پیام",
+      "name": "نام و نام خانوادگی",
+      "email": "ایمیل",
+      "subject": "موضوع",
+      "message": "متن پیام",
+      "send": "ارسال پیام"
+    },
+
+    "info": {
+      "title": "اطلاعات تماس",
+      "email": "support@wraplink.ir",
+      "telegram": "@WrapLinkSupport",
+      "discord": "انجمن WrapLink",
+      "hours": "پشتیبانی ۲۴ ساعته"
+    },
+
+    "supportTitle": "کمک فوری نیاز دارید؟",
+    "supportDescription": "پس از ورود، از داشبورد کاربری تیکت پشتیبانی ایجاد کنید."
+  },
+  "PricingPage": {
+    "badge": "پلن مناسب خود را انتخاب کنید",
+    "title": "پلن‌های منعطف برای هر گیمر",
+    "description": "بر اساس میزان مصرف و مدت زمان، بهترین پلن را انتخاب کنید.",
+
+    "monthly": "ماهانه",
+    "yearly": "سالانه",
+
+    "buy": "خرید",
+
+    "paymentTitle": "روش‌های پرداخت",
+
+    "payments": {
+      "wallet": "کیف پول",
+      "crypto": "رمزارز",
+      "cart": "کارت به کارت",
+      "isp": "پرداخت ISP"
+    },
+
+    "plans": {
+      "starter": {
+        "name": "Starter",
+        "description": "مناسب بازی روزانه.",
+        "bandwidth": "۵۰ گیگابایت",
+        "duration": "۳۰ روز",
+        "price": "۵ دلار"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "انتخاب محبوب گیمرهای حرفه‌ای.",
+        "bandwidth": "۲۰۰ گیگابایت",
+        "duration": "۳۰ روز",
+        "price": "۱۲ دلار"
+      },
+      "ultimate": {
+        "name": "Ultimate",
+        "description": "بیشترین سرعت و پهنای باند.",
+        "bandwidth": "نامحدود",
+        "duration": "۳۰ روز",
+        "price": "۲۵ دلار"
+      }
+    }
+  },
+  "LoginPage": {
+    "badge": "ورود امن",
+    "title": "خوش آمدید",
+    "description": "برای ورود به داشبورد WrapLink وارد شوید.",
+
+    "email": "ایمیل",
+    "password": "رمز عبور",
+    "remember": "این دستگاه را به خاطر بسپار",
+    "forgot": "رمز عبور را فراموش کرده‌اید؟",
+    "login": "ورود",
+
+    "noAccount": "حساب کاربری ندارید؟",
+    "register": "ثبت‌نام",
+
+    "securityTitle": "ورود محافظت‌شده",
+    "securityText": "حساب شما با احراز هویت سطح سازمانی محافظت می‌شود."
+  },
+  "RegisterPage": {
+    "badge": "ایجاد حساب کاربری",
+    "title": "به WrapLink بپیوندید",
+    "description": "حساب کاربری خود را ایجاد کنید و اتصال بهتر برای بازی آنلاین را تجربه کنید.",
+
+    "fullName": "نام و نام خانوادگی",
+    "email": "ایمیل",
+    "password": "رمز عبور",
+    "confirmPassword": "تکرار رمز عبور",
+
+    "passwordHint": "حداقل ۸ کاراکتر شامل حروف بزرگ، حروف کوچک و عدد استفاده کنید.",
+
+    "strength": "قدرت رمز عبور",
+    "weak": "ضعیف",
+    "medium": "متوسط",
+    "strong": "قوی",
+
+    "terms": "با قوانین استفاده و سیاست حفظ حریم خصوصی موافقم.",
+    "register": "ایجاد حساب",
+
+    "alreadyAccount": "قبلاً حساب دارید؟",
+    "login": "ورود",
+
+    "securityTitle": "حساب شما، کنترل شما",
+    "securityText": "با حساب WrapLink به اتصال‌ها، پلن‌ها، کیف پول، سفارش‌ها و پشتیبانی دسترسی خواهید داشت.",
+
+    "validation": {
+      "nameRequired": "نام و نام خانوادگی الزامی است.",
+      "emailRequired": "ایمیل الزامی است.",
+      "emailInvalid": "لطفاً یک ایمیل معتبر وارد کنید.",
+      "passwordRequired": "رمز عبور الزامی است.",
+      "passwordWeak": "رمز عبور باید حداقل ۸ کاراکتر و شامل حروف بزرگ، حروف کوچک و عدد باشد.",
+      "confirmRequired": "لطفاً رمز عبور را تکرار کنید.",
+      "passwordMismatch": "رمزهای عبور یکسان نیستند.",
+      "termsRequired": "پذیرش قوانین الزامی است."
+    }
+  },
+  "ForgotPasswordPage": {
+    "title": "رمز عبور را فراموش کرده‌اید؟",
+    "description": "ایمیل حساب کاربری خود را وارد کنید تا دستورالعمل تغییر رمز عبور برای شما ارسال شود.",
+    "email": "آدرس ایمیل",
+    "emailPlaceholder": "you@example.com",
+    "submit": "ارسال لینک بازیابی",
+    "backToLogin": "بازگشت به ورود",
+    "rememberPassword": "رمز عبور خود را به یاد آوردید؟",
+    "login": "ورود",
+    "successTitle": "ایمیل خود را بررسی کنید",
+    "successDescription": "اگر حسابی با این آدرس ایمیل وجود داشته باشد، دستورالعمل بازیابی رمز عبور برای شما ارسال خواهد شد.",
+    "errors": {
+      "emailRequired": "لطفاً آدرس ایمیل خود را وارد کنید.",
+      "emailInvalid": "لطفاً یک آدرس ایمیل معتبر وارد کنید."
+    }
   }
 }
