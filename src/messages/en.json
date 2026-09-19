@@ -267,5 +267,293 @@
       "emailRequired": "Please enter your email address.",
       "emailInvalid": "Please enter a valid email address."
     }
+  },
+  "VerifyEmailPage": {
+    "badge": "Almost There",
+    "title": "Verify Your Email",
+    "description": "We've sent a verification link to your email address. Please verify your account before signing in.",
+
+    "checkInbox": "Check your inbox and spam folder.",
+    "openMail": "Open Mail App",
+
+    "resend": "Resend Email",
+    "resendIn": "Resend in {seconds}s",
+
+    "backToLogin": "Back to Login",
+
+    "success": "Verification email sent successfully."
+  },
+  "ResetPasswordPage": {
+    "badge": "Secure Password Reset",
+    "title": "Create a New Password",
+    "description": "Choose a strong password for your WrapLink account.",
+
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm Password",
+
+    "strength": "Password Strength",
+    "weak": "Weak",
+    "medium": "Medium",
+    "strong": "Strong",
+
+    "passwordHint": "Use at least 8 characters with uppercase, lowercase and numbers.",
+
+    "reset": "Reset Password",
+
+    "successTitle": "Password Updated",
+    "successDescription": "Your password has been successfully changed.",
+    "goLogin": "Go to Login",
+
+    "invalidToken": "This reset link is invalid or has expired.",
+
+    "validation": {
+      "passwordRequired": "Password is required.",
+      "passwordWeak": "Password must contain at least 8 characters, uppercase, lowercase and a number.",
+      "confirmRequired": "Please confirm your password.",
+      "passwordMismatch": "Passwords do not match."
+    }
+  },
+  "DashboardPage": {
+    "welcome": "Welcome back",
+    "subtitle": "Manage your WrapLink services from one place.",
+
+    "wallet": "Wallet",
+    "currentPlan": "Current Plan",
+    "connection": "Connection",
+    "bandwidth": "Bandwidth",
+    "orders": "Recent Orders",
+
+    "active": "Active",
+
+    "quickActions": "Quick Actions",
+
+    "actions": {
+      "connect": "Connect to Server",
+      "buy": "Buy Plan",
+      "wallet": "Charge Wallet",
+      "ticket": "Support Ticket"
+    },
+
+    "connectionInfo": {
+      "title": "Connection Information",
+      "userIp": "Your IP",
+      "primaryDns": "Primary DNS",
+      "secondaryDns": "Secondary DNS",
+      "edgeServer": "Edge Server"
+    }
+  },
+  "ConnectionPage": {
+    "title": "Connection Center",
+    "subtitle": "Manage your WrapLink connection and network configuration.",
+
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+
+    "latency": "Latency",
+
+    "info": {
+      "title": "Connection Information",
+      "publicIp": "Public IP",
+      "primaryDns": "Primary DNS",
+      "secondaryDns": "Secondary DNS",
+      "edgeServer": "Edge Server"
+    },
+
+    "copy": "Copy",
+
+    "setup": {
+      "title": "Mobile Setup",
+      "description": "Scan this QR code later to configure your mobile device."
+    },
+
+    "download": {
+      "title": "Download Configuration",
+      "windows": "Windows Client",
+      "android": "Android Guide",
+      "ios": "iPhone Guide",
+      "config": "Configuration File"
+    },
+
+    "logs": "Connection Logs"
+  },
+  "WalletPage": {
+    "title": "Wallet",
+    "subtitle": "Manage your balance and payments.",
+
+    "balance": "Current Balance",
+
+    "deposit": "Charge Wallet",
+    "withdraw": "Cash Out",
+
+    "amount": "Amount",
+
+    "paymentMethods": "Payment Methods",
+
+    "methods": {
+      "wallet": "Wallet",
+      "cart": "Cart-to-Cart",
+      "crypto": "Crypto",
+      "isp": "ISP Payment"
+    },
+
+    "transactions": "Transaction History",
+
+    "filters": {
+      "all": "All",
+      "deposit": "Deposits",
+      "withdraw": "Withdrawals"
+    },
+
+    "submitDeposit": "Charge Wallet",
+    "submitWithdraw": "Request Withdrawal"
+  },
+  "MarketPage": {
+    "badge": "WrapLink Marketplace",
+    "title": "Choose Your Connection",
+    "subtitle": "Plans, services and add-ons designed for your gaming experience.",
+    "basket": "Basket",
+    "search": "Search products...",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "perMonth": "/ month",
+    "perYear": "/ year",
+    "popular": "Most Popular",
+    "addToBasket": "Add to Basket",
+    "noProducts": "No products found",
+    "tryDifferentSearch": "Try another search or category.",
+    "categories": {
+      "all": "All",
+      "plans": "Plans",
+      "services": "Services",
+      "addons": "Add-ons"
+    },
+    "products": {
+      "starter": {
+        "name": "Starter",
+        "description": "Reliable gaming connectivity for casual players."
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "Advanced connectivity with better performance and stability."
+      },
+      "ultimate": {
+        "name": "Ultimate",
+        "description": "Maximum performance for serious gamers and power users."
+      },
+      "staticIp": {
+        "name": "Static IP",
+        "description": "Dedicated static IP for your connection."
+      },
+      "extraDevice": {
+        "name": "Extra Device",
+        "description": "Connect one additional device to your WrapLink service."
+      }
+    }
+  },"OrdersPage": {
+  "badge": "Order Management",
+  "title": "Your Orders",
+  "subtitle": "Track your WrapLink orders, manage cancellations, and request refunds for eligible items.",
+  "total": "Total",
+  "orderTotal": "Order Total",
+  "paymentMethod": "Payment Method",
+  "quantity": "Quantity",
+  "refund": "Refund Item",
+  "refunded": "Refunded",
+  "cancelOrder": "Cancel Order",
+  "status": {
+    "pending": "Pending",
+    "confirmed": "Confirmed",
+    "delivered": "Delivered",
+    "cancelled": "Cancelled"
+  },
+  "empty": {
+    "title": "No orders yet",
+    "description": "Your orders will appear here after you make a purchase."
   }
+},"SupportPage": {
+  "badge": "Customer Support",
+  "title": "Support Tickets",
+  "subtitle": "Create and manage support requests with the WrapLink support team.",
+  "newTicket": "New Ticket",
+  "backToTickets": "Back to Tickets",
+  "closeTicket": "Close Ticket",
+  "sendReply": "Send Reply",
+  "replyPlaceholder": "Write your reply...",
+  "noMessages": "No messages in this ticket yet.",
+  "you": "You",
+  "supportTeam": "Support Team",
+  "priorityLabel": "Priority",
+  "status": {
+    "open": "Open",
+    "pending": "Pending",
+    "resolved": "Resolved",
+    "closed": "Closed"
+  },
+  "priority": {
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High"
+  },
+  "create": {
+    "title": "Create Support Ticket",
+    "subtitle": "Tell us how we can help.",
+    "subject": "Subject",
+    "subjectPlaceholder": "Describe your issue...",
+    "category": "Category",
+    "priority": "Priority",
+    "submit": "Create Ticket",
+    "categories": {
+      "technical": "Technical",
+      "billing": "Billing",
+      "connection": "Connection",
+      "other": "Other"
+    }
+  }
+},"BandwidthPage": {
+  "badge": "Network Analytics",
+  "title": "Bandwidth Reports",
+  "subtitle": "Monitor your bandwidth consumption and understand how your connection is being used.",
+  "currentUsage": "Current Usage",
+  "remaining": "remaining",
+  "used": "Used",
+  "currentPlan": "Current Plan",
+  "bandwidthLimit": "Bandwidth Limit",
+  "billingCycle": "Billing Cycle",
+  "monthly": "Monthly",
+  "download": "Download",
+  "upload": "Upload",
+  "totalTraffic": "Total Traffic",
+  "trafficReceived": "Traffic received",
+  "trafficSent": "Traffic sent",
+  "downloadUploadCombined": "Download + upload",
+  "usageReport": "Usage Report",
+  "usageReportSubtitle": "Bandwidth consumption over time.",
+  "ranges": {
+    "7d": "7 Days",
+    "30d": "30 Days",
+    "90d": "90 Days"
+  },
+  "reportInfoTitle": "Usage information",
+  "reportInfo": "Bandwidth statistics are calculated from your network traffic and may be updated periodically."
+},"UserSidebar": {
+  "controlPanel": "Control Panel",
+  "navigation": "Navigation",
+  "wallet": "Wallet",
+  "logout": "Logout",
+  "openMenu": "Open menu",
+  "closeMenu": "Close menu",
+  "items": {
+    "dashboard": "Dashboard",
+    "connection": "Connection",
+    "wallet": "Wallet",
+    "market": "Market",
+    "basket": "Basket",
+    "orders": "Orders",
+    "support": "Support",
+    "bandwidth": "Bandwidth"
+  }
+}
 }

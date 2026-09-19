@@ -268,5 +268,293 @@
       "emailRequired": "لطفاً آدرس ایمیل خود را وارد کنید.",
       "emailInvalid": "لطفاً یک آدرس ایمیل معتبر وارد کنید."
     }
+  },
+  "VerifyEmailPage": {
+    "badge": "یک قدم تا پایان",
+    "title": "ایمیل خود را تأیید کنید",
+    "description": "لینک تأیید حساب برای ایمیل شما ارسال شده است. قبل از ورود، حساب خود را تأیید کنید.",
+
+    "checkInbox": "صندوق ورودی و پوشه Spam را بررسی کنید.",
+    "openMail": "باز کردن برنامه ایمیل",
+
+    "resend": "ارسال مجدد ایمیل",
+    "resendIn": "ارسال مجدد تا {seconds} ثانیه",
+
+    "backToLogin": "بازگشت به ورود",
+
+    "success": "ایمیل تأیید دوباره ارسال شد."
+  },
+  "ResetPasswordPage": {
+    "badge": "بازیابی امن رمز عبور",
+    "title": "رمز عبور جدید ایجاد کنید",
+    "description": "یک رمز عبور قدرتمند برای حساب WrapLink خود انتخاب کنید.",
+
+    "newPassword": "رمز عبور جدید",
+    "confirmPassword": "تکرار رمز عبور",
+
+    "strength": "قدرت رمز عبور",
+    "weak": "ضعیف",
+    "medium": "متوسط",
+    "strong": "قوی",
+
+    "passwordHint": "حداقل ۸ کاراکتر شامل حروف بزرگ، کوچک و عدد استفاده کنید.",
+
+    "reset": "تغییر رمز عبور",
+
+    "successTitle": "رمز عبور تغییر کرد",
+    "successDescription": "رمز عبور شما با موفقیت تغییر یافت.",
+    "goLogin": "ورود",
+
+    "invalidToken": "لینک بازیابی نامعتبر است یا منقضی شده است.",
+
+    "validation": {
+      "passwordRequired": "رمز عبور الزامی است.",
+      "passwordWeak": "رمز عبور باید حداقل ۸ کاراکتر و شامل حروف بزرگ، کوچک و عدد باشد.",
+      "confirmRequired": "لطفاً رمز عبور را تکرار کنید.",
+      "passwordMismatch": "رمزهای عبور یکسان نیستند."
+    }
+  },
+  "DashboardPage": {
+    "welcome": "خوش آمدید",
+    "subtitle": "تمام سرویس‌های WrapLink را از یک مکان مدیریت کنید.",
+
+    "wallet": "کیف پول",
+    "currentPlan": "پلن فعال",
+    "connection": "اتصال",
+    "bandwidth": "مصرف پهنای باند",
+    "orders": "آخرین سفارش‌ها",
+
+    "active": "فعال",
+
+    "quickActions": "دسترسی سریع",
+
+    "actions": {
+      "connect": "اتصال به سرور",
+      "buy": "خرید پلن",
+      "wallet": "شارژ کیف پول",
+      "ticket": "تیکت پشتیبانی"
+    },
+
+    "connectionInfo": {
+      "title": "اطلاعات اتصال",
+      "userIp": "IP شما",
+      "primaryDns": "DNS اصلی",
+      "secondaryDns": "DNS دوم",
+      "edgeServer": "سرور Edge"
+    }
+  },
+  "ConnectionPage": {
+    "title": "مرکز مدیریت اتصال",
+    "subtitle": "اتصال WrapLink و تنظیمات شبکه خود را مدیریت کنید.",
+
+    "connected": "متصل",
+    "disconnected": "قطع شده",
+
+    "connect": "اتصال",
+    "disconnect": "قطع اتصال",
+
+    "latency": "تأخیر",
+
+    "info": {
+      "title": "اطلاعات اتصال",
+      "publicIp": "IP عمومی",
+      "primaryDns": "DNS اصلی",
+      "secondaryDns": "DNS دوم",
+      "edgeServer": "سرور Edge"
+    },
+
+    "copy": "کپی",
+
+    "setup": {
+      "title": "راه‌اندازی موبایل",
+      "description": "بعداً با اسکن این QR دستگاه خود را تنظیم کنید."
+    },
+
+    "download": {
+      "title": "دانلود تنظیمات",
+      "windows": "برنامه ویندوز",
+      "android": "راهنمای اندروید",
+      "ios": "راهنمای آیفون",
+      "config": "فایل تنظیمات"
+    },
+
+    "logs": "گزارش اتصال"
+  },
+  "WalletPage": {
+    "title": "کیف پول",
+    "subtitle": "موجودی و پرداخت‌های خود را مدیریت کنید.",
+
+    "balance": "موجودی فعلی",
+
+    "deposit": "شارژ کیف پول",
+    "withdraw": "برداشت وجه",
+
+    "amount": "مبلغ",
+
+    "paymentMethods": "روش‌های پرداخت",
+
+    "methods": {
+      "wallet": "کیف پول",
+      "cart": "کارت به کارت",
+      "crypto": "رمزارز",
+      "isp": "پرداخت ISP"
+    },
+
+    "transactions": "تاریخچه تراکنش‌ها",
+
+    "filters": {
+      "all": "همه",
+      "deposit": "واریزها",
+      "withdraw": "برداشت‌ها"
+    },
+
+    "submitDeposit": "شارژ کیف پول",
+    "submitWithdraw": "ثبت درخواست برداشت"
+  },
+  "MarketPage": {
+    "badge": "فروشگاه WrapLink",
+    "title": "اتصال خود را انتخاب کنید",
+    "subtitle": "پلن‌ها، سرویس‌ها و افزونه‌های مناسب تجربه گیمینگ شما.",
+    "basket": "سبد خرید",
+    "search": "جستجوی محصولات...",
+    "monthly": "ماهانه",
+    "yearly": "سالانه",
+    "perMonth": "/ ماه",
+    "perYear": "/ سال",
+    "popular": "محبوب‌ترین",
+    "addToBasket": "افزودن به سبد",
+    "noProducts": "محصولی پیدا نشد",
+    "tryDifferentSearch": "جستجو یا دسته‌بندی دیگری را امتحان کنید.",
+    "categories": {
+      "all": "همه",
+      "plans": "پلن‌ها",
+      "services": "سرویس‌ها",
+      "addons": "افزونه‌ها"
+    },
+    "products": {
+      "starter": {
+        "name": "استارتر",
+        "description": "اتصال پایدار برای گیمرهای معمولی."
+      },
+      "pro": {
+        "name": "پرو",
+        "description": "اتصال پیشرفته با عملکرد و پایداری بهتر."
+      },
+      "ultimate": {
+        "name": "آلتیمیت",
+        "description": "بیشترین عملکرد برای گیمرهای حرفه‌ای و کاربران پرمصرف."
+      },
+      "staticIp": {
+        "name": "IP ثابت",
+        "description": "یک IP ثابت اختصاصی برای اتصال شما."
+      },
+      "extraDevice": {
+        "name": "دستگاه اضافه",
+        "description": "یک دستگاه اضافی را به سرویس WrapLink خود متصل کنید."
+      }
+    }
+  },"OrdersPage": {
+  "badge": "مدیریت سفارش‌ها",
+  "title": "سفارش‌های شما",
+  "subtitle": "سفارش‌های WrapLink را پیگیری کنید، سفارش‌های قابل لغو را مدیریت کنید و برای اقلام واجد شرایط درخواست بازپرداخت دهید.",
+  "total": "مجموع",
+  "orderTotal": "مجموع سفارش",
+  "paymentMethod": "روش پرداخت",
+  "quantity": "تعداد",
+  "refund": "بازپرداخت کالا",
+  "refunded": "بازپرداخت شد",
+  "cancelOrder": "لغو سفارش",
+  "status": {
+    "pending": "در انتظار",
+    "confirmed": "تأیید شده",
+    "delivered": "تحویل شده",
+    "cancelled": "لغو شده"
+  },
+  "empty": {
+    "title": "هنوز سفارشی ندارید",
+    "description": "پس از خرید، سفارش‌های شما در اینجا نمایش داده می‌شوند."
   }
+},"SupportPage": {
+  "badge": "پشتیبانی مشتریان",
+  "title": "تیکت‌های پشتیبانی",
+  "subtitle": "درخواست‌های پشتیبانی خود را ایجاد و با تیم پشتیبانی WrapLink مدیریت کنید.",
+  "newTicket": "تیکت جدید",
+  "backToTickets": "بازگشت به تیکت‌ها",
+  "closeTicket": "بستن تیکت",
+  "sendReply": "ارسال پاسخ",
+  "replyPlaceholder": "پاسخ خود را بنویسید...",
+  "noMessages": "هنوز پیامی در این تیکت وجود ندارد.",
+  "you": "شما",
+  "supportTeam": "تیم پشتیبانی",
+  "priorityLabel": "اولویت",
+  "status": {
+    "open": "باز",
+    "pending": "در انتظار",
+    "resolved": "حل شده",
+    "closed": "بسته شده"
+  },
+  "priority": {
+    "low": "کم",
+    "medium": "متوسط",
+    "high": "زیاد"
+  },
+  "create": {
+    "title": "ایجاد تیکت پشتیبانی",
+    "subtitle": "مشکل یا درخواست خود را برای ما بنویسید.",
+    "subject": "موضوع",
+    "subjectPlaceholder": "مشکل خود را توضیح دهید...",
+    "category": "دسته‌بندی",
+    "priority": "اولویت",
+    "submit": "ایجاد تیکت",
+    "categories": {
+      "technical": "فنی",
+      "billing": "مالی",
+      "connection": "اتصال",
+      "other": "سایر"
+    }
+  }
+},"BandwidthPage": {
+  "badge": "تحلیل شبکه",
+  "title": "گزارش پهنای باند",
+  "subtitle": "مصرف پهنای باند خود را بررسی کنید و نحوه استفاده از اتصال خود را مشاهده کنید.",
+  "currentUsage": "مصرف فعلی",
+  "remaining": "باقی‌مانده",
+  "used": "مصرف شده",
+  "currentPlan": "پلن فعلی",
+  "bandwidthLimit": "سقف پهنای باند",
+  "billingCycle": "دوره صورتحساب",
+  "monthly": "ماهانه",
+  "download": "دریافت",
+  "upload": "ارسال",
+  "totalTraffic": "کل ترافیک",
+  "trafficReceived": "ترافیک دریافتی",
+  "trafficSent": "ترافیک ارسالی",
+  "downloadUploadCombined": "دریافت + ارسال",
+  "usageReport": "گزارش مصرف",
+  "usageReportSubtitle": "مصرف پهنای باند در طول زمان.",
+  "ranges": {
+    "7d": "۷ روز",
+    "30d": "۳۰ روز",
+    "90d": "۹۰ روز"
+  },
+  "reportInfoTitle": "اطلاعات مصرف",
+  "reportInfo": "آمار پهنای باند بر اساس ترافیک شبکه محاسبه می‌شود و ممکن است به‌صورت دوره‌ای به‌روزرسانی شود."
+},"UserSidebar": {
+  "controlPanel": "پنل کاربری",
+  "navigation": "ناوبری",
+  "wallet": "کیف پول",
+  "logout": "خروج",
+  "openMenu": "باز کردن منو",
+  "closeMenu": "بستن منو",
+  "items": {
+    "dashboard": "داشبورد",
+    "connection": "اتصال",
+    "wallet": "کیف پول",
+    "market": "فروشگاه",
+    "basket": "سبد خرید",
+    "orders": "سفارش‌ها",
+    "support": "پشتیبانی",
+    "bandwidth": "پهنای باند"
+  }
+}
 }

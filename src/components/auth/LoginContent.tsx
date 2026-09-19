@@ -6,12 +6,15 @@ import {
     EyeOff,
     Mail,
     Lock,
-    Shield
+    Shield,
+    Loader2,
 } from "lucide-react";
 
 import {useTranslations} from "next-intl";
 
-import {Link} from "@/i18n/navigation";
+import {Link, useRouter} from "@/i18n/navigation";
+
+import {setAuthSession} from "@/lib/auth";
 
 type Props = {
     locale: string;
@@ -19,8 +22,114 @@ type Props = {
 
 export default function LoginContent({locale}: Props) {
     const t = useTranslations("LoginPage");
+    const router = useRouter();
 
-    const [showPassword, setShowPassword] = useState(false);
+    const [showPassword, setShowPassword] =
+        useState(false);
+
+    const [email, setEmail] =
+        useState("");
+
+    const [password, setPassword] =
+        useState("");
+
+    const [loading, setLoading] =
+        useState(false);
+
+    const [error, setError] =
+        useState("");
+
+    const handleSubmit = async (
+        event: React.FormEvent<HTMLFormElement>
+    ) => {
+        event.preventDefault();
+
+        setError("");
+        setLoading(true);
+
+        /*
+         * ========================================================
+         * BACKEND TODO
+         * ========================================================
+         *
+         * Replace this temporary frontend authentication with:
+         *
+         * POST /api/v1/auth/login
+         *
+         * Request:
+         * {
+         *     "email": "...",
+         *     "password": "...",
+         *     "rememberMe": true
+         * }
+         *
+         * Expected response:
+         * {
+         *     "accessToken": "...",
+         *     "user": {
+         *         "id": "...",
+         *         "name": "...",
+         *         "email": "..."
+         *     }
+         * }
+         *
+         * The real implementation should NOT store sensitive
+         * authentication data in localStorage.
+         * ========================================================
+         */
+
+        await new Promise((resolve) =>
+            setTimeout(resolve, 500)
+        );
+
+        if (!email || !password) {
+            setError("Please enter your email and password.");
+            setLoading(false);
+            return;
+        }
+
+        // Temporary frontend session
+        setAuthSession({
+            accessToken: "frontend-demo-token",
+            user: {
+                id: "user-001",
+                name: "Mahdi Asgari",
+                email,
+            },
+        });
+
+        setLoading(false);
+
+        /*
+         * Redirect back to the page the user originally
+         * wanted to access.
+         *
+         * Example:
+         *
+         * /basket
+         *     ↓
+         * /auth/login?returnUrl=%2Fbasket
+         *     ↓
+         * successful login
+         *     ↓
+         * /basket
+         */
+
+        const params =
+            new URLSearchParams(window.location.search);
+
+        const returnUrl =
+            params.get("returnUrl");
+
+        if (
+            returnUrl &&
+            returnUrl.startsWith("/")
+        ) {
+            router.push(returnUrl);
+        } else {
+            router.push("/dashboard");
+        }
+    };
 
     return (
         <section className="mx-auto flex min-h-[calc(100vh-120px)] max-w-7xl items-center px-6 py-20">
@@ -31,9 +140,9 @@ export default function LoginContent({locale}: Props) {
 
                 <div className="flex flex-col justify-center">
 
-          <span className="inline-flex w-fit rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-sm text-cyan-300">
-            {t("badge")}
-          </span>
+                    <span className="inline-flex w-fit rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-sm text-cyan-300">
+                        {t("badge")}
+                    </span>
 
                     <h1 className="mt-8 text-5xl font-black lg:text-6xl">
                         {t("title")}
@@ -46,7 +155,10 @@ export default function LoginContent({locale}: Props) {
                     <div className="mt-12 rounded-3xl border border-cyan-400/20 bg-white/5 p-8 backdrop-blur-xl">
 
                         <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-cyan-400/20 bg-cyan-400/10">
-                            <Shield size={28} className="text-cyan-400"/>
+                            <Shield
+                                size={28}
+                                className="text-cyan-400"
+                            />
                         </div>
 
                         <h3 className="mt-6 text-2xl font-bold">
@@ -65,7 +177,10 @@ export default function LoginContent({locale}: Props) {
 
                 <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
 
-                    <form className="space-y-6">
+                    <form
+                        onSubmit={handleSubmit}
+                        className="space-y-6"
+                    >
 
                         <div>
                             <label className="mb-2 block text-sm font-semibold">
@@ -73,13 +188,24 @@ export default function LoginContent({locale}: Props) {
                             </label>
 
                             <div className="flex items-center rounded-xl border border-white/10 bg-black/20 px-4">
-                                <Mail size={20} className="text-gray-400"/>
+
+                                <Mail
+                                    size={20}
+                                    className="text-gray-400"
+                                />
 
                                 <input
                                     type="email"
+                                    value={email}
+                                    onChange={(event) =>
+                                        setEmail(event.target.value)
+                                    }
                                     className="w-full bg-transparent px-3 py-3 outline-none"
                                     placeholder="name@example.com"
+                                    autoComplete="email"
+                                    disabled={loading}
                                 />
+
                             </div>
                         </div>
 
@@ -89,31 +215,57 @@ export default function LoginContent({locale}: Props) {
                             </label>
 
                             <div className="flex items-center rounded-xl border border-white/10 bg-black/20 px-4">
-                                <Lock size={20} className="text-gray-400"/>
+
+                                <Lock
+                                    size={20}
+                                    className="text-gray-400"
+                                />
 
                                 <input
-                                    type={showPassword ? "text" : "password"}
+                                    type={
+                                        showPassword
+                                            ? "text"
+                                            : "password"
+                                    }
+                                    value={password}
+                                    onChange={(event) =>
+                                        setPassword(event.target.value)
+                                    }
                                     className="w-full bg-transparent px-3 py-3 outline-none"
                                     placeholder="••••••••"
+                                    autoComplete="current-password"
+                                    disabled={loading}
                                 />
 
                                 <button
                                     type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
+                                    onClick={() =>
+                                        setShowPassword(
+                                            !showPassword
+                                        )
+                                    }
                                     className="text-gray-400 hover:text-cyan-400"
+                                    disabled={loading}
                                 >
                                     {showPassword
                                         ? <EyeOff size={20}/>
                                         : <Eye size={20}/>}
                                 </button>
+
                             </div>
                         </div>
 
                         <div className="flex items-center justify-between">
 
                             <label className="flex items-center gap-2 text-sm text-gray-300">
-                                <input type="checkbox"/>
+
+                                <input
+                                    type="checkbox"
+                                    disabled={loading}
+                                />
+
                                 {t("remember")}
+
                             </label>
 
                             <Link
@@ -125,11 +277,31 @@ export default function LoginContent({locale}: Props) {
 
                         </div>
 
+                        {error && (
+                            <div className="rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-300">
+                                {error}
+                            </div>
+                        )}
+
                         <button
                             type="submit"
-                            className="w-full rounded-xl bg-cyan-400 py-3 font-bold text-black transition hover:scale-[1.02]"
+                            disabled={loading}
+                            className="flex w-full items-center justify-center gap-2 rounded-xl bg-cyan-400 py-3 font-bold text-black transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
                         >
-                            {t("login")}
+
+                            {loading ? (
+                                <>
+                                    <Loader2
+                                        size={20}
+                                        className="animate-spin"
+                                    />
+
+                                    Signing in...
+                                </>
+                            ) : (
+                                t("login")
+                            )}
+
                         </button>
 
                     </form>

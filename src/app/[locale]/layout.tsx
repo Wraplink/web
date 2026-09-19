@@ -1,19 +1,4 @@
 import type {Metadata} from "next";
-import {NextIntlClientProvider} from "next-intl";
-
-import LocaleDocument from "@/components/layout/LocaleDocument";
-
-import en from "@/messages/en.json";
-import fa from "@/messages/fa.json";
-
-export const metadata: Metadata = {
-    title: {
-        default: "WrapLink",
-        template: "%s | WrapLink",
-    },
-    description:
-        "Next generation gamer network and connectivity platform.",
-};
 
 type Props = {
     children: React.ReactNode;
@@ -21,6 +6,32 @@ type Props = {
         locale: string;
     }>;
 };
+
+export async function generateMetadata({
+                                           params,
+                                       }: Props): Promise<Metadata> {
+    const {locale} = await params;
+
+    const isPersian = locale === "fa";
+
+    return {
+        title: {
+            default: "WrapLink",
+            template: "%s | WrapLink",
+        },
+
+        description: isPersian
+            ? "شبکه و پلتفرم نسل جدید اتصال برای گیمرها."
+            : "Next generation gamer network and connectivity platform.",
+
+        alternates: {
+            languages: {
+                en: "/",
+                fa: "/fa",
+            },
+        },
+    };
+}
 
 export default async function LocaleLayout({
                                                children,

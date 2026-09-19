@@ -15,42 +15,83 @@ type Props = {
     children: React.ReactNode;
 };
 
-export default function AppShell({children}: Props) {
+const authenticatedRoutes = [
+    "/dashboard",
+    "/connection",
+    "/wallet",
+    "/market",
+    "/basket",
+    "/orders",
+    "/support",
+    "/bandwidth",
+];
+
+export default function AppShell({
+                                     children,
+                                 }: Props) {
     const pathname = usePathname();
 
-    const locale = pathname === "/fa" || pathname.startsWith("/fa/")
-        ? "fa"
-        : "en";
+    const locale =
+        pathname === "/fa" ||
+        pathname.startsWith("/fa/")
+            ? "fa"
+            : "en";
 
-    const messages = locale === "fa" ? fa : en;
+    const messages =
+        locale === "fa"
+            ? fa
+            : en;
+
+    const normalizedPath =
+        locale === "fa"
+            ? pathname.replace(/^\/fa/, "") || "/"
+            : pathname;
+
+    const isAuthenticatedRoute =
+        authenticatedRoutes.some(
+            (route) =>
+                normalizedPath === route ||
+                normalizedPath.startsWith(
+                    `${route}/`
+                )
+        );
 
     useEffect(() => {
-        document.documentElement.lang = locale;
+        document.documentElement.lang =
+            locale;
+
         document.documentElement.dir =
-            locale === "fa" ? "rtl" : "ltr";
+            locale === "fa"
+                ? "rtl"
+                : "ltr";
     }, [locale]);
 
-    console.log("AppShell locale:", locale);
-    console.log(
-        "ForgotPassword title:",
-        messages.ForgotPasswordPage?.title
-    );
     return (
         <NextIntlClientProvider
             locale={locale}
             messages={messages}
             timeZone="UTC"
-
         >
             <ThemeBackground/>
 
-            <Navbar/>
+            {!isAuthenticatedRoute && (
+                <Navbar/>
+            )}
 
-            <main className="min-h-screen">
+            <main
+                className={
+                    isAuthenticatedRoute
+                        ? "min-h-screen"
+                        : "min-h-screen"
+                }
+            >
                 {children}
             </main>
 
-            <Footer/>
+            {!isAuthenticatedRoute && (
+                <Footer/>
+            )}
+
         </NextIntlClientProvider>
     );
 }
