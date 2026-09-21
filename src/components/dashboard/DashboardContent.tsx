@@ -30,8 +30,6 @@ export default async function DashboardContent({locale}: Props) {
      * BACKEND TODO
      * ============================================================
      *
-     * Future API calls:
-     *
      * GET /api/v1/dashboard/summary
      * GET /api/v1/connection/current
      * GET /api/v1/wallet/balance
@@ -127,11 +125,18 @@ export default async function DashboardContent({locale}: Props) {
 
                 <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
 
+                    {/* Connect */}
+
                     <ActionCard
                         icon={<Server/>}
                         title={t("actions.connect")}
                         href="/connection"
+                        primary
+                        badge={t("active")}
+                        buttonText={t("actions.connectNow")}
                     />
+
+                    {/* Buy */}
 
                     <ActionCard
                         icon={<ShoppingCart/>}
@@ -139,11 +144,15 @@ export default async function DashboardContent({locale}: Props) {
                         href="/market"
                     />
 
+                    {/* Wallet */}
+
                     <ActionCard
                         icon={<CreditCard/>}
                         title={t("actions.wallet")}
                         href="/wallet"
                     />
+
+                    {/* Support */}
 
                     <ActionCard
                         icon={<LifeBuoy/>}
@@ -161,9 +170,21 @@ export default async function DashboardContent({locale}: Props) {
 
                 <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
 
-                    <h2 className="text-2xl font-bold">
-                        {t("connectionInfo.title")}
-                    </h2>
+                    <div className="flex items-center justify-between">
+
+                        <h2 className="text-2xl font-bold">
+                            {t("connectionInfo.title")}
+                        </h2>
+
+                        <Link
+                            href="/connection"
+                            className="flex items-center gap-2 text-sm font-semibold text-cyan-400 transition hover:text-cyan-300"
+                        >
+                            {t("actions.connect")}
+                            <ArrowRight size={16}/>
+                        </Link>
+
+                    </div>
 
                     <div className="mt-6 space-y-5">
 
@@ -256,33 +277,83 @@ function SummaryCard({
 function ActionCard({
                         icon,
                         title,
-                        href
+                        href,
+                        primary = false,
+                        badge,
+                        buttonText
                     }: {
     icon: React.ReactNode;
     title: string;
     href: string;
+    primary?: boolean;
+    badge?: string;
+    buttonText?: string;
 }) {
     return (
         <Link
             href={href}
-            className="group rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl transition hover:-translate-y-1 hover:border-cyan-400/30"
+            className={`
+                group relative overflow-hidden rounded-3xl border p-6
+                backdrop-blur-xl transition duration-300
+                hover:-translate-y-1
+                ${
+                primary
+                    ? "border-cyan-400/40 bg-cyan-400/10 shadow-[0_0_30px_rgba(0,229,255,0.08)] hover:border-cyan-400/70 hover:bg-cyan-400/15"
+                    : "border-white/10 bg-white/5 hover:border-cyan-400/30"
+            }
+            `}
         >
-            <div className="flex items-center justify-between">
 
-                <div className="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 p-3 text-cyan-400">
+            {primary && (
+                <div
+                    className="
+                        absolute -right-10 -top-10
+                        h-28 w-28 rounded-full
+                        bg-cyan-400/10 blur-3xl
+                        transition group-hover:bg-cyan-400/20
+                    "
+                />
+            )}
+
+            <div className="relative flex items-center justify-between">
+
+                <div
+                    className={`
+                        rounded-2xl border p-3
+                        ${
+                        primary
+                            ? "border-cyan-400/40 bg-cyan-400/15 text-cyan-400 shadow-[0_0_20px_rgba(0,229,255,0.15)]"
+                            : "border-cyan-400/20 bg-cyan-400/10 text-cyan-400"
+                    }
+                    `}
+                >
                     {icon}
                 </div>
 
                 <ArrowRight
                     size={18}
-                    className="text-gray-500 transition group-hover:text-cyan-400"
+                    className="text-gray-500 transition group-hover:translate-x-1 group-hover:text-cyan-400"
                 />
 
             </div>
 
-            <div className="mt-5 font-bold">
+            <div className="relative mt-5 font-bold text-white">
                 {title}
             </div>
+
+            {primary && badge && (
+                <div className="relative mt-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-cyan-400">
+                    <span className="h-2 w-2 animate-pulse rounded-full bg-cyan-400"/>
+                    {badge}
+                </div>
+            )}
+
+            {primary && buttonText && (
+                <div className="relative mt-5 flex items-center justify-center gap-2 rounded-xl bg-cyan-400 px-4 py-3 text-sm font-bold text-black transition group-hover:bg-cyan-300">
+                    <Wifi size={17}/>
+                    {buttonText}
+                </div>
+            )}
 
         </Link>
     );
@@ -302,7 +373,7 @@ function InfoRow({
                 {label}
             </span>
 
-            <span className="font-semibold">
+            <span className="font-semibold text-white">
                 {value}
             </span>
 

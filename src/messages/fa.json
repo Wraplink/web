@@ -330,6 +330,7 @@
 
     "actions": {
       "connect": "اتصال به سرور",
+      "connectNow": "اتصال سریع",
       "buy": "خرید پلن",
       "wallet": "شارژ کیف پول",
       "ticket": "تیکت پشتیبانی"
@@ -344,41 +345,57 @@
     }
   },
   "ConnectionPage": {
-    "title": "مرکز مدیریت اتصال",
-    "subtitle": "اتصال WrapLink و تنظیمات شبکه خود را مدیریت کنید.",
-
-    "connected": "متصل",
-    "disconnected": "قطع شده",
-
-    "connect": "اتصال",
-    "disconnect": "قطع اتصال",
-
-    "latency": "تأخیر",
-
-    "info": {
-      "title": "اطلاعات اتصال",
-      "publicIp": "IP عمومی",
-      "primaryDns": "DNS اصلی",
-      "secondaryDns": "DNS دوم",
-      "edgeServer": "سرور Edge"
+    "badge": "داشبورد اتصال",
+    "title": "مدیریت اتصال",
+    "subtitle": "وضعیت اتصال WrapLink، تنظیمات DNS، سرور Edge و ابزارهای عیب‌یابی را مشاهده کنید.",
+    "status": {
+      "connection": "اتصال",
+      "connected": "متصل",
+      "disconnect": "قطع اتصال",
+      "latency": "تأخیر",
+      "packetLoss": "از دست رفتن بسته‌ها"
     },
-
-    "copy": "کپی",
-
-    "setup": {
-      "title": "راه‌اندازی موبایل",
-      "description": "بعداً با اسکن این QR دستگاه خود را تنظیم کنید."
+    "dns": {
+      "primary": "DNS اصلی",
+      "secondary": "DNS پشتیبان"
     },
-
-    "download": {
-      "title": "دانلود تنظیمات",
-      "windows": "برنامه ویندوز",
-      "android": "راهنمای اندروید",
-      "ios": "راهنمای آیفون",
-      "config": "فایل تنظیمات"
+    "mode": {
+      "title": "حالت اتصال",
+      "description": "پروفایل مسیریابی مناسب فعالیت خود را انتخاب کنید.",
+      "smart": "هوشمند",
+      "gaming": "گیمینگ",
+      "streaming": "استریم"
     },
-
-    "logs": "گزارش اتصال"
+    "edge": {
+      "title": "سرور Edge متصل",
+      "optimal": "بهینه",
+      "country": "کشور",
+      "region": "منطقه",
+      "load": "بار سرور"
+    },
+    "diagnostics": {
+      "title": "عیب‌یابی اتصال",
+      "description": "بررسی سریع وضعیت اتصال WrapLink.",
+      "ping": "پینگ",
+      "dns": "DNS",
+      "route": "مسیریابی",
+      "ok": "سالم",
+      "optimized": "بهینه"
+    },
+    "events": {
+      "title": "فعالیت‌های اخیر"
+    },
+    "power": {
+      "connect": "اتصال",
+      "disconnect": "قطع اتصال",
+      "connected": "اتصال فعال است",
+      "connecting": "در حال تغییر وضعیت اتصال...",
+      "disconnected": "اتصال غیرفعال است",
+      "connectedDescription": "ترافیک شما هم‌اکنون از طریق شبکه Edge شرکت WrapLink برای بهترین تجربه بازی عبور می‌کند.",
+      "disconnectedDescription": "برای استفاده از مسیریابی بهینه و DNS امن، WrapLink را فعال کنید.",
+      "online": "آنلاین",
+      "offline": "آفلاین"
+    }
   },
   "WalletPage": {
     "title": "کیف پول",
@@ -576,6 +593,7 @@
     "bandwidth": "پهنای باند",
     "profile": "حساب کاربری",
     "notifications": "اعلان ها"
+
   }
 },"CheckoutPage": {
   "loading": "در حال بارگذاری پرداخت...",

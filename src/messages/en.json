@@ -329,6 +329,7 @@
 
     "actions": {
       "connect": "Connect to Server",
+      "connectNow": "Connect Now",
       "buy": "Buy Plan",
       "wallet": "Charge Wallet",
       "ticket": "Support Ticket"
@@ -343,41 +344,57 @@
     }
   },
   "ConnectionPage": {
-    "title": "Connection Center",
-    "subtitle": "Manage your WrapLink connection and network configuration.",
-
-    "connected": "Connected",
-    "disconnected": "Disconnected",
-
-    "connect": "Connect",
-    "disconnect": "Disconnect",
-
-    "latency": "Latency",
-
-    "info": {
-      "title": "Connection Information",
-      "publicIp": "Public IP",
-      "primaryDns": "Primary DNS",
-      "secondaryDns": "Secondary DNS",
-      "edgeServer": "Edge Server"
+    "badge": "Connection Dashboard",
+    "title": "Connection Management",
+    "subtitle": "Monitor your WrapLink connection, DNS configuration, edge server and diagnostics.",
+    "status": {
+      "connection": "Connection",
+      "connected": "Connected",
+      "disconnected": "Connection Disabled",
+      "latency": "Latency",
+      "packetLoss": "Packet Loss"
     },
-
-    "copy": "Copy",
-
-    "setup": {
-      "title": "Mobile Setup",
-      "description": "Scan this QR code later to configure your mobile device."
+    "dns": {
+      "primary": "Primary DNS",
+      "secondary": "Secondary DNS"
     },
-
-    "download": {
-      "title": "Download Configuration",
-      "windows": "Windows Client",
-      "android": "Android Guide",
-      "ios": "iPhone Guide",
-      "config": "Configuration File"
+    "mode": {
+      "title": "Connection Mode",
+      "description": "Choose the routing profile that best matches your activity.",
+      "smart": "Smart",
+      "gaming": "Gaming",
+      "streaming": "Streaming"
     },
-
-    "logs": "Connection Logs"
+    "edge": {
+      "title": "Connected Edge",
+      "optimal": "Optimal",
+      "country": "Country",
+      "region": "Region",
+      "load": "Server Load"
+    },
+    "diagnostics": {
+      "title": "Connection Diagnostics",
+      "description": "Run quick checks against your current WrapLink connection.",
+      "ping": "Ping",
+      "dns": "DNS",
+      "route": "Route",
+      "ok": "OK",
+      "optimized": "Optimized"
+    },
+    "events": {
+      "title": "Recent Activity"
+    },
+    "power": {
+      "connect": "Connect",
+      "disconnect": "Disconnect",
+      "connected": "Connection Active",
+      "connecting": "Switching Connection...",
+      "disconnected": "Connection Disabled",
+      "connectedDescription": "Your traffic is currently routed through the WrapLink edge network for the best gaming experience.",
+      "disconnectedDescription": "Enable WrapLink to start using optimized routing and secure DNS.",
+      "online": "ONLINE",
+      "offline": "OFFLINE"
+    }
   },
   "WalletPage": {
     "title": "Wallet",
@@ -573,7 +590,8 @@
     "orders": "Orders",
     "support": "Support",
     "bandwidth": "Bandwidth",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "profile": "Profile"
   }
 },"CheckoutPage": {
   "loading": "Loading checkout...",

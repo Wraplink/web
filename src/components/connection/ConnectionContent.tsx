@@ -1,17 +1,22 @@
 "use client";
 
-import {useState} from "react";
+import {useMemo, useState} from "react";
 
 import {
-    Wifi,
-    WifiOff,
-    Globe,
-    Server,
+    Activity,
+    Check,
+    CircleAlert,
+    CircleCheck,
     Copy,
-    Smartphone,
-    Download,
-    Clock,
-    Zap
+    Gauge,
+    Globe,
+    Network,
+    Power,
+    RefreshCw,
+    Route,
+    Server,
+    ShieldCheck,
+    Wifi,
 } from "lucide-react";
 
 import {useTranslations} from "next-intl";
@@ -20,278 +25,920 @@ type Props = {
     locale: string;
 };
 
-export default function ConnectionContent({locale}: Props) {
+type ConnectionMode =
+    | "smart"
+    | "gaming"
+    | "streaming";
 
+type EventType =
+    | "success"
+    | "info"
+    | "warning";
+
+type ConnectionEvent = {
+    id: string;
+    type: EventType;
+    title: string;
+    time: string;
+};
+
+const initialEvents: ConnectionEvent[] = [
+    {
+        id: "1",
+        type: "success",
+        title: "Connected to DE-FRA-01",
+        time: "Today · 10:32",
+    },
+    {
+        id: "2",
+        type: "info",
+        title: "DNS configuration updated",
+        time: "Yesterday",
+    },
+    {
+        id: "3",
+        type: "warning",
+        title: "Maintenance completed",
+        time: "2 days ago",
+    },
+];
+
+export default function ConnectionContent({
+                                              locale,
+                                          }: Props) {
     const t = useTranslations("ConnectionPage");
 
-    const [connected, setConnected] = useState(true);
+    /*
+     * ---------------------------------------------------------
+     * Connection state
+     * ---------------------------------------------------------
+     */
+
+    const [connected, setConnected] =
+        useState(true);
+
+    const [connecting, setConnecting] =
+        useState(false);
+
+    const [mode, setMode] =
+        useState<ConnectionMode>("gaming");
+
+    const [copied, setCopied] =
+        useState<string | null>(null);
+
+    const [runningTest, setRunningTest] =
+        useState<string | null>(null);
+
+    const [events] =
+        useState(initialEvents);
 
     /*
-     * ============================================================
-     * BACKEND TODO
-     * ============================================================
+     * ---------------------------------------------------------
+     * Mock connection data
      *
-     * GET /api/v1/connection/current
-     * POST /api/v1/connection/connect
-     * POST /api/v1/connection/disconnect
-     * GET /api/v1/connection/config
-     * GET /api/v1/connection/logs
+     * BACKEND TODO:
+     * Replace this with:
      *
-     * Replace mock values with API responses.
-     * ============================================================
+     * GET /api/v1/connection/status
+     * GET /api/v1/connection/dns
+     * GET /api/v1/edge/state
+     * ---------------------------------------------------------
      */
 
     const connection = {
-        publicIp: "185.220.15.120",
-        dns1: "10.10.10.10",
-        dns2: "10.10.10.11",
-        edge: "Frankfurt-01",
-        latency: "18 ms"
+        latency: 18,
+        packetLoss: 0,
+        primaryDns: "10.10.10.10",
+        secondaryDns: "10.10.20.20",
+        edge: "DE-FRA-01",
+        region: "Frankfurt",
+        country: "Germany",
+        load: 22,
     };
 
-    const logs = [
-        "Connected to Frankfurt-01",
-        "DNS updated",
-        "Connection refreshed",
-        "Configuration synchronized"
-    ];
+    /*
+     * ---------------------------------------------------------
+     * Connection quality
+     * ---------------------------------------------------------
+     */
 
-    const copy = (text: string) => {
-        navigator.clipboard.writeText(text);
+    const connectionQuality = useMemo(() => {
+        if (connection.latency <= 20) {
+            return "excellent";
+        }
+
+        if (connection.latency <= 40) {
+            return "good";
+        }
+
+        return "average";
+    }, [connection.latency]);
+
+    /*
+     * ---------------------------------------------------------
+     * Toggle connection
+     * ---------------------------------------------------------
+     */
+
+    const toggleConnection = async () => {
+        if (connecting) {
+            return;
+        }
+
+        setConnecting(true);
+
+        /*
+         * =====================================================
+         * BACKEND TODO
+         * =====================================================
+         *
+         * When connected:
+         *
+         * POST /api/v1/connection/disconnect
+         *
+         * When disconnected:
+         *
+         * POST /api/v1/connection/connect
+         *
+         * Expected response:
+         *
+         * {
+         *     connected: true
+         * }
+         *
+         * =====================================================
+         */
+
+        await new Promise((resolve) =>
+            setTimeout(resolve, 1200)
+        );
+
+        setConnected(
+            (current) => !current
+        );
+
+        setConnecting(false);
     };
+
+    /*
+     * ---------------------------------------------------------
+     * Copy DNS
+     * ---------------------------------------------------------
+     */
+
+    const copyText = async (
+        text: string,
+        key: string
+    ) => {
+        try {
+            await navigator.clipboard.writeText(
+                text
+            );
+
+            setCopied(key);
+
+            setTimeout(
+                () => setCopied(null),
+                2000
+            );
+        } catch {
+            // Clipboard access may be unavailable.
+        }
+    };
+
+    /*
+     * ---------------------------------------------------------
+     * Diagnostics
+     * ---------------------------------------------------------
+     */
+
+    const runTest = async (
+        type: string
+    ) => {
+        if (runningTest) {
+            return;
+        }
+
+        setRunningTest(type);
+
+        /*
+         * =====================================================
+         * BACKEND TODO
+         * =====================================================
+         *
+         * POST /api/v1/diagnostics/ping
+         * POST /api/v1/diagnostics/dns
+         * POST /api/v1/diagnostics/route
+         *
+         * =====================================================
+         */
+
+        await new Promise((resolve) =>
+            setTimeout(resolve, 1200)
+        );
+
+        setRunningTest(null);
+    };
+
+    /*
+     * ---------------------------------------------------------
+     * Connection mode
+     * ---------------------------------------------------------
+     */
+
+    const changeMode = async (
+        nextMode: ConnectionMode
+    ) => {
+        setMode(nextMode);
+
+        /*
+         * =====================================================
+         * BACKEND TODO
+         * =====================================================
+         *
+         * PUT /api/v1/connection/mode
+         *
+         * {
+         *     mode: nextMode
+         * }
+         *
+         * =====================================================
+         */
+    };
+
+    /*
+     * ---------------------------------------------------------
+     * Render
+     * ---------------------------------------------------------
+     */
 
     return (
-        <section className="mx-auto max-w-7xl px-6 py-12">
+        <section className="min-h-screen px-4 py-8 sm:px-6 lg:px-10 lg:py-12">
+            <div className="mx-auto max-w-7xl">
 
-            {/* Header */}
+                {/* =================================================
+                    HEADER
+                   ================================================= */}
 
-            <div className="rounded-3xl border border-cyan-400/20 bg-white/5 p-8 backdrop-blur-xl">
+                <div className="mb-8">
 
-                <div className="flex flex-wrap items-center justify-between gap-6">
+                    <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-sm text-cyan-400">
+                        <Network size={16}/>
 
-                    <div>
-
-                        <h1 className="text-4xl font-black">
-                            {t("title")}
-                        </h1>
-
-                        <p className="mt-3 text-gray-300">
-                            {t("subtitle")}
-                        </p>
-
+                        {t("badge")}
                     </div>
 
-                    <button
-                        onClick={() => setConnected(!connected)}
-                        className={`rounded-xl px-6 py-3 font-bold transition ${
+                    <h1 className="text-3xl font-black tracking-tight text-white sm:text-4xl">
+                        {t("title")}
+                    </h1>
+
+                    <p className="mt-3 max-w-3xl text-sm leading-6 text-gray-400 sm:text-base">
+                        {t("subtitle")}
+                    </p>
+
+                </div>
+
+                {/* =================================================
+                    POWER BUTTON
+                   ================================================= */}
+
+                <ConnectionPowerCard
+                    connected={connected}
+                    connecting={connecting}
+                    onToggle={toggleConnection}
+                    t={t}
+                />
+
+                {/* =================================================
+                    STATUS CARDS
+                   ================================================= */}
+
+                <div className="grid gap-4 md:grid-cols-3">
+
+                    <StatusCard
+                        icon={
+                            <Wifi size={22}/>
+                        }
+                        label={t(
+                            "status.connection"
+                        )}
+                        value={
                             connected
-                                ? "bg-red-500 hover:bg-red-400"
-                                : "bg-cyan-400 text-black hover:scale-105"
-                        }`}
-                    >
-                        {connected
-                            ? t("disconnect")
-                            : t("connect")}
-                    </button>
+                                ? t(
+                                    "status.connected"
+                                )
+                                : t(
+                                    "status.disconnected"
+                                )
+                        }
+                        color={
+                            connected
+                                ? "green"
+                                : "red"
+                        }
+                    />
+
+                    <StatusCard
+                        icon={
+                            <Gauge size={22}/>
+                        }
+                        label={t(
+                            "status.latency"
+                        )}
+                        value={
+                            connected
+                                ? `${connection.latency} ms`
+                                : "--"
+                        }
+                        color="cyan"
+                    />
+
+                    <StatusCard
+                        icon={
+                            <Activity size={22}/>
+                        }
+                        label={t(
+                            "status.packetLoss"
+                        )}
+                        value={
+                            connected
+                                ? `${connection.packetLoss}%`
+                                : "--"
+                        }
+                        color="purple"
+                    />
 
                 </div>
 
-            </div>
+                {/* =================================================
+                    DNS
+                   ================================================= */}
 
-            {/* Status */}
+                <div className="mt-8 grid gap-6 lg:grid-cols-2">
 
-            <div className="mt-8 grid gap-6 md:grid-cols-3">
+                    <DnsCard
+                        title={t(
+                            "dns.primary"
+                        )}
+                        value={
+                            connection.primaryDns
+                        }
+                        copied={
+                            copied === "primary"
+                        }
+                        onCopy={() =>
+                            copyText(
+                                connection.primaryDns,
+                                "primary"
+                            )
+                        }
+                    />
 
-                <StatusCard
-                    icon={
-                        connected
-                            ? <Wifi className="text-green-400"/>
-                            : <WifiOff className="text-red-400"/>
-                    }
-                    title={connected
-                        ? t("connected")
-                        : t("disconnected")}
-                    value={connected ? "Online" : "Offline"}
-                />
-
-                <StatusCard
-                    icon={<Zap className="text-cyan-400"/>}
-                    title={t("latency")}
-                    value={connection.latency}
-                />
-
-                <StatusCard
-                    icon={<Server className="text-cyan-400"/>}
-                    title={t("info.edgeServer")}
-                    value={connection.edge}
-                />
-
-            </div>
-
-            {/* Information */}
-
-            <div className="mt-10 grid gap-8 lg:grid-cols-2">
-
-                <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
-
-                    <h2 className="text-2xl font-bold">
-                        {t("info.title")}
-                    </h2>
-
-                    <div className="mt-6 space-y-5">
-
-                        <InfoRow
-                            label={t("info.publicIp")}
-                            value={connection.publicIp}
-                            copy={() => copy(connection.publicIp)}
-                            t={t}
-                        />
-
-                        <InfoRow
-                            label={t("info.primaryDns")}
-                            value={connection.dns1}
-                            copy={() => copy(connection.dns1)}
-                            t={t}
-                        />
-
-                        <InfoRow
-                            label={t("info.secondaryDns")}
-                            value={connection.dns2}
-                            copy={() => copy(connection.dns2)}
-                            t={t}
-                        />
-
-                        <InfoRow
-                            label={t("info.edgeServer")}
-                            value={connection.edge}
-                            copy={() => copy(connection.edge)}
-                            t={t}
-                        />
-
-                    </div>
+                    <DnsCard
+                        title={t(
+                            "dns.secondary"
+                        )}
+                        value={
+                            connection.secondaryDns
+                        }
+                        copied={
+                            copied ===
+                            "secondary"
+                        }
+                        onCopy={() =>
+                            copyText(
+                                connection.secondaryDns,
+                                "secondary"
+                            )
+                        }
+                    />
 
                 </div>
 
-                {/* QR Setup */}
+                {/* =================================================
+                    CONNECTION MODE
+                   ================================================= */}
 
-                <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
+                <div className="mt-8 rounded-3xl border border-white/10 bg-white/[0.03] p-6">
 
                     <div className="flex items-center gap-3">
 
-                        <Smartphone className="text-cyan-400"/>
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-400">
+                            <Route size={22}/>
+                        </div>
 
-                        <h2 className="text-2xl font-bold">
-                            {t("setup.title")}
-                        </h2>
+                        <div>
+                            <h2 className="text-xl font-bold text-white">
+                                {t(
+                                    "mode.title"
+                                )}
+                            </h2>
 
-                    </div>
-
-                    <p className="mt-4 text-gray-300">
-                        {t("setup.description")}
-                    </p>
-
-                    <div className="mt-8 flex justify-center">
-
-                        <div className="flex h-48 w-48 items-center justify-center rounded-3xl border border-cyan-400/20 bg-black/30 text-gray-500">
-                            QR
+                            <p className="text-sm text-gray-500">
+                                {t(
+                                    "mode.description"
+                                )}
+                            </p>
                         </div>
 
                     </div>
 
-                </div>
+                    <div className="mt-6 grid gap-3 sm:grid-cols-3">
 
-            </div>
+                        <ModeButton
+                            active={
+                                mode === "smart"
+                            }
+                            onClick={() =>
+                                changeMode(
+                                    "smart"
+                                )
+                            }
+                            title={t(
+                                "mode.smart"
+                            )}
+                        />
 
-            {/* Downloads */}
+                        <ModeButton
+                            active={
+                                mode === "gaming"
+                            }
+                            onClick={() =>
+                                changeMode(
+                                    "gaming"
+                                )
+                            }
+                            title={t(
+                                "mode.gaming"
+                            )}
+                        />
 
-            <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
+                        <ModeButton
+                            active={
+                                mode === "streaming"
+                            }
+                            onClick={() =>
+                                changeMode(
+                                    "streaming"
+                                )
+                            }
+                            title={t(
+                                "mode.streaming"
+                            )}
+                        />
 
-                <div className="flex items-center gap-3">
-
-                    <Download className="text-cyan-400"/>
-
-                    <h2 className="text-2xl font-bold">
-                        {t("download.title")}
-                    </h2>
-
-                </div>
-
-                <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-
-                    {[
-                        t("download.windows"),
-                        t("download.android"),
-                        t("download.ios"),
-                        t("download.config")
-                    ].map((item) => (
-                        <button
-                            key={item}
-                            className="rounded-xl border border-white/10 bg-black/20 p-4 text-left transition hover:border-cyan-400 hover:bg-black/30"
-                        >
-                            {item}
-                        </button>
-                    ))}
-
-                </div>
-
-            </div>
-
-            {/* Logs */}
-
-            <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
-
-                <div className="flex items-center gap-3">
-
-                    <Clock className="text-cyan-400"/>
-
-                    <h2 className="text-2xl font-bold">
-                        {t("logs")}
-                    </h2>
+                    </div>
 
                 </div>
 
-                <div className="mt-6 space-y-3">
+                {/* =================================================
+                    EDGE SERVER
+                   ================================================= */}
 
-                    {logs.map((log, index) => (
-                        <div
-                            key={index}
-                            className="rounded-xl border border-white/10 bg-black/20 px-4 py-3"
-                        >
-                            {log}
+                <div className="mt-8 rounded-3xl border border-white/10 bg-white/[0.03] p-6">
+
+                    <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+
+                        <div className="flex items-center gap-4">
+
+                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-400">
+                                <Server size={22}/>
+                            </div>
+
+                            <div>
+
+                                <h2 className="text-xl font-bold text-white">
+                                    {t(
+                                        "edge.title"
+                                    )}
+                                </h2>
+
+                                <p className="mt-1 text-lg font-semibold text-cyan-400">
+                                    {connection.region}
+                                    {" · "}
+                                    {connection.edge}
+                                </p>
+
+                            </div>
+
                         </div>
-                    ))}
+
+                        <span className="inline-flex w-fit rounded-full border border-green-400/20 bg-green-400/10 px-4 py-2 text-sm text-green-300">
+                            {t(
+                                "edge.optimal"
+                            )}
+                        </span>
+
+                    </div>
+
+                    <div className="mt-8 grid gap-4 sm:grid-cols-3">
+
+                        <InfoCard
+                            icon={
+                                <Globe size={18}/>
+                            }
+                            label={t(
+                                "edge.country"
+                            )}
+                            value={
+                                connection.country
+                            }
+                        />
+
+                        <InfoCard
+                            icon={
+                                <Server size={18}/>
+                            }
+                            label={t(
+                                "edge.region"
+                            )}
+                            value={
+                                connection.region
+                            }
+                        />
+
+                        <InfoCard
+                            icon={
+                                <Activity size={18}/>
+                            }
+                            label={t(
+                                "edge.load"
+                            )}
+                            value={`${connection.load}%`}
+                        />
+
+                    </div>
+
+                </div>
+
+                {/* =================================================
+                    DIAGNOSTICS
+                   ================================================= */}
+
+                <div className="mt-8 rounded-3xl border border-white/10 bg-white/[0.03] p-6">
+
+                    <div className="flex items-center gap-3">
+
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-400">
+                            <ShieldCheck size={22}/>
+                        </div>
+
+                        <div>
+
+                            <h2 className="text-xl font-bold text-white">
+                                {t(
+                                    "diagnostics.title"
+                                )}
+                            </h2>
+
+                            <p className="text-sm text-gray-500">
+                                {t(
+                                    "diagnostics.description"
+                                )}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div className="mt-8 grid gap-4 md:grid-cols-3">
+
+                        <DiagnosticCard
+                            title={t(
+                                "diagnostics.ping"
+                            )}
+                            value={
+                                connected
+                                    ? `${connection.latency} ms`
+                                    : "--"
+                            }
+                            icon={
+                                <Activity
+                                    size={20}
+                                />
+                            }
+                            running={
+                                runningTest ===
+                                "ping"
+                            }
+                            onRun={() =>
+                                runTest(
+                                    "ping"
+                                )
+                            }
+                        />
+
+                        <DiagnosticCard
+                            title={t(
+                                "diagnostics.dns"
+                            )}
+                            value={
+                                connected
+                                    ? t(
+                                        "diagnostics.ok"
+                                    )
+                                    : "--"
+                            }
+                            icon={
+                                <CircleCheck
+                                    size={20}
+                                />
+                            }
+                            running={
+                                runningTest ===
+                                "dns"
+                            }
+                            onRun={() =>
+                                runTest(
+                                    "dns"
+                                )
+                            }
+                        />
+
+                        <DiagnosticCard
+                            title={t(
+                                "diagnostics.route"
+                            )}
+                            value={
+                                connected
+                                    ? t(
+                                        "diagnostics.optimized"
+                                    )
+                                    : "--"
+                            }
+                            icon={
+                                <Route size={20}/>
+                            }
+                            running={
+                                runningTest ===
+                                "route"
+                            }
+                            onRun={() =>
+                                runTest(
+                                    "route"
+                                )
+                            }
+                        />
+
+                    </div>
+
+                </div>
+
+                {/* =================================================
+                    EVENTS
+                   ================================================= */}
+
+                <div className="mt-8 rounded-3xl border border-white/10 bg-white/[0.03] p-6">
+
+                    <h2 className="text-xl font-bold text-white">
+                        {t("events.title")}
+                    </h2>
+
+                    <div className="mt-6 space-y-3">
+
+                        {events.map(
+                            (event) => (
+                                <EventCard
+                                    key={
+                                        event.id
+                                    }
+                                    event={
+                                        event
+                                    }
+                                />
+                            )
+                        )}
+
+                    </div>
 
                 </div>
 
             </div>
-
         </section>
     );
 }
 
-function StatusCard({
-                        icon,
-                        title,
-                        value
-                    }: {
-    icon: React.ReactNode;
-    title: string;
-    value: string;
+/*
+ * =============================================================
+ * POWER CARD
+ * =============================================================
+ */
+
+function ConnectionPowerCard({
+                                 connected,
+                                 connecting,
+                                 onToggle,
+                                 t,
+                             }: {
+    connected: boolean;
+    connecting: boolean;
+    onToggle: () => void;
+    t: ReturnType<typeof useTranslations>;
 }) {
     return (
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
+        <div
+            className={`
+                relative mb-8 overflow-hidden rounded-3xl
+                border p-8 transition-all duration-500
+                ${
+                connected
+                    ? "border-cyan-400/20 bg-cyan-400/[0.04]"
+                    : "border-red-400/20 bg-red-400/[0.03]"
+            }
+            `}
+        >
 
-            <div className="flex items-center justify-between">
+            {/* Glow */}
 
-                <div className="text-gray-300">
-                    {title}
+            <div
+                className={`
+                    pointer-events-none absolute left-1/2 top-1/2
+                    h-64 w-64 -translate-x-1/2 -translate-y-1/2
+                    rounded-full blur-3xl
+                    ${
+                    connected
+                        ? "bg-cyan-400/10"
+                        : "bg-red-400/10"
+                }
+                `}
+            />
+
+            <div className="relative flex flex-col items-center text-center">
+
+                {/* Power Button */}
+
+                <button
+                    type="button"
+                    onClick={onToggle}
+                    disabled={connecting}
+                    aria-label={
+                        connected
+                            ? t(
+                                "power.disconnect"
+                            )
+                            : t(
+                                "power.connect"
+                            )
+                    }
+                    className={`
+                        group relative flex h-36 w-36
+                        items-center justify-center
+                        rounded-full border-4
+                        transition-all duration-500
+                        sm:h-40 sm:w-40
+                        ${
+                        connecting
+                            ? "cursor-wait animate-pulse"
+                            : "hover:scale-105 active:scale-95"
+                    }
+                        ${
+                        connected
+                            ? "border-cyan-400 bg-cyan-400/10 shadow-[0_0_70px_rgba(34,211,238,0.35)]"
+                            : "border-red-400/70 bg-red-400/5 shadow-[0_0_50px_rgba(248,113,113,0.2)]"
+                    }
+                    `}
+                >
+
+                    <div
+                        className={`
+                            absolute inset-3 rounded-full
+                            border border-white/5
+                            transition-all duration-500
+                            ${
+                            connected
+                                ? "bg-cyan-400/5 group-hover:bg-cyan-400/10"
+                                : "bg-red-400/5 group-hover:bg-red-400/10"
+                        }
+                        `}
+                    />
+
+                    <Power
+                        size={58}
+                        strokeWidth={2}
+                        className={`
+                            relative z-10
+                            transition-all duration-500
+                            ${
+                            connected
+                                ? "text-cyan-400"
+                                : "text-red-400"
+                        }
+                            ${
+                            connecting
+                                ? "rotate-180"
+                                : ""
+                        }
+                        `}
+                    />
+
+                </button>
+
+                {/* Status */}
+
+                <h2 className="mt-7 text-2xl font-black text-white sm:text-3xl">
+                    {connecting
+                        ? t(
+                            "power.connecting"
+                        )
+                        : connected
+                            ? t(
+                                "power.connected"
+                            )
+                            : t(
+                                "power.disconnected"
+                            )}
+                </h2>
+
+                <p className="mt-3 max-w-xl text-sm leading-6 text-gray-400">
+                    {connected
+                        ? t(
+                            "power.connectedDescription"
+                        )
+                        : t(
+                            "power.disconnectedDescription"
+                        )}
+                </p>
+
+                {/* Online indicator */}
+
+                <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/20 px-4 py-2 text-xs font-bold tracking-wider">
+
+                    <span
+                        className={`
+                            h-2.5 w-2.5 rounded-full
+                            ${
+                            connected
+                                ? "bg-green-400 shadow-[0_0_10px_#4ade80]"
+                                : "bg-red-400 shadow-[0_0_10px_#f87171]"
+                        }
+                        `}
+                    />
+
+                    {connected
+                        ? t(
+                            "power.online"
+                        )
+                        : t(
+                            "power.offline"
+                        )}
+
                 </div>
 
-                {icon}
+            </div>
+        </div>
+    );
+}
 
+/*
+ * =============================================================
+ * STATUS CARD
+ * =============================================================
+ */
+
+function StatusCard({
+                        icon,
+                        label,
+                        value,
+                        color,
+                    }: {
+    icon: React.ReactNode;
+    label: string;
+    value: string;
+    color:
+        | "green"
+        | "cyan"
+        | "purple"
+        | "red";
+}) {
+    const colors = {
+        green:
+            "bg-green-400/10 text-green-400",
+        cyan:
+            "bg-cyan-400/10 text-cyan-400",
+        purple:
+            "bg-purple-400/10 text-purple-400",
+        red:
+            "bg-red-400/10 text-red-400",
+    };
+
+    return (
+        <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
+
+            <div
+                className={`
+                    flex h-12 w-12 items-center
+                    justify-center rounded-xl
+                    ${colors[color]}
+                `}
+            >
+                {icon}
             </div>
 
-            <div className="mt-5 text-3xl font-black text-cyan-400">
+            <div className="mt-5 text-sm text-gray-500">
+                {label}
+            </div>
+
+            <div className="mt-2 text-3xl font-black text-white">
                 {value}
             </div>
 
@@ -299,40 +946,236 @@ function StatusCard({
     );
 }
 
-function InfoRow({
-                     label,
+/*
+ * =============================================================
+ * DNS CARD
+ * =============================================================
+ */
+
+function DnsCard({
+                     title,
                      value,
-                     copy,
-                     t
+                     copied,
+                     onCopy,
                  }: {
-    label: string;
+    title: string;
     value: string;
-    copy: () => void;
-    t: (key: string) => string;
+    copied: boolean;
+    onCopy: () => void;
 }) {
     return (
-        <div className="flex items-center justify-between border-b border-white/10 pb-3">
+        <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
 
-            <div>
+            <div className="flex items-center justify-between gap-4">
 
-                <div className="text-sm text-gray-400">
-                    {label}
+                <div>
+
+                    <div className="text-sm text-gray-500">
+                        {title}
+                    </div>
+
+                    <div className="mt-2 text-2xl font-black text-cyan-400">
+                        {value}
+                    </div>
+
                 </div>
 
-                <div className="font-semibold">
-                    {value}
-                </div>
+                <button
+                    type="button"
+                    onClick={onCopy}
+                    className="shrink-0 rounded-xl border border-white/10 p-3 text-gray-400 transition hover:border-cyan-400/50 hover:text-cyan-400"
+                    aria-label="Copy DNS"
+                >
+                    {copied ? (
+                        <Check size={18}/>
+                    ) : (
+                        <Copy size={18}/>
+                    )}
+                </button>
 
             </div>
 
-            <button
-                onClick={copy}
-                className="flex items-center gap-1 rounded-lg border border-white/10 px-3 py-2 text-sm transition hover:border-cyan-400 hover:text-cyan-400"
-            >
-                <Copy size={16}/>
-                {t("copy")}
-            </button>
+        </div>
+    );
+}
 
+/*
+ * =============================================================
+ * MODE BUTTON
+ * =============================================================
+ */
+
+function ModeButton({
+                        active,
+                        onClick,
+                        title,
+                    }: {
+    active: boolean;
+    onClick: () => void;
+    title: string;
+}) {
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            className={`
+                rounded-xl border px-4 py-4
+                font-semibold transition
+                ${
+                active
+                    ? "border-cyan-400 bg-cyan-400/10 text-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.08)]"
+                    : "border-white/10 bg-black/20 text-gray-400 hover:border-cyan-400/30 hover:text-white"
+            }
+            `}
+        >
+            {title}
+        </button>
+    );
+}
+
+/*
+ * =============================================================
+ * INFO CARD
+ * =============================================================
+ */
+
+function InfoCard({
+                      icon,
+                      label,
+                      value,
+                  }: {
+    icon: React.ReactNode;
+    label: string;
+    value: string;
+}) {
+    return (
+        <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+
+            <div className="flex items-center gap-2 text-cyan-400">
+                {icon}
+
+                <span className="text-xs text-gray-500">
+                    {label}
+                </span>
+            </div>
+
+            <div className="mt-3 text-xl font-bold text-white">
+                {value}
+            </div>
+
+        </div>
+    );
+}
+
+/*
+ * =============================================================
+ * DIAGNOSTIC CARD
+ * =============================================================
+ */
+
+function DiagnosticCard({
+                            title,
+                            value,
+                            icon,
+                            running,
+                            onRun,
+                        }: {
+    title: string;
+    value: string;
+    icon: React.ReactNode;
+    running: boolean;
+    onRun: () => void;
+}) {
+    return (
+        <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
+
+            <div className="flex items-center justify-between text-cyan-400">
+
+                {icon}
+
+                <button
+                    type="button"
+                    onClick={onRun}
+                    disabled={running}
+                    className="rounded-lg border border-white/10 p-2 transition hover:border-cyan-400 hover:text-cyan-400 disabled:cursor-wait disabled:opacity-50"
+                >
+                    <RefreshCw
+                        size={16}
+                        className={
+                            running
+                                ? "animate-spin"
+                                : ""
+                        }
+                    />
+                </button>
+
+            </div>
+
+            <div className="mt-4 text-sm text-gray-500">
+                {title}
+            </div>
+
+            <div className="mt-2 text-2xl font-black text-white">
+                {value}
+            </div>
+
+        </div>
+    );
+}
+
+/*
+ * =============================================================
+ * EVENT CARD
+ * =============================================================
+ */
+
+function EventCard({
+                       event,
+                   }: {
+    event: ConnectionEvent;
+}) {
+    const styles = {
+        success:
+            "border-green-400/20 bg-green-400/5 text-green-400",
+
+        info:
+            "border-cyan-400/20 bg-cyan-400/5 text-cyan-400",
+
+        warning:
+            "border-yellow-400/20 bg-yellow-400/5 text-yellow-400",
+    };
+
+    const Icon =
+        event.type === "success"
+            ? CircleCheck
+            : event.type === "info"
+                ? RefreshCw
+                : CircleAlert;
+
+    return (
+        <div
+            className={`
+                rounded-xl border p-4
+                ${styles[event.type]}
+            `}
+        >
+            <div className="flex items-center gap-3">
+
+                <Icon size={18}/>
+
+                <div className="flex-1">
+
+                    <div className="font-semibold text-white">
+                        {event.title}
+                    </div>
+
+                    <div className="mt-1 text-xs opacity-80">
+                        {event.time}
+                    </div>
+
+                </div>
+
+            </div>
         </div>
     );
 }
