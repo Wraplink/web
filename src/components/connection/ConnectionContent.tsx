@@ -21,6 +21,8 @@ import {
 
 import {useTranslations} from "next-intl";
 
+import {useConnectionRealtime} from "@/hooks/useConnectionRealtime";
+
 type Props = {
     locale: string;
 };
@@ -92,6 +94,11 @@ export default function ConnectionContent({
     const [events] =
         useState(initialEvents);
 
+    const realtime =
+        useConnectionRealtime({
+            enabled: connected
+        });
+
     /*
      * ---------------------------------------------------------
      * Mock connection data
@@ -106,14 +113,14 @@ export default function ConnectionContent({
      */
 
     const connection = {
-        latency: 18,
-        packetLoss: 0,
+        latency: realtime.latency,
+        packetLoss: realtime.packetLoss,
         primaryDns: "10.10.10.10",
         secondaryDns: "10.10.20.20",
-        edge: "DE-FRA-01",
+        edge: realtime.edge,
         region: "Frankfurt",
         country: "Germany",
-        load: 22,
+        load: realtime.load,
     };
 
     /*

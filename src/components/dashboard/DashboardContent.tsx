@@ -131,6 +131,7 @@ export default async function DashboardContent({locale}: Props) {
                         icon={<Server/>}
                         title={t("actions.connect")}
                         href="/connection"
+                        locale={locale}
                         primary
                         badge={t("active")}
                         buttonText={t("actions.connectNow")}
@@ -141,6 +142,7 @@ export default async function DashboardContent({locale}: Props) {
                     <ActionCard
                         icon={<ShoppingCart/>}
                         title={t("actions.buy")}
+                        locale={locale}
                         href="/market"
                     />
 
@@ -149,6 +151,7 @@ export default async function DashboardContent({locale}: Props) {
                     <ActionCard
                         icon={<CreditCard/>}
                         title={t("actions.wallet")}
+                        locale={locale}
                         href="/wallet"
                     />
 
@@ -157,6 +160,7 @@ export default async function DashboardContent({locale}: Props) {
                     <ActionCard
                         icon={<LifeBuoy/>}
                         title={t("actions.ticket")}
+                        locale={locale}
                         href="/support"
                     />
 
@@ -278,6 +282,7 @@ function ActionCard({
                         icon,
                         title,
                         href,
+                        locale,
                         primary = false,
                         badge,
                         buttonText
@@ -285,13 +290,16 @@ function ActionCard({
     icon: React.ReactNode;
     title: string;
     href: string;
+    locale: string;
     primary?: boolean;
     badge?: string;
     buttonText?: string;
 }) {
+
     return (
         <Link
             href={href}
+            locale={locale}
             className={`
                 group relative overflow-hidden rounded-3xl border p-6
                 backdrop-blur-xl transition duration-300

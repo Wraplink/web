@@ -11,19 +11,21 @@ type Props = {
 export async function generateMetadata({
                                            params,
                                        }: Props): Promise<Metadata> {
+
     const {locale} = await params;
 
     return {
         title:
             locale === "fa"
-                ? "حساب کاربری"
-                : "Profile",
+                ? "پروفایل و امنیت"
+                : "Profile & Security",
     };
 }
 
 export default async function ProfilePage({
                                               params,
                                           }: Props) {
+
     const {locale} = await params;
 
     return (

@@ -149,3 +149,11 @@ body {
 .glow-purple {
   box-shadow: 0 0 30px rgba(124,58,237,.45);
 }
+
+.input {
+  @apply w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none transition;
+}
+
+.input:focus {
+  @apply border-cyan-400/50 bg-black/30 ring-1 ring-cyan-400/20;
+}

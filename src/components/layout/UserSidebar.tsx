@@ -8,7 +8,7 @@ import {
     Menu,
     Package,
     Server,
-    Settings,
+    User,
     Bell,
     ShoppingBag,
     Wallet,
@@ -68,7 +68,7 @@ const navigation = [
     {
         key:"profile",
         href:"/profile",
-        icon:Settings
+        icon: User
     },
     {
         key: "notifications",

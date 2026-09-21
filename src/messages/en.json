@@ -682,38 +682,53 @@
     "discount": "Discount",
     "total": "Total"
   }
-},"ProfilePage": {
-  "badge": "Account & Security",
-  "title": "Profile & Security",
-  "subtitle": "Manage your personal information, password and active sessions.",
-  "profile": {
-    "title": "Profile Information",
-    "description": "Update the information associated with your account.",
-    "name": "Full Name",
-    "email": "Email Address",
-    "save": "Save Changes",
-    "saving": "Saving...",
-    "saved": "Profile updated successfully.",
-    "profile": "Profile"
-  },
-  "verification": {
-    "title": "Email Verification",
-    "description": "Your email address is used for account recovery and important security notifications.",
-    "verified": "Email Verified",
-    "resend": "Resend Verification Email"
-  },
-  "password": {
-    "title": "Change Password",
-    "description": "Use a strong password that you do not use elsewhere.",
-    "current": "Current Password",
-    "new": "New Password",
-    "confirm": "Confirm New Password",
-    "change": "Change Password",
-    "saved": "Password changed successfully.",
-    "errors": {
-      "required": "Please fill in all password fields.",
-      "minLength": "Password must contain at least 8 characters.",
-      "mismatch": "The new passwords do not match."
+},
+  "ProfilePage": {
+    "title": "Profile & Security",
+    "subtitle": "Manage your account, password, security and active sessions.",
+
+    "profile": {
+      "title": "Profile Information",
+      "description": "Update your personal account information.",
+      "name": "Full Name",
+      "email": "Email Address",
+      "save": "Save Changes",
+      "saving": "Saving...",
+      "saved": "Changes saved"
+    },
+
+    "account": {
+      "title": "Account Status",
+      "emailVerified": "Email Verification",
+      "accountStatus": "Account Status",
+      "plan": "Current Plan",
+      "verified": "Verified",
+      "active": "Active"
+    },
+
+    "security": {
+      "passwordTitle": "Change Password",
+      "passwordDescription": "Use a strong password that you don't use elsewhere.",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm New Password",
+      "changePassword": "Change Password",
+      "changing": "Changing...",
+      "passwordRequired": "Please fill in all password fields.",
+      "passwordMismatch": "The new passwords do not match.",
+      "passwordChanged": "Your password has been changed successfully.",
+      "twoFactorTitle": "Two-Factor Authentication",
+      "twoFactorDescription": "Add an additional layer of security to your WrapLink account.",
+      "twoFactorEnabled": "Two-factor authentication is enabled.",
+      "twoFactorDisabled": "Two-factor authentication is disabled."
+    },
+
+    "sessions": {
+      "title": "Active Sessions",
+      "description": "Review devices currently signed in to your account.",
+      "current": "Current Session",
+      "revoke": "Revoke",
+      "logoutAll": "Sign Out All Sessions"
     }
   },
   "security": {
