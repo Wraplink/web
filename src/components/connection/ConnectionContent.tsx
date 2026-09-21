@@ -44,24 +44,29 @@ type ConnectionEvent = {
     time: string;
 };
 
+type DiagnosticResult = {
+    value: string;
+    success: boolean;
+};
+
 const initialEvents: ConnectionEvent[] = [
     {
         id: "1",
         type: "success",
-        title: "Connected to DE-FRA-01",
-        time: "Today · 10:32",
+        title: "events.connected",
+        time: "events.todayTime",
     },
     {
         id: "2",
         type: "info",
-        title: "DNS configuration updated",
-        time: "Yesterday",
+        title: "events.dnsUpdated",
+        time: "events.yesterday",
     },
     {
         id: "3",
         type: "warning",
-        title: "Maintenance completed",
-        time: "2 days ago",
+        title: "events.maintenance",
+        time: "events.twoDaysAgo",
     },
 ];
 
@@ -91,20 +96,35 @@ export default function ConnectionContent({
     const [runningTest, setRunningTest] =
         useState<string | null>(null);
 
+    const [diagnostics, setDiagnostics] =
+        useState<Record<string, DiagnosticResult>>(
+            {}
+        );
+
     const [events] =
         useState(initialEvents);
 
+    /*
+     * ---------------------------------------------------------
+     * Real-time connection state
+     *
+     * BACKEND TODO:
+     * Replace the mock implementation inside
+     * useConnectionRealtime with WebSocket/SSE.
+     * ---------------------------------------------------------
+     */
+
     const realtime =
         useConnectionRealtime({
-            enabled: connected
+            enabled: connected,
         });
 
     /*
      * ---------------------------------------------------------
-     * Mock connection data
+     * Connection data
      *
      * BACKEND TODO:
-     * Replace this with:
+     * Replace static fields with:
      *
      * GET /api/v1/connection/status
      * GET /api/v1/connection/dns
@@ -222,7 +242,7 @@ export default function ConnectionContent({
     const runTest = async (
         type: string
     ) => {
-        if (runningTest) {
+        if (runningTest || !connected) {
             return;
         }
 
@@ -237,12 +257,59 @@ export default function ConnectionContent({
          * POST /api/v1/diagnostics/dns
          * POST /api/v1/diagnostics/route
          *
+         * Expected example:
+         *
+         * {
+         *     success: true,
+         *     value: "18 ms"
+         * }
+         *
          * =====================================================
          */
 
         await new Promise((resolve) =>
             setTimeout(resolve, 1200)
         );
+
+        let result: DiagnosticResult;
+
+        switch (type) {
+            case "ping":
+                result = {
+                    value: `${connection.latency} ms`,
+                    success: true,
+                };
+                break;
+
+            case "dns":
+                result = {
+                    value: t(
+                        "diagnostics.ok"
+                    ),
+                    success: true,
+                };
+                break;
+
+            case "route":
+                result = {
+                    value: t(
+                        "diagnostics.optimized"
+                    ),
+                    success: true,
+                };
+                break;
+
+            default:
+                result = {
+                    value: "--",
+                    success: false,
+                };
+        }
+
+        setDiagnostics((current) => ({
+            ...current,
+            [type]: result,
+        }));
 
         setRunningTest(null);
     };
@@ -256,6 +323,10 @@ export default function ConnectionContent({
     const changeMode = async (
         nextMode: ConnectionMode
     ) => {
+        if (nextMode === mode) {
+            return;
+        }
+
         setMode(nextMode);
 
         /*
@@ -280,7 +351,11 @@ export default function ConnectionContent({
      */
 
     return (
-        <section className="min-h-screen px-4 py-8 sm:px-6 lg:px-10 lg:py-12">
+        <section
+            className="min-h-screen px-4 py-8 sm:px-6 lg:px-10 lg:py-12"
+            lang={locale}
+            dir={locale === "fa" ? "rtl" : "ltr"}
+        >
             <div className="mx-auto max-w-7xl">
 
                 {/* =================================================
@@ -323,9 +398,7 @@ export default function ConnectionContent({
                 <div className="grid gap-4 md:grid-cols-3">
 
                     <StatusCard
-                        icon={
-                            <Wifi size={22}/>
-                        }
+                        icon={<Wifi size={22}/>}
                         label={t(
                             "status.connection"
                         )}
@@ -346,9 +419,7 @@ export default function ConnectionContent({
                     />
 
                     <StatusCard
-                        icon={
-                            <Gauge size={22}/>
-                        }
+                        icon={<Gauge size={22}/>}
                         label={t(
                             "status.latency"
                         )}
@@ -361,9 +432,7 @@ export default function ConnectionContent({
                     />
 
                     <StatusCard
-                        icon={
-                            <Activity size={22}/>
-                        }
+                        icon={<Activity size={22}/>}
                         label={t(
                             "status.packetLoss"
                         )}
@@ -409,8 +478,7 @@ export default function ConnectionContent({
                             connection.secondaryDns
                         }
                         copied={
-                            copied ===
-                            "secondary"
+                            copied === "secondary"
                         }
                         onCopy={() =>
                             copyText(
@@ -436,15 +504,11 @@ export default function ConnectionContent({
 
                         <div>
                             <h2 className="text-xl font-bold text-white">
-                                {t(
-                                    "mode.title"
-                                )}
+                                {t("mode.title")}
                             </h2>
 
                             <p className="text-sm text-gray-500">
-                                {t(
-                                    "mode.description"
-                                )}
+                                {t("mode.description")}
                             </p>
                         </div>
 
@@ -515,9 +579,7 @@ export default function ConnectionContent({
                             <div>
 
                                 <h2 className="text-xl font-bold text-white">
-                                    {t(
-                                        "edge.title"
-                                    )}
+                                    {t("edge.title")}
                                 </h2>
 
                                 <p className="mt-1 text-lg font-semibold text-cyan-400">
@@ -531,9 +593,7 @@ export default function ConnectionContent({
                         </div>
 
                         <span className="inline-flex w-fit rounded-full border border-green-400/20 bg-green-400/10 px-4 py-2 text-sm text-green-300">
-                            {t(
-                                "edge.optimal"
-                            )}
+                            {t("edge.optimal")}
                         </span>
 
                     </div>
@@ -541,36 +601,20 @@ export default function ConnectionContent({
                     <div className="mt-8 grid gap-4 sm:grid-cols-3">
 
                         <InfoCard
-                            icon={
-                                <Globe size={18}/>
-                            }
-                            label={t(
-                                "edge.country"
-                            )}
-                            value={
-                                connection.country
-                            }
+                            icon={<Globe size={18}/>}
+                            label={t("edge.country")}
+                            value={connection.country}
                         />
 
                         <InfoCard
-                            icon={
-                                <Server size={18}/>
-                            }
-                            label={t(
-                                "edge.region"
-                            )}
-                            value={
-                                connection.region
-                            }
+                            icon={<Server size={18}/>}
+                            label={t("edge.region")}
+                            value={connection.region}
                         />
 
                         <InfoCard
-                            icon={
-                                <Activity size={18}/>
-                            }
-                            label={t(
-                                "edge.load"
-                            )}
+                            icon={<Activity size={18}/>}
+                            label={t("edge.load")}
                             value={`${connection.load}%`}
                         />
 
@@ -615,9 +659,10 @@ export default function ConnectionContent({
                                 "diagnostics.ping"
                             )}
                             value={
-                                connected
+                                diagnostics.ping?.value ??
+                                (connected
                                     ? `${connection.latency} ms`
-                                    : "--"
+                                    : "--")
                             }
                             icon={
                                 <Activity
@@ -628,11 +673,13 @@ export default function ConnectionContent({
                                 runningTest ===
                                 "ping"
                             }
-                            onRun={() =>
-                                runTest(
-                                    "ping"
-                                )
+                            success={
+                                diagnostics.ping?.success
                             }
+                            onRun={() =>
+                                runTest("ping")
+                            }
+                            disabled={!connected}
                         />
 
                         <DiagnosticCard
@@ -640,11 +687,12 @@ export default function ConnectionContent({
                                 "diagnostics.dns"
                             )}
                             value={
-                                connected
+                                diagnostics.dns?.value ??
+                                (connected
                                     ? t(
                                         "diagnostics.ok"
                                     )
-                                    : "--"
+                                    : "--")
                             }
                             icon={
                                 <CircleCheck
@@ -655,11 +703,13 @@ export default function ConnectionContent({
                                 runningTest ===
                                 "dns"
                             }
-                            onRun={() =>
-                                runTest(
-                                    "dns"
-                                )
+                            success={
+                                diagnostics.dns?.success
                             }
+                            onRun={() =>
+                                runTest("dns")
+                            }
+                            disabled={!connected}
                         />
 
                         <DiagnosticCard
@@ -667,11 +717,12 @@ export default function ConnectionContent({
                                 "diagnostics.route"
                             )}
                             value={
-                                connected
+                                diagnostics.route?.value ??
+                                (connected
                                     ? t(
                                         "diagnostics.optimized"
                                     )
-                                    : "--"
+                                    : "--")
                             }
                             icon={
                                 <Route size={20}/>
@@ -680,11 +731,13 @@ export default function ConnectionContent({
                                 runningTest ===
                                 "route"
                             }
-                            onRun={() =>
-                                runTest(
-                                    "route"
-                                )
+                            success={
+                                diagnostics.route?.success
                             }
+                            onRun={() =>
+                                runTest("route")
+                            }
+                            disabled={!connected}
                         />
 
                     </div>
@@ -697,9 +750,24 @@ export default function ConnectionContent({
 
                 <div className="mt-8 rounded-3xl border border-white/10 bg-white/[0.03] p-6">
 
-                    <h2 className="text-xl font-bold text-white">
-                        {t("events.title")}
-                    </h2>
+                    <div className="flex items-center justify-between">
+
+                        <div>
+                            <h2 className="text-xl font-bold text-white">
+                                {t("events.title")}
+                            </h2>
+
+                            <p className="mt-1 text-sm text-gray-500">
+                                {t("events.description")}
+                            </p>
+                        </div>
+
+                        <Activity
+                            size={22}
+                            className="text-cyan-400"
+                        />
+
+                    </div>
 
                     <div className="mt-6 space-y-3">
 
@@ -712,6 +780,7 @@ export default function ConnectionContent({
                                     event={
                                         event
                                     }
+                                    t={t}
                                 />
                             )
                         )}
@@ -754,9 +823,6 @@ function ConnectionPowerCard({
             }
             `}
         >
-
-            {/* Glow */}
-
             <div
                 className={`
                     pointer-events-none absolute left-1/2 top-1/2
@@ -771,8 +837,6 @@ function ConnectionPowerCard({
             />
 
             <div className="relative flex flex-col items-center text-center">
-
-                {/* Power Button */}
 
                 <button
                     type="button"
@@ -840,8 +904,6 @@ function ConnectionPowerCard({
 
                 </button>
 
-                {/* Status */}
-
                 <h2 className="mt-7 text-2xl font-black text-white sm:text-3xl">
                     {connecting
                         ? t(
@@ -866,8 +928,6 @@ function ConnectionPowerCard({
                         )}
                 </p>
 
-                {/* Online indicator */}
-
                 <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/20 px-4 py-2 text-xs font-bold tracking-wider">
 
                     <span
@@ -882,12 +942,8 @@ function ConnectionPowerCard({
                     />
 
                     {connected
-                        ? t(
-                            "power.online"
-                        )
-                        : t(
-                            "power.offline"
-                        )}
+                        ? t("power.online")
+                        : t("power.offline")}
 
                 </div>
 
@@ -1059,11 +1115,13 @@ function InfoCard({
         <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
 
             <div className="flex items-center gap-2 text-cyan-400">
+
                 {icon}
 
                 <span className="text-xs text-gray-500">
                     {label}
                 </span>
+
             </div>
 
             <div className="mt-3 text-xl font-bold text-white">
@@ -1085,26 +1143,42 @@ function DiagnosticCard({
                             value,
                             icon,
                             running,
+                            success,
                             onRun,
+                            disabled,
                         }: {
     title: string;
     value: string;
     icon: React.ReactNode;
     running: boolean;
+    success?: boolean;
     onRun: () => void;
+    disabled?: boolean;
 }) {
     return (
         <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
 
-            <div className="flex items-center justify-between text-cyan-400">
+            <div className="flex items-center justify-between">
 
-                {icon}
+                <div
+                    className={
+                        success === true
+                            ? "text-green-400"
+                            : "text-cyan-400"
+                    }
+                >
+                    {icon}
+                </div>
 
                 <button
                     type="button"
                     onClick={onRun}
-                    disabled={running}
-                    className="rounded-lg border border-white/10 p-2 transition hover:border-cyan-400 hover:text-cyan-400 disabled:cursor-wait disabled:opacity-50"
+                    disabled={
+                        running ||
+                        disabled
+                    }
+                    aria-label={`Run ${title} test`}
+                    className="rounded-lg border border-white/10 p-2 text-gray-400 transition hover:border-cyan-400 hover:text-cyan-400 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                     <RefreshCw
                         size={16}
@@ -1138,8 +1212,10 @@ function DiagnosticCard({
 
 function EventCard({
                        event,
+                       t,
                    }: {
     event: ConnectionEvent;
+    t: ReturnType<typeof useTranslations>;
 }) {
     const styles = {
         success:
@@ -1173,11 +1249,11 @@ function EventCard({
                 <div className="flex-1">
 
                     <div className="font-semibold text-white">
-                        {event.title}
+                        {t(event.title)}
                     </div>
 
                     <div className="mt-1 text-xs opacity-80">
-                        {event.time}
+                        {t(event.time)}
                     </div>
 
                 </div>

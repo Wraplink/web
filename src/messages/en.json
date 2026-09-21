@@ -382,7 +382,14 @@
       "optimized": "Optimized"
     },
     "events": {
-      "title": "Recent Activity"
+      "title": "Connection Events",
+      "description": "Recent activity related to your WrapLink connection.",
+      "connected": "Connected to DE-FRA-01",
+      "dnsUpdated": "DNS configuration updated",
+      "maintenance": "Maintenance completed",
+      "todayTime": "Today · 10:32",
+      "yesterday": "Yesterday",
+      "twoDaysAgo": "2 days ago"
     },
     "power": {
       "connect": "Connect",
@@ -394,6 +401,15 @@
       "disconnectedDescription": "Enable WrapLink to start using optimized routing and secure DNS.",
       "online": "ONLINE",
       "offline": "OFFLINE"
+    },
+    "history": {
+      "title": "Connection History",
+      "description": "Review your recent WrapLink connection activity.",
+      "connected": "Connected",
+      "disconnected": "Disconnected",
+      "duration": "Duration",
+      "latency": "Latency",
+      "time": "Time"
     }
   },
   "WalletPage": {

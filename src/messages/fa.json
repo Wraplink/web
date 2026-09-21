@@ -383,7 +383,14 @@
       "optimized": "بهینه"
     },
     "events": {
-      "title": "فعالیت‌های اخیر"
+      "title": "رویدادهای اتصال",
+      "description": "فعالیت‌های اخیر مربوط به اتصال WrapLink شما.",
+      "connected": "اتصال به DE-FRA-01",
+      "dnsUpdated": "تنظیمات DNS به‌روزرسانی شد",
+      "maintenance": "عملیات تعمیر و نگهداری تکمیل شد",
+      "todayTime": "امروز · ۱۰:۳۲",
+      "yesterday": "دیروز",
+      "twoDaysAgo": "۲ روز پیش"
     },
     "power": {
       "connect": "اتصال",
@@ -395,6 +402,15 @@
       "disconnectedDescription": "برای استفاده از مسیریابی بهینه و DNS امن، WrapLink را فعال کنید.",
       "online": "آنلاین",
       "offline": "آفلاین"
+    },
+    "history": {
+      "title": "تاریخچه اتصال",
+      "description": "فعالیت‌های اخیر اتصال شما به WrapLink را مشاهده کنید.",
+      "connected": "متصل",
+      "disconnected": "قطع شده",
+      "duration": "مدت اتصال",
+      "latency": "تاخیر",
+      "time": "زمان"
     }
   },
   "WalletPage": {
