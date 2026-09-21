@@ -1,6 +1,6 @@
 import type {Metadata} from "next";
 
-import OrdersContent from "@/components/orders/OrdersContent";
+import ProfileContent from "@/components/profile/ProfileContent";
 
 type Props = {
     params: Promise<{
@@ -16,19 +16,17 @@ export async function generateMetadata({
     return {
         title:
             locale === "fa"
-                ? "سفارش‌ها"
-                : "Orders",
+                ? "حساب کاربری"
+                : "Profile",
     };
 }
 
-export default async function OrdersPage({
-                                             params,
-                                         }: Props) {
+export default async function ProfilePage({
+                                              params,
+                                          }: Props) {
     const {locale} = await params;
 
     return (
-        <OrdersContent
-            locale={locale}
-        />
+        <ProfileContent locale={locale}/>
     );
 }

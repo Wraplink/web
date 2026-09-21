@@ -455,23 +455,42 @@
   },"OrdersPage": {
   "badge": "Order Management",
   "title": "Your Orders",
-  "subtitle": "Track your WrapLink orders, manage cancellations, and request refunds for eligible items.",
-  "total": "Total",
-  "orderTotal": "Order Total",
-  "paymentMethod": "Payment Method",
+  "subtitle": "Track your purchases, manage orders and request eligible refunds.",
+  "items": "items",
+  "payment": "Payment Method",
+  "itemCount": "Total Items",
+  "itemsTitle": "Order Items",
   "quantity": "Quantity",
   "refund": "Refund Item",
   "refunded": "Refunded",
   "cancelOrder": "Cancel Order",
-  "status": {
+  "filters": {
+    "all": "All",
     "pending": "Pending",
     "confirmed": "Confirmed",
+    "provisioning": "Provisioning",
     "delivered": "Delivered",
     "cancelled": "Cancelled"
   },
+  "stats": {
+    "pending": "Pending Orders",
+    "confirmed": "Processing Orders",
+    "active": "Active Orders",
+    "refunded": "Refunded Orders"
+  },
+  "status": {
+    "pending": "Pending",
+    "confirmed": "Confirmed",
+    "provisioning": "Provisioning",
+    "active": "Active",
+    "delivered": "Delivered",
+    "cancelled": "Cancelled",
+    "refunded": "Refunded"
+  },
   "empty": {
-    "title": "No orders yet",
-    "description": "Your orders will appear here after you make a purchase."
+    "title": "No orders found",
+    "description": "You don't have any orders matching this filter.",
+    "button": "Browse Marketplace"
   }
 },"SupportPage": {
   "badge": "Customer Support",
@@ -553,7 +572,184 @@
     "basket": "Basket",
     "orders": "Orders",
     "support": "Support",
-    "bandwidth": "Bandwidth"
+    "bandwidth": "Bandwidth",
+    "notifications": "Notifications"
+  }
+},"CheckoutPage": {
+  "loading": "Loading checkout...",
+  "badge": "Secure Checkout",
+  "title": "Complete Your Purchase",
+  "subtitle": "Choose your payment method and complete your order.",
+  "backToBasket": "Back to Basket",
+  "paymentMethod": "Payment Method",
+  "paymentMethodDescription": "Select how you want to pay for your WrapLink services.",
+  "processing": "Processing payment...",
+  "payNow": "Pay Now",
+  "securePayment": "Your payment is securely processed.",
+  "methods": {
+    "wallet": "WrapLink Wallet",
+    "walletDesc": "Pay instantly using your wallet balance.",
+    "card": "Card-to-Card",
+    "cardDesc": "Transfer the payment and upload your receipt.",
+    "crypto": "Cryptocurrency",
+    "cryptoDesc": "Pay using USDT cryptocurrency.",
+    "isp": "ISP Payment",
+    "ispDesc": "Pay through your internet service provider."
+  },
+  "wallet": {
+    "title": "Wallet Payment",
+    "description": "The amount will be deducted from your WrapLink wallet.",
+    "balance": "Available Balance",
+    "required": "Required Amount",
+    "sufficient": "Your wallet has enough balance to complete this payment.",
+    "insufficient": "Your wallet balance is insufficient."
+  },
+  "card": {
+    "title": "Card-to-Card Payment",
+    "description": "Transfer the exact amount to the WrapLink card below.",
+    "cardHolder": "Card Holder",
+    "cardHolderName": "WrapLink Payment",
+    "cardNumber": "Card Number",
+    "receipt": "Payment Receipt",
+    "upload": "Click to upload your payment receipt",
+    "fileTypes": "JPG, PNG or PDF"
+  },
+  "crypto": {
+    "title": "Cryptocurrency Payment",
+    "description": "Send the exact amount using the selected network.",
+    "network": "Network",
+    "address": "Wallet Address",
+    "warning": "Only send USDT using the selected network. Sending another asset or using another network may result in permanent loss."
+  },
+  "isp": {
+    "title": "ISP Payment",
+    "description": "Select your internet service provider.",
+    "provider": "Internet Provider",
+    "note": "After submitting the order, you will be redirected to your ISP payment service."
+  },
+  "summary": {
+    "title": "Order Summary",
+    "items": "items",
+    "quantity": "Quantity",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "total": "Total"
+  },
+  "empty": {
+    "title": "Your basket is empty",
+    "description": "Add a product to your basket before proceeding to checkout.",
+    "button": "Browse Marketplace"
+  },
+  "errors": {
+    "emptyBasket": "Your basket is empty.",
+    "insufficientBalance": "Your wallet balance is insufficient for this payment.",
+    "receiptRequired": "Please upload your payment receipt."
+  }
+},"BasketPage": {
+  "title": "Your Basket",
+  "subtitle": "Review your selected products before checkout.",
+  "items": "items",
+  "clear": "Clear basket",
+  "remove": "Remove item",
+  "checkout": "Proceed to Checkout",
+  "continueShopping": "Continue Shopping",
+  "empty": {
+    "title": "Your basket is empty",
+    "description": "Browse the WrapLink marketplace and add a plan or service to your basket.",
+    "button": "Browse Marketplace"
+  },
+  "summary": {
+    "title": "Order Summary",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "total": "Total"
+  }
+},"ProfilePage": {
+  "badge": "Account & Security",
+  "title": "Profile & Security",
+  "subtitle": "Manage your personal information, password and active sessions.",
+  "profile": {
+    "title": "Profile Information",
+    "description": "Update the information associated with your account.",
+    "name": "Full Name",
+    "email": "Email Address",
+    "save": "Save Changes",
+    "saving": "Saving...",
+    "saved": "Profile updated successfully.",
+    "profile": "Profile"
+  },
+  "verification": {
+    "title": "Email Verification",
+    "description": "Your email address is used for account recovery and important security notifications.",
+    "verified": "Email Verified",
+    "resend": "Resend Verification Email"
+  },
+  "password": {
+    "title": "Change Password",
+    "description": "Use a strong password that you do not use elsewhere.",
+    "current": "Current Password",
+    "new": "New Password",
+    "confirm": "Confirm New Password",
+    "change": "Change Password",
+    "saved": "Password changed successfully.",
+    "errors": {
+      "required": "Please fill in all password fields.",
+      "minLength": "Password must contain at least 8 characters.",
+      "mismatch": "The new passwords do not match."
+    }
+  },
+  "security": {
+    "title": "Security",
+    "description": "Additional protection for your WrapLink account.",
+    "twoFactor": "Two-Factor Authentication",
+    "disabled": "Not enabled",
+    "optional": "Recommended",
+    "setup2fa": "Set Up 2FA"
+  },
+  "sessions": {
+    "title": "Active Sessions",
+    "description": "Review devices currently signed in to your account.",
+    "current": "Current",
+    "logout": "Revoke",
+    "revoking": "Revoking...",
+    "logoutAll": "Revoke Other Sessions"
+  },
+  "account": {
+    "title": "Sign Out",
+    "description": "Sign out from the current WrapLink session.",
+    "logout": "Sign Out"
+  }
+},"NotificationPage": {
+  "badge": "Notification Center",
+  "title": "Notifications",
+  "subtitle": "Stay updated with orders, payments, support and security events.",
+  "markAll": "Mark all as read",
+  "empty": "No notifications",
+  "stats": {
+    "total": "Total",
+    "unread": "Unread",
+    "read": "Read",
+    "categories": "Categories"
+  },
+  "filters": {
+    "all": "All",
+    "unread": "Unread",
+    "order": "Orders",
+    "payment": "Payments",
+    "support": "Support",
+    "security": "Security",
+    "system": "System"
+  },
+  "preferences": {
+    "title": "Preferences",
+    "orders": "Order notifications",
+    "payments": "Payment notifications",
+    "support": "Support notifications",
+    "security": "Security notifications",
+    "system": "System notifications",
+    "email": "Email",
+    "push": "Push",
+    "sms": "SMS"
   }
 }
 }

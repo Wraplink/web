@@ -8,6 +8,7 @@ import {Link} from "@/i18n/navigation";
 
 import LanguageSwitcher from "./LanguageSwitcher";
 import MobileMenu from "./MobileMenu";
+import NotificationBell from "@/components/notifications/NotificationBell";
 
 const navigation = [
     {
@@ -71,6 +72,7 @@ export default function Navbar() {
                     <div className="hidden items-center gap-3 md:flex">
 
                         <LanguageSwitcher />
+                        <NotificationBell/>
 
                         <Link
                             href="/auth/login"

@@ -8,6 +8,8 @@ import {
     Menu,
     Package,
     Server,
+    Settings,
+    Bell,
     ShoppingBag,
     Wallet,
     X,
@@ -63,6 +65,17 @@ const navigation = [
         href: "/bandwidth",
         icon: BarChart3,
     },
+    {
+        key:"profile",
+        href:"/profile",
+        icon:Settings
+    },
+    {
+        key: "notifications",
+        href: "/notifications",
+        icon: Bell,
+    },
+
 ] as const;
 
 type Props = {

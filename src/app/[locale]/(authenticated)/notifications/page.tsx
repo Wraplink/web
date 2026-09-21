@@ -1,6 +1,6 @@
 import type {Metadata} from "next";
 
-import OrdersContent from "@/components/orders/OrdersContent";
+import NotificationCenter from "@/components/notifications/NotificationCenter";
 
 type Props = {
     params: Promise<{
@@ -16,19 +16,17 @@ export async function generateMetadata({
     return {
         title:
             locale === "fa"
-                ? "سفارش‌ها"
-                : "Orders",
+                ? "اعلان‌ها"
+                : "Notifications",
     };
 }
 
-export default async function OrdersPage({
-                                             params,
-                                         }: Props) {
+export default async function NotificationsPage({
+                                                    params,
+                                                }: Props) {
     const {locale} = await params;
 
     return (
-        <OrdersContent
-            locale={locale}
-        />
+        <NotificationCenter locale={locale}/>
     );
 }
