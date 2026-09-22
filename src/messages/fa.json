@@ -374,13 +374,19 @@
       "load": "بار سرور"
     },
     "diagnostics": {
-      "title": "عیب‌یابی اتصال",
-      "description": "بررسی سریع وضعیت اتصال WrapLink.",
-      "ping": "پینگ",
-      "dns": "DNS",
-      "route": "مسیریابی",
-      "ok": "سالم",
-      "optimized": "بهینه"
+      "title": "Connection Diagnostics",
+      "ping": {
+        "title": "Ping Test",
+        "description": "Check latency to the WrapLink edge server."
+      },
+      "dns": {
+        "title": "DNS Test",
+        "description": "Verify that WrapLink DNS is working correctly."
+      },
+      "route": {
+        "title": "Route Test",
+        "description": "Check whether your network route is optimized."
+      }
     },
     "events": {
       "title": "رویدادهای اتصال",
@@ -390,7 +396,8 @@
       "maintenance": "عملیات تعمیر و نگهداری تکمیل شد",
       "todayTime": "امروز · ۱۰:۳۲",
       "yesterday": "دیروز",
-      "twoDaysAgo": "۲ روز پیش"
+      "twoDaysAgo": "۲ روز پیش",
+      "empty": "هنوز رویدادی برای اتصال ثبت نشده است."
     },
     "power": {
       "connect": "اتصال",
@@ -411,6 +418,35 @@
       "duration": "مدت اتصال",
       "latency": "تاخیر",
       "time": "زمان"
+    },
+    "errors": {
+      "loadFailed": "بارگذاری اطلاعات اتصال ناموفق بود.",
+      "connectionFailed": "تغییر وضعیت اتصال ناموفق بود.",
+      "diagnosticFailed": "اجرای تست عیب‌یابی ناموفق بود.",
+      "modeUpdateFailed": "به‌روزرسانی حالت اتصال ناموفق بود.",
+      "copyFailed": "کپی در کلیپ‌بورد امکان‌پذیر نیست."
+    },
+    "connectionDetails": {
+      "title": "جزئیات اتصال",
+      "edgeServer": "سرور لبه",
+      "region": "منطقه",
+      "country": "کشور",
+      "serverLoad": "بار سرور"
+    },
+    "modes": {
+      "title": "حالت اتصال",
+      "smart": {
+        "title": "هوشمند",
+        "description": "اتصال شما را به‌صورت خودکار بهینه می‌کند."
+      },
+      "gaming": {
+        "title": "گیمینگ",
+        "description": "اولویت را به تأخیر کم و ترافیک بازی می‌دهد."
+      },
+      "streaming": {
+        "title": "استریم",
+        "description": "اتصال را برای پخش ویدئو بهینه می‌کند."
+      }
     }
   },
   "WalletPage": {
@@ -609,7 +645,6 @@
     "bandwidth": "پهنای باند",
     "profile": "حساب کاربری",
     "notifications": "اعلان ها"
-
   }
 },"CheckoutPage": {
   "loading": "در حال بارگذاری پرداخت...",
