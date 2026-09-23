@@ -1,0 +1,35 @@
+services:
+
+  wraplink-web:
+    image: wraplink.ir/web:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: wraplink-web
+
+    restart: unless-stopped
+
+    ports:
+      - "3000:3000"
+
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: "1"
+      PORT: "3000"
+      HOSTNAME: "0.0.0.0"
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://127.0.0.1:3000/"
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
