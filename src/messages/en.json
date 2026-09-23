@@ -8,90 +8,68 @@
     "login": "Login",
     "register": "Register"
   },
-
   "HomePage": {
     "badge": "Next Generation Gamer Network",
-
     "heroTitle": "Play Faster.",
     "heroTitleAccent": "Connect Smarter.",
-
     "heroDescription": "WrapLink provides intelligent DNS routing, secure network acceleration, bandwidth management, and gamer-focused connectivity through a modern platform.",
-
     "getStarted": "Get Started",
     "viewPlans": "View Plans",
-
     "features": {
       "latencyTitle": "Ultra Low Latency",
       "latencyDescription": "Smart routing reduces unnecessary network hops.",
-
       "securityTitle": "Secure Connection",
       "securityDescription": "Enterprise-grade protection with intelligent traffic control.",
-
       "dnsTitle": "Global DNS",
       "dnsDescription": "Optimized DNS for selected gaming services."
     },
-
     "stats": {
       "edgeNodes": "Edge Nodes",
       "connections": "Protected Connections",
       "games": "Supported Games",
       "uptime": "Uptime"
     },
-
     "featuresTitle": "Everything in One Platform",
     "featuresDescription": "Designed for gamers, powered by enterprise infrastructure.",
-
     "platform": {
       "walletTitle": "Wallet",
       "walletDescription": "Charge, pay, withdraw and track every transaction.",
-
       "supportTitle": "Support Tickets",
       "supportDescription": "Built-in customer support with ticket tracking.",
-
       "marketTitle": "Marketplace",
       "marketDescription": "Buy plans and services through a modern store.",
-
       "connectionTitle": "Connection Management",
       "connectionDescription": "DNS addresses, IP assignments and connection status.",
-
       "bandwidthTitle": "Bandwidth Reports",
       "bandwidthDescription": "Monitor usage with detailed analytics.",
-
       "languageTitle": "Multi-language",
       "languageDescription": "English and Persian interface."
     },
-
     "howItWorksTitle": "How WrapLink Works",
-
     "steps": {
       "register": "Create your account",
       "plan": "Choose a connection plan",
       "connection": "Receive your DNS and connection details",
       "monitor": "Connect and monitor usage"
     },
-
     "pricingTitle": "Flexible Gamer Plans",
     "pricingDescription": "Buy using Wallet, Crypto, Cart-to-Cart, or ISP payment.",
     "explorePricing": "Explore Pricing",
-
     "plans": {
       "starter": "Starter Plan",
       "pro": "Pro Plan",
       "ultimate": "Ultimate Plan"
     },
-
     "ctaTitle": "Ready to Join WrapLink?",
     "ctaDescription": "Create your account and experience the next generation of gamer networking.",
     "createAccount": "Create Account"
   },
-
   "Footer": {
     "description": "Next Generation Gamer Network Platform.",
     "platform": "Platform",
     "support": "Support",
     "copyright": "© 2026 WrapLink. All rights reserved."
   },
-
   "LanguageSwitcher": {
     "english": "English",
     "persian": "Persian"
@@ -100,15 +78,11 @@
     "badge": "Enterprise Gaming Network",
     "title": "Built for Gamers. Engineered for Enterprise.",
     "description": "WrapLink combines intelligent DNS routing, edge acceleration, traffic optimization and enterprise-grade infrastructure to deliver a better gaming experience.",
-
     "missionTitle": "Our Mission",
     "missionText": "Reduce latency, simplify connectivity and provide gamers with reliable global networking through intelligent infrastructure.",
-
     "visionTitle": "Our Vision",
     "visionText": "Become the leading gamer connectivity platform with enterprise-grade reliability, transparent management and global edge technology.",
-
     "valuesTitle": "Core Values",
-
     "values": {
       "performance": {
         "title": "Performance First",
@@ -127,53 +101,45 @@
         "description": "Constant improvement."
       }
     },
-
     "architectureTitle": "Enterprise Architecture",
     "architectureDescription": "WrapLink is designed around scalable edge nodes, intelligent DNS control, secure APIs and centralized management."
-  },"ContactPage": {
-  "badge": "We're Here to Help",
-  "title": "Contact WrapLink",
-  "description": "Need help with your connection, payments or account? Our support team is ready to assist.",
-
-  "form": {
-    "title": "Send a Message",
-    "name": "Full Name",
-    "email": "Email Address",
-    "subject": "Subject",
-    "message": "Message",
-    "send": "Send Message"
   },
-
-  "info": {
-    "title": "Contact Information",
-    "email": "support@wraplink.ir",
-    "telegram": "@WrapLinkSupport",
-    "discord": "WrapLink Community",
-    "hours": "24/7 Support"
+  "ContactPage": {
+    "badge": "We're Here to Help",
+    "title": "Contact WrapLink",
+    "description": "Need help with your connection, payments or account? Our support team is ready to assist.",
+    "form": {
+      "title": "Send a Message",
+      "name": "Full Name",
+      "email": "Email Address",
+      "subject": "Subject",
+      "message": "Message",
+      "send": "Send Message"
+    },
+    "info": {
+      "title": "Contact Information",
+      "email": "support@wraplink.ir",
+      "telegram": "@WrapLinkSupport",
+      "discord": "WrapLink Community",
+      "hours": "24/7 Support"
+    },
+    "supportTitle": "Need Immediate Help?",
+    "supportDescription": "Create a support ticket from your user dashboard after signing in."
   },
-
-  "supportTitle": "Need Immediate Help?",
-  "supportDescription": "Create a support ticket from your user dashboard after signing in."
-},
   "PricingPage": {
     "badge": "Choose Your Plan",
     "title": "Flexible Plans for Every Gamer",
     "description": "Select the bandwidth and duration that fits your gaming style.",
-
     "monthly": "Monthly",
     "yearly": "Yearly",
-
     "buy": "Buy Now",
-
     "paymentTitle": "Supported Payments",
-
     "payments": {
       "wallet": "Wallet",
       "crypto": "Crypto",
       "cart": "Cart-to-Cart",
       "isp": "ISP Payment"
     },
-
     "plans": {
       "starter": {
         "name": "Starter",
@@ -202,16 +168,13 @@
     "badge": "Secure Sign In",
     "title": "Welcome Back",
     "description": "Sign in to access your WrapLink dashboard.",
-
     "email": "Email Address",
     "password": "Password",
     "remember": "Remember this device",
     "forgot": "Forgot Password?",
     "login": "Sign In",
-
     "noAccount": "Don't have an account?",
     "register": "Create one",
-
     "securityTitle": "Protected Login",
     "securityText": "Your account is protected with enterprise-grade authentication."
   },
@@ -219,28 +182,21 @@
     "badge": "Create Your Account",
     "title": "Join WrapLink",
     "description": "Create your account and start building a better gaming connection.",
-
     "fullName": "Full Name",
     "email": "Email Address",
     "password": "Password",
     "confirmPassword": "Confirm Password",
-
     "passwordHint": "Use at least 8 characters with uppercase, lowercase and numbers.",
-
     "strength": "Password Strength",
     "weak": "Weak",
     "medium": "Medium",
     "strong": "Strong",
-
     "terms": "I agree to the Terms of Service and Privacy Policy.",
     "register": "Create Account",
-
     "alreadyAccount": "Already have an account?",
     "login": "Sign In",
-
     "securityTitle": "Your Account, Your Control",
     "securityText": "Your WrapLink account will give you access to connections, plans, wallet, orders and support.",
-
     "validation": {
       "nameRequired": "Full name is required.",
       "emailRequired": "Email address is required.",
@@ -272,40 +228,29 @@
     "badge": "Almost There",
     "title": "Verify Your Email",
     "description": "We've sent a verification link to your email address. Please verify your account before signing in.",
-
     "checkInbox": "Check your inbox and spam folder.",
     "openMail": "Open Mail App",
-
     "resend": "Resend Email",
     "resendIn": "Resend in {seconds}s",
-
     "backToLogin": "Back to Login",
-
     "success": "Verification email sent successfully."
   },
   "ResetPasswordPage": {
     "badge": "Secure Password Reset",
     "title": "Create a New Password",
     "description": "Choose a strong password for your WrapLink account.",
-
     "newPassword": "New Password",
     "confirmPassword": "Confirm Password",
-
     "strength": "Password Strength",
     "weak": "Weak",
     "medium": "Medium",
     "strong": "Strong",
-
     "passwordHint": "Use at least 8 characters with uppercase, lowercase and numbers.",
-
     "reset": "Reset Password",
-
     "successTitle": "Password Updated",
     "successDescription": "Your password has been successfully changed.",
     "goLogin": "Go to Login",
-
     "invalidToken": "This reset link is invalid or has expired.",
-
     "validation": {
       "passwordRequired": "Password is required.",
       "passwordWeak": "Password must contain at least 8 characters, uppercase, lowercase and a number.",
@@ -316,17 +261,13 @@
   "DashboardPage": {
     "welcome": "Welcome back",
     "subtitle": "Manage your WrapLink services from one place.",
-
     "wallet": "Wallet",
     "currentPlan": "Current Plan",
     "connection": "Connection",
     "bandwidth": "Bandwidth",
     "orders": "Recent Orders",
-
     "active": "Active",
-
     "quickActions": "Quick Actions",
-
     "actions": {
       "connect": "Connect to Server",
       "connectNow": "Connect Now",
@@ -334,7 +275,6 @@
       "wallet": "Charge Wallet",
       "ticket": "Support Ticket"
     },
-
     "connectionInfo": {
       "title": "Connection Information",
       "userIp": "Your IP",
@@ -373,110 +313,103 @@
       "load": "Server Load"
     },
     "diagnostics": {
-    "diagnostics": {
-      "title": "Connection Diagnostics",
-      "ping": {
-        "title": "Ping Test",
-        "description": "Check latency to the WrapLink edge server."
+      "diagnostics": {
+        "title": "Connection Diagnostics",
+        "ping": {
+          "title": "Ping Test",
+          "description": "Check latency to the WrapLink edge server."
+        },
+        "dns": {
+          "title": "DNS Test",
+          "description": "Verify that WrapLink DNS is working correctly."
+        },
+        "route": {
+          "title": "Route Test",
+          "description": "Check whether your network route is optimized."
+        }
       },
-      "dns": {
-        "title": "DNS Test",
-        "description": "Verify that WrapLink DNS is working correctly."
+      "events": {
+        "title": "Connection Events",
+        "description": "Recent activity related to your WrapLink connection.",
+        "connected": "Connected to DE-FRA-01",
+        "dnsUpdated": "DNS configuration updated",
+        "maintenance": "Maintenance completed",
+        "todayTime": "Today · 10:32",
+        "yesterday": "Yesterday",
+        "twoDaysAgo": "2 days ago",
+        "empty": "No connection events yet."
       },
-      "route": {
-        "title": "Route Test",
-        "description": "Check whether your network route is optimized."
-      }
-    },
-    "events": {
-      "title": "Connection Events",
-      "description": "Recent activity related to your WrapLink connection.",
-      "connected": "Connected to DE-FRA-01",
-      "dnsUpdated": "DNS configuration updated",
-      "maintenance": "Maintenance completed",
-      "todayTime": "Today · 10:32",
-      "yesterday": "Yesterday",
-      "twoDaysAgo": "2 days ago",
-      "empty": "No connection events yet."
-    },
-    "power": {
-      "connect": "Connect",
-      "disconnect": "Disconnect",
-      "connected": "Connection Active",
-      "connecting": "Switching Connection...",
-      "disconnected": "Connection Disabled",
-      "connectedDescription": "Your traffic is currently routed through the WrapLink edge network for the best gaming experience.",
-      "disconnectedDescription": "Enable WrapLink to start using optimized routing and secure DNS.",
-      "online": "ONLINE",
-      "offline": "OFFLINE"
-    },
-    "history": {
-      "title": "Connection History",
-      "description": "Review your recent WrapLink connection activity.",
-      "connected": "Connected",
-      "disconnected": "Disconnected",
-      "duration": "Duration",
-      "latency": "Latency",
-      "time": "Time"
-    },
-    "errors": {
-      "loadFailed": "بارگذاری اطلاعات اتصال ناموفق بود.",
-      "connectionFailed": "تغییر وضعیت اتصال ناموفق بود.",
-      "diagnosticFailed": "اجرای تست عیب‌یابی ناموفق بود.",
-      "modeUpdateFailed": "به‌روزرسانی حالت اتصال ناموفق بود.",
-      "copyFailed": "کپی در کلیپ‌بورد امکان‌پذیر نیست."
-    },
-    "connectionDetails": {
-      "title": "Connection Details",
-      "edgeServer": "Edge Server",
-      "region": "Region",
-      "country": "Country",
-      "serverLoad": "Server Load"
-    },
-    "modes": {
-      "title": "Connection Mode",
-      "smart": {
-        "title": "Smart",
-        "description": "Automatically optimize your connection."
+      "power": {
+        "connect": "Connect",
+        "disconnect": "Disconnect",
+        "connected": "Connection Active",
+        "connecting": "Switching Connection...",
+        "disconnected": "Connection Disabled",
+        "connectedDescription": "Your traffic is currently routed through the WrapLink edge network for the best gaming experience.",
+        "disconnectedDescription": "Enable WrapLink to start using optimized routing and secure DNS.",
+        "online": "ONLINE",
+        "offline": "OFFLINE"
       },
-      "gaming": {
-        "title": "Gaming",
-        "description": "Prioritize low latency and gaming traffic."
+      "history": {
+        "title": "Connection History",
+        "description": "Review your recent WrapLink connection activity.",
+        "connected": "Connected",
+        "disconnected": "Disconnected",
+        "duration": "Duration",
+        "latency": "Latency",
+        "time": "Time"
       },
-      "streaming": {
-        "title": "Streaming",
-        "description": "Optimize the connection for video streaming."
+      "errors": {
+        "loadFailed": "بارگذاری اطلاعات اتصال ناموفق بود.",
+        "connectionFailed": "تغییر وضعیت اتصال ناموفق بود.",
+        "diagnosticFailed": "اجرای تست عیب‌یابی ناموفق بود.",
+        "modeUpdateFailed": "به‌روزرسانی حالت اتصال ناموفق بود.",
+        "copyFailed": "کپی در کلیپ‌بورد امکان‌پذیر نیست."
+      },
+      "connectionDetails": {
+        "title": "Connection Details",
+        "edgeServer": "Edge Server",
+        "region": "Region",
+        "country": "Country",
+        "serverLoad": "Server Load"
+      },
+      "modes": {
+        "title": "Connection Mode",
+        "smart": {
+          "title": "Smart",
+          "description": "Automatically optimize your connection."
+        },
+        "gaming": {
+          "title": "Gaming",
+          "description": "Prioritize low latency and gaming traffic."
+        },
+        "streaming": {
+          "title": "Streaming",
+          "description": "Optimize the connection for video streaming."
+        }
       }
     }
   },
   "WalletPage": {
     "title": "Wallet",
     "subtitle": "Manage your balance and payments.",
-
     "balance": "Current Balance",
-
     "deposit": "Charge Wallet",
     "withdraw": "Cash Out",
-
     "amount": "Amount",
-
     "paymentMethods": "Payment Methods",
-
     "methods": {
       "wallet": "Wallet",
       "cart": "Cart-to-Cart",
       "crypto": "Crypto",
       "isp": "ISP Payment"
     },
-
     "transactions": "Transaction History",
-
     "filters": {
       "all": "All",
       "deposit": "Deposits",
       "withdraw": "Withdrawals"
     },
-
     "submitDeposit": "Charge Wallet",
     "submitWithdraw": "Request Withdrawal"
   },
@@ -522,224 +455,229 @@
         "description": "Connect one additional device to your WrapLink service."
       }
     }
-  },"OrdersPage": {
-  "badge": "Order Management",
-  "title": "Your Orders",
-  "subtitle": "Track your purchases, manage orders and request eligible refunds.",
-  "items": "items",
-  "payment": "Payment Method",
-  "itemCount": "Total Items",
-  "itemsTitle": "Order Items",
-  "quantity": "Quantity",
-  "refund": "Refund Item",
-  "refunded": "Refunded",
-  "cancelOrder": "Cancel Order",
-  "filters": {
-    "all": "All",
-    "pending": "Pending",
-    "confirmed": "Confirmed",
-    "provisioning": "Provisioning",
-    "delivered": "Delivered",
-    "cancelled": "Cancelled"
   },
-  "stats": {
-    "pending": "Pending Orders",
-    "confirmed": "Processing Orders",
-    "active": "Active Orders",
-    "refunded": "Refunded Orders"
-  },
-  "status": {
-    "pending": "Pending",
-    "confirmed": "Confirmed",
-    "provisioning": "Provisioning",
-    "active": "Active",
-    "delivered": "Delivered",
-    "cancelled": "Cancelled",
-    "refunded": "Refunded"
-  },
-  "empty": {
-    "title": "No orders found",
-    "description": "You don't have any orders matching this filter.",
-    "button": "Browse Marketplace"
-  }
-},"SupportPage": {
-  "badge": "Customer Support",
-  "title": "Support Tickets",
-  "subtitle": "Create and manage support requests with the WrapLink support team.",
-  "newTicket": "New Ticket",
-  "backToTickets": "Back to Tickets",
-  "closeTicket": "Close Ticket",
-  "sendReply": "Send Reply",
-  "replyPlaceholder": "Write your reply...",
-  "noMessages": "No messages in this ticket yet.",
-  "you": "You",
-  "supportTeam": "Support Team",
-  "priorityLabel": "Priority",
-  "status": {
-    "open": "Open",
-    "pending": "Pending",
-    "resolved": "Resolved",
-    "closed": "Closed"
-  },
-  "priority": {
-    "low": "Low",
-    "medium": "Medium",
-    "high": "High"
-  },
-  "create": {
-    "title": "Create Support Ticket",
-    "subtitle": "Tell us how we can help.",
-    "subject": "Subject",
-    "subjectPlaceholder": "Describe your issue...",
-    "category": "Category",
-    "priority": "Priority",
-    "submit": "Create Ticket",
-    "categories": {
-      "technical": "Technical",
-      "billing": "Billing",
-      "connection": "Connection",
-      "other": "Other"
-    }
-  }
-},"BandwidthPage": {
-  "badge": "Network Analytics",
-  "title": "Bandwidth Reports",
-  "subtitle": "Monitor your bandwidth consumption and understand how your connection is being used.",
-  "currentUsage": "Current Usage",
-  "remaining": "remaining",
-  "used": "Used",
-  "currentPlan": "Current Plan",
-  "bandwidthLimit": "Bandwidth Limit",
-  "billingCycle": "Billing Cycle",
-  "monthly": "Monthly",
-  "download": "Download",
-  "upload": "Upload",
-  "totalTraffic": "Total Traffic",
-  "trafficReceived": "Traffic received",
-  "trafficSent": "Traffic sent",
-  "downloadUploadCombined": "Download + upload",
-  "usageReport": "Usage Report",
-  "usageReportSubtitle": "Bandwidth consumption over time.",
-  "ranges": {
-    "7d": "7 Days",
-    "30d": "30 Days",
-    "90d": "90 Days"
-  },
-  "reportInfoTitle": "Usage information",
-  "reportInfo": "Bandwidth statistics are calculated from your network traffic and may be updated periodically."
-},"UserSidebar": {
-  "controlPanel": "Control Panel",
-  "navigation": "Navigation",
-  "wallet": "Wallet",
-  "logout": "Logout",
-  "openMenu": "Open menu",
-  "closeMenu": "Close menu",
-  "items": {
-    "dashboard": "Dashboard",
-    "connection": "Connection",
-    "wallet": "Wallet",
-    "market": "Market",
-    "basket": "Basket",
-    "orders": "Orders",
-    "support": "Support",
-    "bandwidth": "Bandwidth",
-    "notifications": "Notifications",
-    "profile": "Profile"
-  }
-},"CheckoutPage": {
-  "loading": "Loading checkout...",
-  "badge": "Secure Checkout",
-  "title": "Complete Your Purchase",
-  "subtitle": "Choose your payment method and complete your order.",
-  "backToBasket": "Back to Basket",
-  "paymentMethod": "Payment Method",
-  "paymentMethodDescription": "Select how you want to pay for your WrapLink services.",
-  "processing": "Processing payment...",
-  "payNow": "Pay Now",
-  "securePayment": "Your payment is securely processed.",
-  "methods": {
-    "wallet": "WrapLink Wallet",
-    "walletDesc": "Pay instantly using your wallet balance.",
-    "card": "Card-to-Card",
-    "cardDesc": "Transfer the payment and upload your receipt.",
-    "crypto": "Cryptocurrency",
-    "cryptoDesc": "Pay using USDT cryptocurrency.",
-    "isp": "ISP Payment",
-    "ispDesc": "Pay through your internet service provider."
-  },
-  "wallet": {
-    "title": "Wallet Payment",
-    "description": "The amount will be deducted from your WrapLink wallet.",
-    "balance": "Available Balance",
-    "required": "Required Amount",
-    "sufficient": "Your wallet has enough balance to complete this payment.",
-    "insufficient": "Your wallet balance is insufficient."
-  },
-  "card": {
-    "title": "Card-to-Card Payment",
-    "description": "Transfer the exact amount to the WrapLink card below.",
-    "cardHolder": "Card Holder",
-    "cardHolderName": "WrapLink Payment",
-    "cardNumber": "Card Number",
-    "receipt": "Payment Receipt",
-    "upload": "Click to upload your payment receipt",
-    "fileTypes": "JPG, PNG or PDF"
-  },
-  "crypto": {
-    "title": "Cryptocurrency Payment",
-    "description": "Send the exact amount using the selected network.",
-    "network": "Network",
-    "address": "Wallet Address",
-    "warning": "Only send USDT using the selected network. Sending another asset or using another network may result in permanent loss."
-  },
-  "isp": {
-    "title": "ISP Payment",
-    "description": "Select your internet service provider.",
-    "provider": "Internet Provider",
-    "note": "After submitting the order, you will be redirected to your ISP payment service."
-  },
-  "summary": {
-    "title": "Order Summary",
+  "OrdersPage": {
+    "badge": "Order Management",
+    "title": "Your Orders",
+    "subtitle": "Track your purchases, manage orders and request eligible refunds.",
     "items": "items",
+    "payment": "Payment Method",
+    "itemCount": "Total Items",
+    "itemsTitle": "Order Items",
     "quantity": "Quantity",
-    "subtotal": "Subtotal",
-    "discount": "Discount",
-    "total": "Total"
+    "refund": "Refund Item",
+    "refunded": "Refunded",
+    "cancelOrder": "Cancel Order",
+    "filters": {
+      "all": "All",
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "provisioning": "Provisioning",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
+    },
+    "stats": {
+      "pending": "Pending Orders",
+      "confirmed": "Processing Orders",
+      "active": "Active Orders",
+      "refunded": "Refunded Orders"
+    },
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "provisioning": "Provisioning",
+      "active": "Active",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled",
+      "refunded": "Refunded"
+    },
+    "empty": {
+      "title": "No orders found",
+      "description": "You don't have any orders matching this filter.",
+      "button": "Browse Marketplace"
+    }
   },
-  "empty": {
-    "title": "Your basket is empty",
-    "description": "Add a product to your basket before proceeding to checkout.",
-    "button": "Browse Marketplace"
+  "SupportPage": {
+    "badge": "Customer Support",
+    "title": "Support Tickets",
+    "subtitle": "Create and manage support requests with the WrapLink support team.",
+    "newTicket": "New Ticket",
+    "backToTickets": "Back to Tickets",
+    "closeTicket": "Close Ticket",
+    "sendReply": "Send Reply",
+    "replyPlaceholder": "Write your reply...",
+    "noMessages": "No messages in this ticket yet.",
+    "you": "You",
+    "supportTeam": "Support Team",
+    "priorityLabel": "Priority",
+    "status": {
+      "open": "Open",
+      "pending": "Pending",
+      "resolved": "Resolved",
+      "closed": "Closed"
+    },
+    "priority": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
+    "create": {
+      "title": "Create Support Ticket",
+      "subtitle": "Tell us how we can help.",
+      "subject": "Subject",
+      "subjectPlaceholder": "Describe your issue...",
+      "category": "Category",
+      "priority": "Priority",
+      "submit": "Create Ticket",
+      "categories": {
+        "technical": "Technical",
+        "billing": "Billing",
+        "connection": "Connection",
+        "other": "Other"
+      }
+    }
   },
-  "errors": {
-    "emptyBasket": "Your basket is empty.",
-    "insufficientBalance": "Your wallet balance is insufficient for this payment.",
-    "receiptRequired": "Please upload your payment receipt."
-  }
-},"BasketPage": {
-  "title": "Your Basket",
-  "subtitle": "Review your selected products before checkout.",
-  "items": "items",
-  "clear": "Clear basket",
-  "remove": "Remove item",
-  "checkout": "Proceed to Checkout",
-  "continueShopping": "Continue Shopping",
-  "empty": {
-    "title": "Your basket is empty",
-    "description": "Browse the WrapLink marketplace and add a plan or service to your basket.",
-    "button": "Browse Marketplace"
+  "BandwidthPage": {
+    "badge": "Network Analytics",
+    "title": "Bandwidth Reports",
+    "subtitle": "Monitor your bandwidth consumption and understand how your connection is being used.",
+    "currentUsage": "Current Usage",
+    "remaining": "remaining",
+    "used": "Used",
+    "currentPlan": "Current Plan",
+    "bandwidthLimit": "Bandwidth Limit",
+    "billingCycle": "Billing Cycle",
+    "monthly": "Monthly",
+    "download": "Download",
+    "upload": "Upload",
+    "totalTraffic": "Total Traffic",
+    "trafficReceived": "Traffic received",
+    "trafficSent": "Traffic sent",
+    "downloadUploadCombined": "Download + upload",
+    "usageReport": "Usage Report",
+    "usageReportSubtitle": "Bandwidth consumption over time.",
+    "ranges": {
+      "7d": "7 Days",
+      "30d": "30 Days",
+      "90d": "90 Days"
+    },
+    "reportInfoTitle": "Usage information",
+    "reportInfo": "Bandwidth statistics are calculated from your network traffic and may be updated periodically."
   },
-  "summary": {
-    "title": "Order Summary",
-    "subtotal": "Subtotal",
-    "discount": "Discount",
-    "total": "Total"
-  }
-},
+  "UserSidebar": {
+    "controlPanel": "Control Panel",
+    "navigation": "Navigation",
+    "wallet": "Wallet",
+    "logout": "Logout",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "items": {
+      "dashboard": "Dashboard",
+      "connection": "Connection",
+      "wallet": "Wallet",
+      "market": "Market",
+      "basket": "Basket",
+      "orders": "Orders",
+      "support": "Support",
+      "bandwidth": "Bandwidth",
+      "notifications": "Notifications",
+      "profile": "Profile"
+    }
+  },
+  "CheckoutPage": {
+    "loading": "Loading checkout...",
+    "badge": "Secure Checkout",
+    "title": "Complete Your Purchase",
+    "subtitle": "Choose your payment method and complete your order.",
+    "backToBasket": "Back to Basket",
+    "paymentMethod": "Payment Method",
+    "paymentMethodDescription": "Select how you want to pay for your WrapLink services.",
+    "processing": "Processing payment...",
+    "payNow": "Pay Now",
+    "securePayment": "Your payment is securely processed.",
+    "methods": {
+      "wallet": "WrapLink Wallet",
+      "walletDesc": "Pay instantly using your wallet balance.",
+      "card": "Card-to-Card",
+      "cardDesc": "Transfer the payment and upload your receipt.",
+      "crypto": "Cryptocurrency",
+      "cryptoDesc": "Pay using USDT cryptocurrency.",
+      "isp": "ISP Payment",
+      "ispDesc": "Pay through your internet service provider."
+    },
+    "wallet": {
+      "title": "Wallet Payment",
+      "description": "The amount will be deducted from your WrapLink wallet.",
+      "balance": "Available Balance",
+      "required": "Required Amount",
+      "sufficient": "Your wallet has enough balance to complete this payment.",
+      "insufficient": "Your wallet balance is insufficient."
+    },
+    "card": {
+      "title": "Card-to-Card Payment",
+      "description": "Transfer the exact amount to the WrapLink card below.",
+      "cardHolder": "Card Holder",
+      "cardHolderName": "WrapLink Payment",
+      "cardNumber": "Card Number",
+      "receipt": "Payment Receipt",
+      "upload": "Click to upload your payment receipt",
+      "fileTypes": "JPG, PNG or PDF"
+    },
+    "crypto": {
+      "title": "Cryptocurrency Payment",
+      "description": "Send the exact amount using the selected network.",
+      "network": "Network",
+      "address": "Wallet Address",
+      "warning": "Only send USDT using the selected network. Sending another asset or using another network may result in permanent loss."
+    },
+    "isp": {
+      "title": "ISP Payment",
+      "description": "Select your internet service provider.",
+      "provider": "Internet Provider",
+      "note": "After submitting the order, you will be redirected to your ISP payment service."
+    },
+    "summary": {
+      "title": "Order Summary",
+      "items": "items",
+      "quantity": "Quantity",
+      "subtotal": "Subtotal",
+      "discount": "Discount",
+      "total": "Total"
+    },
+    "empty": {
+      "title": "Your basket is empty",
+      "description": "Add a product to your basket before proceeding to checkout.",
+      "button": "Browse Marketplace"
+    },
+    "errors": {
+      "emptyBasket": "Your basket is empty.",
+      "insufficientBalance": "Your wallet balance is insufficient for this payment.",
+      "receiptRequired": "Please upload your payment receipt."
+    }
+  },
+  "BasketPage": {
+    "title": "Your Basket",
+    "subtitle": "Review your selected products before checkout.",
+    "items": "items",
+    "clear": "Clear basket",
+    "remove": "Remove item",
+    "checkout": "Proceed to Checkout",
+    "continueShopping": "Continue Shopping",
+    "empty": {
+      "title": "Your basket is empty",
+      "description": "Browse the WrapLink marketplace and add a plan or service to your basket.",
+      "button": "Browse Marketplace"
+    },
+    "summary": {
+      "title": "Order Summary",
+      "subtotal": "Subtotal",
+      "discount": "Discount",
+      "total": "Total"
+    }
+  },
   "ProfilePage": {
     "title": "Profile & Security",
     "subtitle": "Manage your account, password, security and active sessions.",
-
     "profile": {
       "title": "Profile Information",
       "description": "Update your personal account information.",
@@ -749,7 +687,6 @@
       "saving": "Saving...",
       "saved": "Changes saved"
     },
-
     "account": {
       "title": "Account Status",
       "emailVerified": "Email Verification",
@@ -758,7 +695,6 @@
       "verified": "Verified",
       "active": "Active"
     },
-
     "security": {
       "passwordTitle": "Change Password",
       "passwordDescription": "Use a strong password that you don't use elsewhere.",
@@ -775,67 +711,66 @@
       "twoFactorEnabled": "Two-factor authentication is enabled.",
       "twoFactorDisabled": "Two-factor authentication is disabled."
     },
-
     "sessions": {
       "title": "Active Sessions",
       "description": "Review devices currently signed in to your account.",
       "current": "Current Session",
       "revoke": "Revoke",
       "logoutAll": "Sign Out All Sessions"
+    },
+    "security": {
+      "title": "Security",
+      "description": "Additional protection for your WrapLink account.",
+      "twoFactor": "Two-Factor Authentication",
+      "disabled": "Not enabled",
+      "optional": "Recommended",
+      "setup2fa": "Set Up 2FA"
+    },
+    "sessions": {
+      "title": "Active Sessions",
+      "description": "Review devices currently signed in to your account.",
+      "current": "Current",
+      "logout": "Revoke",
+      "revoking": "Revoking...",
+      "logoutAll": "Revoke Other Sessions"
+    },
+    "account": {
+      "title": "Sign Out",
+      "description": "Sign out from the current WrapLink session.",
+      "logout": "Sign Out"
     }
   },
-  "security": {
-    "title": "Security",
-    "description": "Additional protection for your WrapLink account.",
-    "twoFactor": "Two-Factor Authentication",
-    "disabled": "Not enabled",
-    "optional": "Recommended",
-    "setup2fa": "Set Up 2FA"
-  },
-  "sessions": {
-    "title": "Active Sessions",
-    "description": "Review devices currently signed in to your account.",
-    "current": "Current",
-    "logout": "Revoke",
-    "revoking": "Revoking...",
-    "logoutAll": "Revoke Other Sessions"
-  },
-  "account": {
-    "title": "Sign Out",
-    "description": "Sign out from the current WrapLink session.",
-    "logout": "Sign Out"
+  "NotificationPage": {
+    "badge": "Notification Center",
+    "title": "Notifications",
+    "subtitle": "Stay updated with orders, payments, support and security events.",
+    "markAll": "Mark all as read",
+    "empty": "No notifications",
+    "stats": {
+      "total": "Total",
+      "unread": "Unread",
+      "read": "Read",
+      "categories": "Categories"
+    },
+    "filters": {
+      "all": "All",
+      "unread": "Unread",
+      "order": "Orders",
+      "payment": "Payments",
+      "support": "Support",
+      "security": "Security",
+      "system": "System"
+    },
+    "preferences": {
+      "title": "Preferences",
+      "orders": "Order notifications",
+      "payments": "Payment notifications",
+      "support": "Support notifications",
+      "security": "Security notifications",
+      "system": "System notifications",
+      "email": "Email",
+      "push": "Push",
+      "sms": "SMS"
+    }
   }
-},"NotificationPage": {
-  "badge": "Notification Center",
-  "title": "Notifications",
-  "subtitle": "Stay updated with orders, payments, support and security events.",
-  "markAll": "Mark all as read",
-  "empty": "No notifications",
-  "stats": {
-    "total": "Total",
-    "unread": "Unread",
-    "read": "Read",
-    "categories": "Categories"
-  },
-  "filters": {
-    "all": "All",
-    "unread": "Unread",
-    "order": "Orders",
-    "payment": "Payments",
-    "support": "Support",
-    "security": "Security",
-    "system": "System"
-  },
-  "preferences": {
-    "title": "Preferences",
-    "orders": "Order notifications",
-    "payments": "Payment notifications",
-    "support": "Support notifications",
-    "security": "Security notifications",
-    "system": "System notifications",
-    "email": "Email",
-    "push": "Push",
-    "sms": "SMS"
-  }
-}
 }
