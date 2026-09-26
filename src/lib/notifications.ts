@@ -18,8 +18,8 @@ export type Notification = {
 
 const KEY = "wraplink_notifications";
 
-const defaults: Notification[] = [
-    {
+const defaults: Notification[] = [];
+/*    {
         id: "1",
         type: "order",
         title: "Order Activated",
@@ -43,7 +43,7 @@ const defaults: Notification[] = [
         createdAt: "Yesterday",
         read: true,
     },
-];
+];*/
 
 export function getNotifications(): Notification[] {
     if (typeof window === "undefined")

@@ -53,7 +53,8 @@ type Order = {
     items: OrderItem[];
 };
 
-const initialOrders: Order[] = [
+const initialOrders: Order[] = [];
+    /*[
     {
         id: "#WL-1001",
         date: "2026-09-18",
@@ -113,7 +114,7 @@ const initialOrders: Order[] = [
             },
         ],
     },
-];
+];*/
 
 export default function OrdersContent({
                                           locale,

@@ -184,21 +184,21 @@
         "description": "مناسب بازی روزانه.",
         "bandwidth": "۵۰ گیگابایت",
         "duration": "۳۰ روز",
-        "price": "۵ دلار"
+        "price": "200,000 تومان"
       },
       "pro": {
         "name": "Pro",
         "description": "انتخاب محبوب گیمرهای حرفه‌ای.",
         "bandwidth": "۲۰۰ گیگابایت",
         "duration": "۳۰ روز",
-        "price": "۱۲ دلار"
+        "price": "800،000 تومان"
       },
       "ultimate": {
         "name": "Ultimate",
         "description": "بیشترین سرعت و پهنای باند.",
         "bandwidth": "نامحدود",
         "duration": "۳۰ روز",
-        "price": "۲۵ دلار"
+        "price": "1،500،000 تومان"
       }
     }
   },

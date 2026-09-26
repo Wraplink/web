@@ -52,14 +52,14 @@ const products: Product[] = [
         id: "starter",
         translationKey: "starter",
         category: "plans",
-        monthly: 5,
+        monthly: 199000,
         icon: <Zap size={28}/>,
     },
     {
         id: "pro",
         translationKey: "pro",
         category: "plans",
-        monthly: 12,
+        monthly: 799000,
         icon: <Server size={28}/>,
         popular: true,
     },
@@ -67,22 +67,8 @@ const products: Product[] = [
         id: "ultimate",
         translationKey: "ultimate",
         category: "plans",
-        monthly: 25,
+        monthly: 999000,
         icon: <Crown size={28}/>,
-    },
-    {
-        id: "staticIp",
-        translationKey: "staticIp",
-        category: "services",
-        monthly: 4,
-        icon: <Server size={28}/>,
-    },
-    {
-        id: "extraDevice",
-        translationKey: "extraDevice",
-        category: "addons",
-        monthly: 3,
-        icon: <Smartphone size={28}/>,
     },
 ];
 
@@ -138,22 +124,28 @@ export default function MarketContent({
         });
     }, [category, search, t]);
 
-    const formatPrice = (
-        monthly: number
-    ) => {
-        if (billing === "monthly") {
-            return locale === "fa"
-                ? `${monthly} دلار`
-                : `$${monthly}`;
-        }
-
+    const formatPrice = (monthly: number) => {
         const yearly = Math.round(
             monthly * 12 * 0.8
         );
 
+        if (billing === "monthly") {
+            const formatted = new Intl.NumberFormat(
+                locale === "fa" ? "fa-IR" : "en-US"
+            ).format(monthly);
+
+            return locale === "fa"
+                ? `${formatted} تومان`
+                : `$${formatted}`;
+        }
+
+        const formatted = new Intl.NumberFormat(
+            locale === "fa" ? "fa-IR" : "en-US"
+        ).format(yearly);
+
         return locale === "fa"
-            ? `${yearly} دلار`
-            : `$${yearly}`;
+            ? `${formatted} تومان`
+            : `$${formatted}`;
     };
 
     const addToBasket = (

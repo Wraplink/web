@@ -43,7 +43,8 @@ type SupportTicket = {
     messages: SupportMessage[];
 };
 
-const initialTickets: SupportTicket[] = [
+const initialTickets: SupportTicket[] = [];
+/*[
     {
         id: "#TKT-1001",
         subject: "Connection is slower than usual",
@@ -119,7 +120,7 @@ const initialTickets: SupportTicket[] = [
             },
         ],
     },
-];
+];*/
 
 /*
  * ========================================================

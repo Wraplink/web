@@ -40,10 +40,10 @@ export default async function DashboardContent({locale}: Props) {
      */
 
     const summary = {
-        wallet: "$42.50",
+        wallet: "0",
         plan: "Pro",
         connection: t("active"),
-        bandwidth: "76 GB / 200 GB"
+        bandwidth: "0 GB / 0 GB"
     };
 
     const connection = {

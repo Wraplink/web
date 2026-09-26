@@ -149,21 +149,21 @@
         "description": "Perfect for casual gaming.",
         "bandwidth": "50 GB",
         "duration": "30 Days",
-        "price": "$5"
+        "price": "199,000 Toman"
       },
       "pro": {
         "name": "Pro",
         "description": "Competitive gamers' favorite.",
         "bandwidth": "200 GB",
         "duration": "30 Days",
-        "price": "$12"
+        "price": "799,000 Toman"
       },
       "ultimate": {
         "name": "Ultimate",
         "description": "Maximum performance and bandwidth.",
         "bandwidth": "Unlimited",
         "duration": "30 Days",
-        "price": "$25"
+        "price": "999,000 Toman"
       }
     }
   },
@@ -326,80 +326,78 @@
       "load": "Server Load"
     },
     "diagnostics": {
-      "diagnostics": {
-        "title": "Connection Diagnostics",
-        "ping": {
-          "title": "Ping Test",
-          "description": "Check latency to the WrapLink edge server."
-        },
-        "dns": {
-          "title": "DNS Test",
-          "description": "Verify that WrapLink DNS is working correctly."
-        },
-        "route": {
-          "title": "Route Test",
-          "description": "Check whether your network route is optimized."
-        }
+      "title": "Connection Diagnostics",
+      "ping": {
+        "title": "Ping Test",
+        "description": "Check latency to the WrapLink edge server."
       },
-      "events": {
-        "title": "Connection Events",
-        "description": "Recent activity related to your WrapLink connection.",
-        "connected": "Connected to DE-FRA-01",
-        "dnsUpdated": "DNS configuration updated",
-        "maintenance": "Maintenance completed",
-        "todayTime": "Today · 10:32",
-        "yesterday": "Yesterday",
-        "twoDaysAgo": "2 days ago",
-        "empty": "No connection events yet."
+      "dns": {
+        "title": "DNS Test",
+        "description": "Verify that WrapLink DNS is working correctly."
       },
-      "power": {
-        "connect": "Connect",
-        "disconnect": "Disconnect",
-        "connected": "Connection Active",
-        "connecting": "Switching Connection...",
-        "disconnected": "Connection Disabled",
-        "connectedDescription": "Your traffic is currently routed through the WrapLink edge network for the best gaming experience.",
-        "disconnectedDescription": "Enable WrapLink to start using optimized routing and secure DNS.",
-        "online": "ONLINE",
-        "offline": "OFFLINE"
+      "route": {
+        "title": "Route Test",
+        "description": "Check whether your network route is optimized."
+      }
+    },
+    "events": {
+      "title": "Connection Events",
+      "description": "Recent activity related to your WrapLink connection.",
+      "connected": "Connected to DE-FRA-01",
+      "dnsUpdated": "DNS configuration updated",
+      "maintenance": "Maintenance completed",
+      "todayTime": "Today · 10:32",
+      "yesterday": "Yesterday",
+      "twoDaysAgo": "2 days ago",
+      "empty": "No connection events yet."
+    },
+    "power": {
+      "connect": "Connect",
+      "disconnect": "Disconnect",
+      "connected": "Connection Active",
+      "connecting": "Switching Connection...",
+      "disconnected": "Connection Disabled",
+      "connectedDescription": "Your traffic is currently routed through the WrapLink edge network for the best gaming experience.",
+      "disconnectedDescription": "Enable WrapLink to start using optimized routing and secure DNS.",
+      "online": "ONLINE",
+      "offline": "OFFLINE"
+    },
+    "history": {
+      "title": "Connection History",
+      "description": "Review your recent WrapLink connection activity.",
+      "connected": "Connected",
+      "disconnected": "Disconnected",
+      "duration": "Duration",
+      "latency": "Latency",
+      "time": "Time"
+    },
+    "errors": {
+      "loadFailed": "بارگذاری اطلاعات اتصال ناموفق بود.",
+      "connectionFailed": "تغییر وضعیت اتصال ناموفق بود.",
+      "diagnosticFailed": "اجرای تست عیب‌یابی ناموفق بود.",
+      "modeUpdateFailed": "به‌روزرسانی حالت اتصال ناموفق بود.",
+      "copyFailed": "کپی در کلیپ‌بورد امکان‌پذیر نیست."
+    },
+    "connectionDetails": {
+      "title": "Connection Details",
+      "edgeServer": "Edge Server",
+      "region": "Region",
+      "country": "Country",
+      "serverLoad": "Server Load"
+    },
+    "modes": {
+      "title": "Connection Mode",
+      "smart": {
+        "title": "Smart",
+        "description": "Automatically optimize your connection."
       },
-      "history": {
-        "title": "Connection History",
-        "description": "Review your recent WrapLink connection activity.",
-        "connected": "Connected",
-        "disconnected": "Disconnected",
-        "duration": "Duration",
-        "latency": "Latency",
-        "time": "Time"
+      "gaming": {
+        "title": "Gaming",
+        "description": "Prioritize low latency and gaming traffic."
       },
-      "errors": {
-        "loadFailed": "بارگذاری اطلاعات اتصال ناموفق بود.",
-        "connectionFailed": "تغییر وضعیت اتصال ناموفق بود.",
-        "diagnosticFailed": "اجرای تست عیب‌یابی ناموفق بود.",
-        "modeUpdateFailed": "به‌روزرسانی حالت اتصال ناموفق بود.",
-        "copyFailed": "کپی در کلیپ‌بورد امکان‌پذیر نیست."
-      },
-      "connectionDetails": {
-        "title": "Connection Details",
-        "edgeServer": "Edge Server",
-        "region": "Region",
-        "country": "Country",
-        "serverLoad": "Server Load"
-      },
-      "modes": {
-        "title": "Connection Mode",
-        "smart": {
-          "title": "Smart",
-          "description": "Automatically optimize your connection."
-        },
-        "gaming": {
-          "title": "Gaming",
-          "description": "Prioritize low latency and gaming traffic."
-        },
-        "streaming": {
-          "title": "Streaming",
-          "description": "Optimize the connection for video streaming."
-        }
+      "streaming": {
+        "title": "Streaming",
+        "description": "Optimize the connection for video streaming."
       }
     }
   },

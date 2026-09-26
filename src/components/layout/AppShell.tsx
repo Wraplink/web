@@ -43,18 +43,14 @@ export default function AppShell({
             : en;
 
     const normalizedPath =
-        locale === "fa"
-            ? pathname.replace(/^\/fa/, "") || "/"
-            : pathname;
+        pathname.replace(/^\/(en|fa)(?=\/|$)/, "") || "/";
 
-    const isAuthenticatedRoute =
-        authenticatedRoutes.some(
-            (route) =>
-                normalizedPath === route ||
-                normalizedPath.startsWith(
-                    `${route}/`
-                )
-        );
+
+    const isAuthenticatedRoute = authenticatedRoutes.some(
+        (route) =>
+            normalizedPath === route ||
+            (route !== "/" && normalizedPath.startsWith(`${route}/`))
+    );
 
     useEffect(() => {
         document.documentElement.lang =

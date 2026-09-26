@@ -43,7 +43,7 @@ export default function WalletContent({locale}: Props) {
      * ============================================================
      */
 
-    const balance = "$126.75";
+    const balance = "0 تومان";
 
     const transactions = [
         {

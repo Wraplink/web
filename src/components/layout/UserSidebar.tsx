@@ -297,7 +297,7 @@ export default function UserSidebar({
                     </div>
 
                     <div className="mt-1 text-xl font-bold text-cyan-400">
-                        $126.75
+                        0 تونان
                     </div>
 
                 </div>

@@ -17,28 +17,28 @@ type Range = "7d" | "30d" | "90d";
 
 const usageData = {
     "7d": [
-        {day: "Mon", value: 8},
-        {day: "Tue", value: 14},
-        {day: "Wed", value: 11},
-        {day: "Thu", value: 19},
-        {day: "Fri", value: 24},
-        {day: "Sat", value: 31},
-        {day: "Sun", value: 18},
+        {day: "Mon", value: 0},
+        {day: "Tue", value: 0},
+        {day: "Wed", value: 0},
+        {day: "Thu", value: 0},
+        {day: "Fri", value: 0},
+        {day: "Sat", value: 0},
+        {day: "Sun", value: 0},
     ],
     "30d": [
-        {day: "1", value: 12},
-        {day: "5", value: 22},
-        {day: "10", value: 18},
-        {day: "15", value: 35},
-        {day: "20", value: 28},
-        {day: "25", value: 42},
-        {day: "30", value: 31},
+        {day: "1", value: 0},
+        {day: "5", value: 0},
+        {day: "10", value: 0},
+        {day: "15", value: 0},
+        {day: "20", value: 0},
+        {day: "25", value: 0},
+        {day: "30", value: 0},
     ],
     "90d": [
-        {day: "Jun", value: 180},
-        {day: "Jul", value: 220},
-        {day: "Aug", value: 265},
-        {day: "Sep", value: 145},
+        {day: "Jun", value: 0},
+        {day: "Jul", value: 0},
+        {day: "Aug", value: 0},
+        {day: "Sep", value: 0},
     ],
 };
 
@@ -73,15 +73,15 @@ export default function BandwidthContent() {
     const [range, setRange] =
         useState<Range>("7d");
 
-    const used = 76;
-    const limit = 200;
+    const used = 0;
+    const limit = 1;
     const remaining = limit - used;
 
     const percentage =
         Math.round((used / limit) * 100);
 
-    const download = 52;
-    const upload = 24;
+    const download = 0;
+    const upload = 0;
 
     const chartData = usageData[range];
 

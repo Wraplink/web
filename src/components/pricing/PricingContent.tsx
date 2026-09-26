@@ -23,17 +23,17 @@ const plans = [
     {
         key: "starter",
         icon: Zap,
-        monthly: 5,
+        monthly: 199000,
     },
     {
         key: "pro",
         icon: Shield,
-        monthly: 12,
+        monthly: 799000,
     },
     {
         key: "ultimate",
         icon: Crown,
-        monthly: 25,
+        monthly: 999000,
     },
 ] as const;
 
@@ -64,17 +64,18 @@ export default function PricingContent({locale}: Props) {
     );
 
     const formatPrice = (monthly: number) => {
-        if (billing === "monthly") {
-            return locale === "fa"
-                ? `${monthly} دلار`
-                : `$${monthly}`;
-        }
+        const amount =
+            billing === "monthly"
+                ? monthly
+                : Math.round(monthly * 12 * 0.8);
 
-        const yearly = Math.round(monthly * 12 * 0.8);
+        const formatted = new Intl.NumberFormat(
+            locale === "fa" ? "fa-IR" : "en-US"
+        ).format(amount);
 
         return locale === "fa"
-            ? `${yearly} دلار`
-            : `$${yearly}`;
+            ? `${formatted} تومان`
+            : `$${formatted}`;
     };
 
     return (
