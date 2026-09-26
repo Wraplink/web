@@ -32,10 +32,10 @@ export default function AppShell({
     const pathname = usePathname();
 
     const locale =
-        pathname === "/fa" ||
-        pathname.startsWith("/fa/")
-            ? "fa"
-            : "en";
+        pathname === "/en" ||
+        pathname.startsWith("/en/")
+            ? "en"
+            : "fa";
 
     const messages =
         locale === "fa"

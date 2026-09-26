@@ -11,7 +11,7 @@ export default function LanguageSwitcher() {
     const locale = useLocale();
     const pathname = usePathname();
 
-    const targetLocale = locale === "en" ? "fa" : "en";
+    const targetLocale = locale === "fa" ? "en" : "fa";
 
     return (
         <Link
@@ -19,7 +19,7 @@ export default function LanguageSwitcher() {
             locale={targetLocale}
             className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm font-medium text-gray-300 transition hover:border-cyan-400 hover:text-cyan-400"
         >
-            {locale === "en" ? "فارسی" : "English"}
+            {locale === "fa" ? "English" : "فارسی"}
         </Link>
     );
 }

@@ -1,5 +1,5 @@
 import AboutContent from "@/components/about/AboutContent";
 
 export default function AboutPage() {
-    return <AboutContent locale="en"/>;
+    return <AboutContent locale="fa"/>;
 }

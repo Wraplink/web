@@ -8,6 +8,6 @@ export const metadata: Metadata = {
 
 export default function CheckoutPage() {
     return (
-        <CheckoutContent locale="en"/>
+        <CheckoutContent locale="fa"/>
     );
 }

@@ -15,7 +15,7 @@ function ResetPasswordLoading() {
 export default function ResetPasswordPage() {
     return (
         <Suspense fallback={<ResetPasswordLoading/>}>
-            <ResetPasswordContent locale="en"/>
+            <ResetPasswordContent locale="fa"/>
         </Suspense>
     );
 }

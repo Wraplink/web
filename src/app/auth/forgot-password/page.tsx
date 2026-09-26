@@ -2,6 +2,6 @@ import ForgotPasswordContent from "@/components/auth/ForgotPasswordContent";
 
 export default function ForgotPasswordPage() {
     return (
-        <ForgotPasswordContent locale="en"/>
+        <ForgotPasswordContent locale="fa"/>
     );
 }

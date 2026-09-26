@@ -8,6 +8,6 @@ export const metadata: Metadata = {
 
 export default function ProfilePage() {
     return (
-        <ProfileContent locale="en"/>
+        <ProfileContent locale="fa"/>
     );
 }

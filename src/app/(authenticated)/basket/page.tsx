@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function BasketPage() {
-    return <BasketContent locale="en"/>;
+    return <BasketContent locale="fa"/>;
 }

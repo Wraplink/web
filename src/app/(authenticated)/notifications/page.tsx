@@ -8,6 +8,6 @@ export const metadata: Metadata = {
 
 export default function NotificationsPage() {
     return (
-        <NotificationCenter locale="en"/>
+        <NotificationCenter locale="fa"/>
     );
 }

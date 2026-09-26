@@ -2,6 +2,6 @@ import WalletContent from "@/components/wallet/WalletContent";
 
 export default function WalletPage() {
     return (
-        <WalletContent locale="en"/>
+        <WalletContent locale="fa"/>
     );
 }

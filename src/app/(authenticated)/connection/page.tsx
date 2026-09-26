@@ -8,6 +8,6 @@ export const metadata: Metadata = {
 
 export default function ConnectionPage() {
     return (
-        <ConnectionContent locale="en"/>
+        <ConnectionContent locale="fa"/>
     );
 }

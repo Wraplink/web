@@ -1,5 +1,5 @@
 import VerifyEmailContent from "@/components/auth/VerifyEmailContent";
 
 export default function VerifyEmailPage() {
-    return <VerifyEmailContent locale="en"/>;
+    return <VerifyEmailContent locale="fa"/>;
 }
