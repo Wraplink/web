@@ -3,6 +3,7 @@
 import {useMemo, useState} from "react";
 
 import {
+    Check,
     Eye,
     EyeOff,
     Lock,
@@ -25,12 +26,22 @@ type FormErrors = {
     password?: string;
     confirmPassword?: string;
     terms?: string;
+    privacy?: string;
 };
 
-export default function RegisterContent({locale}: Props) {
+const TERMS_VERSION = "2026-09-26";
+const PRIVACY_VERSION = "2026-09-26";
+
+export default function RegisterContent({
+    locale,
+}: Props) {
     const t = useTranslations("RegisterPage");
 
-    const [showPassword, setShowPassword] = useState(false);
+    const isFa = locale === "fa";
+
+    const [showPassword, setShowPassword] =
+        useState(false);
+
     const [showConfirmPassword, setShowConfirmPassword] =
         useState(false);
 
@@ -40,10 +51,20 @@ export default function RegisterContent({locale}: Props) {
     const [confirmPassword, setConfirmPassword] =
         useState("");
 
-    const [terms, setTerms] = useState(false);
+    const [acceptedTerms, setAcceptedTerms] =
+        useState(false);
+
+    const [acceptedPrivacy, setAcceptedPrivacy] =
+        useState(false);
+
+    const [marketingConsent, setMarketingConsent] =
+        useState(false);
 
     const [errors, setErrors] =
         useState<FormErrors>({});
+
+    const [isSubmitting, setIsSubmitting] =
+        useState(false);
 
     const passwordStrength = useMemo(() => {
         if (!password) {
@@ -131,9 +152,15 @@ export default function RegisterContent({locale}: Props) {
             );
         }
 
-        if (!terms) {
+        if (!acceptedTerms) {
             nextErrors.terms = t(
                 "validation.termsRequired",
+            );
+        }
+
+        if (!acceptedPrivacy) {
+            nextErrors.privacy = t(
+                "validation.privacyRequired",
             );
         }
 
@@ -142,7 +169,7 @@ export default function RegisterContent({locale}: Props) {
         return Object.keys(nextErrors).length === 0;
     }
 
-    function handleSubmit(
+    async function handleSubmit(
         event: React.FormEvent<HTMLFormElement>,
     ) {
         event.preventDefault();
@@ -151,44 +178,105 @@ export default function RegisterContent({locale}: Props) {
             return;
         }
 
+        if (isSubmitting) {
+            return;
+        }
+
+        setIsSubmitting(true);
+
         /*
          * ========================================================
          * BACKEND TODO
          * ========================================================
          *
-         * When the Go backend is ready:
-         *
          * POST /api/v1/auth/register
          *
-         * Payload:
+         * Payload should eventually contain:
          *
          * {
          *   name,
          *   email,
-         *   password
+         *   password,
+         *
+         *   legal: {
+         *     termsVersion: "2026-09-26",
+         *     privacyVersion: "2026-09-26",
+         *     acceptedAt: "...",
+         *     marketingConsent: false
+         *   }
          * }
          *
-         * Backend should:
+         * Backend MUST:
          *
-         * 1. Create the user.
-         * 2. Hash the password.
-         * 3. Create email verification request.
-         * 4. Return appropriate authentication/verification state.
+         * 1. Validate the account data.
+         * 2. Hash the password using a strong password hashing
+         *    algorithm such as Argon2id.
+         * 3. Create the user.
+         * 4. Persist the exact accepted Terms version.
+         * 5. Persist the exact accepted Privacy Policy version.
+         * 6. Persist acceptedAt on the server.
+         * 7. Persist marketingConsent separately from mandatory
+         *    legal acceptance.
+         * 8. Create email verification request.
+         * 9. Return the appropriate verification state.
          *
-         * Do NOT put authentication secrets in localStorage.
+         * IMPORTANT:
+         *
+         * Do NOT trust the client-provided acceptedAt.
+         * The backend must generate the authoritative timestamp.
+         *
+         * Do NOT store passwords or authentication secrets
+         * in localStorage.
+         *
          * ========================================================
          */
 
-        console.log("Registration form is valid", {
-            name,
-            email,
+        const registrationPayload = {
+            name: name.trim(),
+            email: email.trim().toLowerCase(),
+            password,
+
+            legal: {
+                termsVersion: TERMS_VERSION,
+                privacyVersion: PRIVACY_VERSION,
+                marketingConsent,
+            },
+
             locale,
-        });
+        };
+
+        console.log(
+            "Registration form is valid",
+            registrationPayload,
+        );
+
+        /*
+         * Temporary frontend implementation.
+         *
+         * Remove this when the backend API is connected.
+         */
+        setTimeout(() => {
+            setIsSubmitting(false);
+        }, 500);
     }
 
-    return (
-        <section className="mx-auto flex min-h-[calc(100vh-120px)] max-w-7xl items-center px-6 py-20">
+    const loginHref = isFa
+        ? "/fa/auth/login"
+        : "/auth/login";
 
+    const legalHref = isFa
+        ? "/fa/legal"
+        : "/legal";
+
+    const privacyHref = isFa
+        ? "/fa/privacy"
+        : "/privacy";
+
+    return (
+        <section
+            dir={isFa ? "rtl" : "ltr"}
+            className="mx-auto flex min-h-[calc(100vh-120px)] max-w-7xl items-center px-6 py-20"
+        >
             <div className="grid w-full gap-10 lg:grid-cols-2">
 
                 {/* Information */}
@@ -253,6 +341,7 @@ export default function RegisterContent({locale}: Props) {
                                 }
                                 className="w-full bg-transparent px-3 py-3 outline-none"
                                 autoComplete="name"
+                                disabled={isSubmitting}
                             />
                         </Field>
 
@@ -271,6 +360,7 @@ export default function RegisterContent({locale}: Props) {
                                 }
                                 className="w-full bg-transparent px-3 py-3 outline-none"
                                 autoComplete="email"
+                                disabled={isSubmitting}
                             />
                         </Field>
 
@@ -293,6 +383,7 @@ export default function RegisterContent({locale}: Props) {
                                 }
                                 className="w-full bg-transparent px-3 py-3 outline-none"
                                 autoComplete="new-password"
+                                disabled={isSubmitting}
                             />
 
                             <button
@@ -304,6 +395,7 @@ export default function RegisterContent({locale}: Props) {
                                 }
                                 className="text-gray-400 transition hover:text-cyan-400"
                                 aria-label={t("password")}
+                                disabled={isSubmitting}
                             >
                                 {showPassword ? (
                                     <EyeOff size={20}/>
@@ -353,29 +445,26 @@ export default function RegisterContent({locale}: Props) {
                                             const active =
                                                 passwordStrength ===
                                                 "weak"
-                                                    ? item ===
-                                                    1
+                                                    ? item === 1
                                                     : passwordStrength ===
                                                     "medium"
-                                                        ? item <=
-                                                        2
-                                                        : item <=
-                                                        3;
+                                                        ? item <= 2
+                                                        : item <= 3;
 
                                             return (
                                                 <div
                                                     key={item}
                                                     className={`h-1.5 flex-1 rounded-full ${
-                                                        active
-                                                            ? passwordStrength ===
-                                                            "weak"
-                                                                ? "bg-red-400"
-                                                                : passwordStrength ===
-                                                                "medium"
-                                                                    ? "bg-yellow-400"
-                                                                    : "bg-green-400"
-                                                            : "bg-white/10"
-                                                    }`}
+    active
+        ? passwordStrength ===
+        "weak"
+            ? "bg-red-400"
+            : passwordStrength ===
+            "medium"
+                ? "bg-yellow-400"
+                : "bg-green-400"
+        : "bg-white/10"
+}`}
                                                 />
                                             );
                                         },
@@ -405,6 +494,7 @@ export default function RegisterContent({locale}: Props) {
                                 }
                                 className="w-full bg-transparent px-3 py-3 outline-none"
                                 autoComplete="new-password"
+                                disabled={isSubmitting}
                             />
 
                             <button
@@ -418,6 +508,7 @@ export default function RegisterContent({locale}: Props) {
                                 aria-label={t(
                                     "confirmPassword",
                                 )}
+                                disabled={isSubmitting}
                             >
                                 {showConfirmPassword ? (
                                     <EyeOff size={20}/>
@@ -427,42 +518,170 @@ export default function RegisterContent({locale}: Props) {
                             </button>
                         </Field>
 
-                        {/* Terms */}
+                        {/* Legal Acceptance */}
 
-                        <div>
-                            <label className="flex items-start gap-3 text-sm text-gray-300">
+                        <div className="space-y-4 rounded-2xl border border-white/10 bg-black/20 p-5">
+
+                            {/* Terms */}
+
+                            <label className="flex cursor-pointer items-start gap-3 text-sm text-gray-300">
 
                                 <input
                                     type="checkbox"
-                                    checked={terms}
-                                    onChange={(e) =>
-                                        setTerms(
+                                    checked={acceptedTerms}
+                                    onChange={(e) => {
+                                        setAcceptedTerms(
                                             e.target.checked,
-                                        )
-                                    }
-                                    className="mt-1 h-4 w-4 accent-cyan-400"
+                                        );
+
+                                        if (
+                                            e.target.checked
+                                        ) {
+                                            setErrors(
+                                                (current) => ({
+                                                    ...current,
+                                                    terms: undefined,
+                                                }),
+                                            );
+                                        }
+                                    }}
+                                    className="mt-1 h-4 w-4 shrink-0 accent-cyan-400"
+                                    disabled={isSubmitting}
                                 />
 
-                                <span>
-                                    {t("terms")}
+                                <span className="leading-6">
+                                    <span className="text-white">
+                                        {t("termsPrefix")}{" "}
+                                    </span>
+
+                                    <Link
+                                        href={legalHref}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="font-semibold text-cyan-400 hover:underline"
+                                    >
+                                        {t("termsLink")}
+                                    </Link>
+
+                                    <span>
+                                        {" "}
+                                        {t("termsSuffix")}
+                                    </span>
                                 </span>
 
                             </label>
 
                             {errors.terms && (
-                                <p className="mt-2 text-sm text-red-400">
+                                <p className="text-sm text-red-400">
                                     {errors.terms}
                                 </p>
                             )}
+
+                            {/* Privacy */}
+
+                            <label className="flex cursor-pointer items-start gap-3 text-sm text-gray-300">
+
+                                <input
+                                    type="checkbox"
+                                    checked={acceptedPrivacy}
+                                    onChange={(e) => {
+                                        setAcceptedPrivacy(
+                                            e.target.checked,
+                                        );
+
+                                        if (
+                                            e.target.checked
+                                        ) {
+                                            setErrors(
+                                                (current) => ({
+                                                    ...current,
+                                                    privacy:
+                                                        undefined,
+                                                }),
+                                            );
+                                        }
+                                    }}
+                                    className="mt-1 h-4 w-4 shrink-0 accent-cyan-400"
+                                    disabled={isSubmitting}
+                                />
+
+                                <span className="leading-6">
+                                    <span className="text-white">
+                                        {t("privacyPrefix")}{" "}
+                                    </span>
+
+                                    <Link
+                                        href={privacyHref}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="font-semibold text-cyan-400 hover:underline"
+                                    >
+                                        {t("privacyLink")}
+                                    </Link>
+
+                                    <span>
+                                        {" "}
+                                        {t("privacySuffix")}
+                                    </span>
+                                </span>
+
+                            </label>
+
+                            {errors.privacy && (
+                                <p className="text-sm text-red-400">
+                                    {errors.privacy}
+                                </p>
+                            )}
+
+                            {/* Marketing - OPTIONAL */}
+
+                            <label className="flex cursor-pointer items-start gap-3 text-sm text-gray-400">
+
+                                <input
+                                    type="checkbox"
+                                    checked={marketingConsent}
+                                    onChange={(e) =>
+                                        setMarketingConsent(
+                                            e.target.checked,
+                                        )
+                                    }
+                                    className="mt-1 h-4 w-4 shrink-0 accent-cyan-400"
+                                    disabled={isSubmitting}
+                                />
+
+                                <span className="leading-6">
+                                    {t("marketing")}
+                                </span>
+
+                            </label>
+
+                            <div className="flex items-start gap-2 border-t border-white/10 pt-4 text-xs leading-5 text-gray-500">
+                                <Check
+                                    size={15}
+                                    className="mt-0.5 shrink-0 text-cyan-400"
+                                />
+
+                                <span>
+                                    {t("legalNotice")}
+                                </span>
+                            </div>
+
                         </div>
 
                         {/* Submit */}
 
                         <button
                             type="submit"
-                            className="w-full rounded-xl bg-cyan-400 py-3 font-bold text-black transition hover:scale-[1.02] hover:shadow-[0_0_25px_rgba(34,211,238,0.35)]"
+                            disabled={
+                                isSubmitting ||
+                                !acceptedTerms ||
+                                !acceptedPrivacy
+                            }
+                            className="w-full rounded-xl bg-cyan-400 py-3 font-bold text-black transition hover:scale-[1.02] hover:shadow-[0_0_25px_rgba(34,211,238,0.35)] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100 disabled:hover:shadow-none"
                         >
-                            {t("register")}
+                            {isSubmitting
+                                ? t("creating")
+                                : t("register")}
                         </button>
 
                     </form>
@@ -472,7 +691,7 @@ export default function RegisterContent({locale}: Props) {
                         {t("alreadyAccount")}{" "}
 
                         <Link
-                            href="/auth/login"
+                            href={loginHref}
                             className="font-semibold text-cyan-400 hover:underline"
                         >
                             {t("login")}
@@ -483,17 +702,16 @@ export default function RegisterContent({locale}: Props) {
                 </div>
 
             </div>
-
         </section>
     );
 }
 
 function Field({
-                   icon,
-                   label,
-                   error,
-                   children,
-               }: {
+    icon,
+    label,
+    error,
+    children,
+}: {
     icon: React.ReactNode;
     label: string;
     error?: string;
@@ -507,10 +725,10 @@ function Field({
 
             <div
                 className={`flex items-center rounded-xl border bg-black/20 px-4 transition ${
-                    error
-                        ? "border-red-400/60"
-                        : "border-white/10 focus-within:border-cyan-400"
-                }`}
+    error
+        ? "border-red-400/60"
+        : "border-white/10 focus-within:border-cyan-400"
+}`}
             >
                 <span className="text-gray-400">
                     {icon}

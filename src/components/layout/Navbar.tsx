@@ -31,6 +31,10 @@ const navigation = [
         key: "contact",
         href: "/contact",
     },
+    {
+        key: "legal",
+        href: "/legal",
+    },
 ] as const;
 
 export default function Navbar() {

@@ -6,7 +6,8 @@
     "pricing": "Pricing",
     "contact": "Contact",
     "login": "Login",
-    "register": "Register"
+    "register": "Register",
+    "legal": "Legal"
   },
   "HomePage": {
     "badge": "Next Generation Gamer Network",
@@ -68,7 +69,9 @@
     "description": "Next Generation Gamer Network Platform.",
     "platform": "Platform",
     "support": "Support",
-    "copyright": "© 2026 WrapLink. All rights reserved."
+    "copyright": "© 2026 WrapLink. All rights reserved.",
+    "legal": "Legal",
+    "privacy": "Privacy Policy"
   },
   "LanguageSwitcher": {
     "english": "English",
@@ -197,6 +200,15 @@
     "login": "Sign In",
     "securityTitle": "Your Account, Your Control",
     "securityText": "Your WrapLink account will give you access to connections, plans, wallet, orders and support.",
+    "termsPrefix": "I have read and agree to the",
+    "termsLink": "Terms of Service",
+    "termsSuffix": ".",
+    "privacyPrefix": "I have read and acknowledge the",
+    "privacyLink": "Privacy Policy",
+    "privacySuffix": ".",
+    "marketing": "I would like to receive product updates, news and promotional communications.",
+    "legalNotice": "These legal acceptances are recorded with the applicable document versions when your account is created.",
+    "creating": "Creating account...",
     "validation": {
       "nameRequired": "Full name is required.",
       "emailRequired": "Email address is required.",
@@ -205,7 +217,8 @@
       "passwordWeak": "Password must contain at least 8 characters, uppercase, lowercase and a number.",
       "confirmRequired": "Please confirm your password.",
       "passwordMismatch": "Passwords do not match.",
-      "termsRequired": "You must accept the terms."
+      "termsRequired": "You must accept the terms.",
+      "privacyRequired": "You must acknowledge the Privacy Policy."
     }
   },
   "ForgotPasswordPage": {
@@ -688,14 +701,22 @@
       "saved": "Changes saved"
     },
     "account": {
-      "title": "Account Status",
+      "title": "Sign Out",
       "emailVerified": "Email Verification",
       "accountStatus": "Account Status",
       "plan": "Current Plan",
       "verified": "Verified",
-      "active": "Active"
+      "active": "Active",
+      "description": "Sign out from the current WrapLink session.",
+      "logout": "Sign Out"
     },
     "security": {
+      "title": "Security",
+      "description": "Additional protection for your WrapLink account.",
+      "twoFactor": "Two-Factor Authentication",
+      "disabled": "Not enabled",
+      "optional": "Recommended",
+      "setup2fa": "Set Up 2FA",
       "passwordTitle": "Change Password",
       "passwordDescription": "Use a strong password that you don't use elsewhere.",
       "currentPassword": "Current Password",
@@ -717,27 +738,6 @@
       "current": "Current Session",
       "revoke": "Revoke",
       "logoutAll": "Sign Out All Sessions"
-    },
-    "security": {
-      "title": "Security",
-      "description": "Additional protection for your WrapLink account.",
-      "twoFactor": "Two-Factor Authentication",
-      "disabled": "Not enabled",
-      "optional": "Recommended",
-      "setup2fa": "Set Up 2FA"
-    },
-    "sessions": {
-      "title": "Active Sessions",
-      "description": "Review devices currently signed in to your account.",
-      "current": "Current",
-      "logout": "Revoke",
-      "revoking": "Revoking...",
-      "logoutAll": "Revoke Other Sessions"
-    },
-    "account": {
-      "title": "Sign Out",
-      "description": "Sign out from the current WrapLink session.",
-      "logout": "Sign Out"
     }
   },
   "NotificationPage": {

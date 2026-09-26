@@ -54,6 +54,14 @@ export default function Footer() {
 
                             <div className="flex flex-col gap-2">
 
+                                <Link href="/legal">
+                                    {t("legal")}
+                                </Link>
+
+                                <Link href="/privacy">
+                                    {t("privacy")}
+                                </Link>
+
                                 <Link href="/contact">
                                     {nav("contact")}
                                 </Link>
