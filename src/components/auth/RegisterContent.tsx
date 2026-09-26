@@ -1,6 +1,7 @@
 "use client";
 
 import {useMemo, useState} from "react";
+import {useRouter} from "next/navigation";
 
 import {
     Check,
@@ -65,6 +66,8 @@ export default function RegisterContent({
 
     const [isSubmitting, setIsSubmitting] =
         useState(false);
+
+    const router = useRouter();
 
     const passwordStrength = useMemo(() => {
         if (!password) {
@@ -257,6 +260,11 @@ export default function RegisterContent({
          */
         setTimeout(() => {
             setIsSubmitting(false);
+            router.push(
+                locale === "fa"
+                    ? "/fa/auth/login"
+                    : "/auth/login"
+            );
         }, 500);
     }
 
