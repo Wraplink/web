@@ -1,5 +1,6 @@
 "use client";
 
+import axios from "axios";
 import {useState} from "react";
 import {
     Eye,
@@ -9,12 +10,11 @@ import {
     Shield,
     Loader2,
 } from "lucide-react";
-
 import {useTranslations} from "next-intl";
 
 import {Link, useRouter} from "@/i18n/navigation";
-
-import {setAuthSession} from "@/lib/auth";
+import {login} from "@/lib/api/auth";
+import {setAuthUser} from "@/lib/auth";
 
 type Props = {
     locale: string;
@@ -45,89 +45,43 @@ export default function LoginContent({locale}: Props) {
         event.preventDefault();
 
         setError("");
-        setLoading(true);
 
-        /*
-         * ========================================================
-         * BACKEND TODO
-         * ========================================================
-         *
-         * Replace this temporary frontend authentication with:
-         *
-         * POST /api/v1/auth/login
-         *
-         * Request:
-         * {
-         *     "email": "...",
-         *     "password": "...",
-         *     "rememberMe": true
-         * }
-         *
-         * Expected response:
-         * {
-         *     "accessToken": "...",
-         *     "user": {
-         *         "id": "...",
-         *         "name": "...",
-         *         "email": "..."
-         *     }
-         * }
-         *
-         * The real implementation should NOT store sensitive
-         * authentication data in localStorage.
-         * ========================================================
-         */
-
-        await new Promise((resolve) =>
-            setTimeout(resolve, 500)
-        );
-
-        if (!email || !password) {
+        if (!email.trim() || !password) {
             setError("Please enter your email and password.");
-            setLoading(false);
             return;
         }
 
-        // Temporary frontend session
-        setAuthSession({
-            accessToken: "frontend-demo-token",
-            user: {
-                id: "user-001",
-                name: "Mahdi Asgari",
+        setLoading(true);
+
+        try {
+            const user = await login(
                 email,
-            },
-        });
+                password
+            );
 
-        setLoading(false);
+            setAuthUser(user);
 
-        /*
-         * Redirect back to the page the user originally
-         * wanted to access.
-         *
-         * Example:
-         *
-         * /basket
-         *     ↓
-         * /auth/login?returnUrl=%2Fbasket
-         *     ↓
-         * successful login
-         *     ↓
-         * /basket
-         */
+            const params =
+                new URLSearchParams(window.location.search);
 
-        const params =
-            new URLSearchParams(window.location.search);
+            const returnUrl =
+                params.get("returnUrl");
 
-        const returnUrl =
-            params.get("returnUrl");
-
-        if (
-            returnUrl &&
-            returnUrl.startsWith("/")
-        ) {
-            router.push(returnUrl);
-        } else {
-            router.push("/dashboard");
+            if (
+                returnUrl &&
+                returnUrl.startsWith("/") &&
+                !returnUrl.startsWith("//")
+            ) {
+                router.push(returnUrl);
+            } else {
+                router.push("/dashboard");
+            }
+        } catch (loginError) {
+            setError(
+                getLoginError(loginError)
+            );
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -325,4 +279,19 @@ export default function LoginContent({locale}: Props) {
 
         </section>
     );
+}
+
+function getLoginError(error: unknown): string {
+    if (axios.isAxiosError<{error?: string}>(error)) {
+        const message = error.response?.data?.error;
+        if (message) {
+            return message;
+        }
+
+        if (!error.response) {
+            return "Cannot connect to the WrapLink backend.";
+        }
+    }
+
+    return "Sign in failed. Please try again.";
 }
