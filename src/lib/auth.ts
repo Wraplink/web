@@ -1,74 +1,79 @@
-/*
- * ========================================================
- * FRONTEND AUTH
- * ========================================================
- *
- * Temporary frontend authentication state.
- *
- * BACKEND TODO:
- * Replace this with real authentication against the Go API.
- *
- * Expected future API:
- *
- * POST /api/v1/auth/login
- * POST /api/v1/auth/logout
- * POST /api/v1/auth/refresh
- * GET  /api/v1/auth/me
- *
- * The real implementation should validate the user's
- * access token/session on the server.
- * ========================================================
- */
-
-export const AUTH_STORAGE_KEY = "wraplink_auth";
+import {
+    getAccessToken,
+    setAccessToken,
+} from "@/lib/api/client";
+import type {AuthUser} from "@/lib/api/auth";
 
 export type AuthSession = {
     accessToken: string;
-    user: {
-        id: string;
-        name: string;
-        email: string;
-    };
+    user: AuthUser;
 };
 
-export function isAuthenticated(): boolean {
-    if (typeof window === "undefined") {
-        return false;
-    }
+type AuthListener = (
+    user: AuthUser | null
+) => void;
 
+let currentUser: AuthUser | null = null;
+const listeners = new Set<AuthListener>();
+
+export function isAuthenticated(): boolean {
     return Boolean(
-        localStorage.getItem(AUTH_STORAGE_KEY)
+        currentUser && getAccessToken()
     );
+}
+
+export function getAuthUser(): AuthUser | null {
+    return currentUser;
 }
 
 export function getAuthSession(): AuthSession | null {
-    if (typeof window === "undefined") {
+    const token = getAccessToken();
+
+    if (!currentUser || !token) {
         return null;
     }
 
-    const value =
-        localStorage.getItem(AUTH_STORAGE_KEY);
-
-    if (!value) {
-        return null;
-    }
-
-    try {
-        return JSON.parse(value) as AuthSession;
-    } catch {
-        return null;
-    }
+    return {
+        accessToken: token,
+        user: currentUser,
+    };
 }
 
+export function setAuthUser(
+    user: AuthUser | null
+) {
+    currentUser = user;
+    emit();
+}
+
+// Kept for compatibility with existing components. The token is stored only
+// in module memory and is never persisted in localStorage/sessionStorage.
 export function setAuthSession(
     session: AuthSession
 ) {
-    localStorage.setItem(
-        AUTH_STORAGE_KEY,
-        JSON.stringify(session)
-    );
+    setAccessToken(session.accessToken);
+    currentUser = session.user;
+    emit();
 }
 
 export function clearAuthSession() {
-    localStorage.removeItem(AUTH_STORAGE_KEY);
+    setAccessToken(null);
+    currentUser = null;
+    emit();
+}
+
+export function subscribeAuth(
+    listener: AuthListener
+): () => void {
+    listeners.add(listener);
+
+    return () => {
+        listeners.delete(listener);
+    };
+}
+
+function emit() {
+    for (const listener of listeners) {
+        listener(currentUser);
+    }
 }
