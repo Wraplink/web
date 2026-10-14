@@ -1,3 +1,7 @@
+import axios from "axios";
+
+import {apiClient} from "@/lib/api/client";
+
 export type ConnectionMode =
     | "smart"
     | "gaming"
@@ -34,218 +38,128 @@ export type ConnectionEvent = {
     time: string;
 };
 
-/* -------------------------------------------------------------------------- */
-/* Mock state                                                                 */
-/* -------------------------------------------------------------------------- */
-
-/*
- * Frontend simulation only.
- *
- * BACKEND TODO:
- * Remove this state when the Go API is connected.
- */
-let mockConnection: ConnectionStatus = {
-    connected: false,
-    latency: 0,
-    packetLoss: 0,
-    primaryDns: "10.10.10.10",
-    secondaryDns: "10.10.20.20",
-    edge: "DE-FRA-01",
-    region: "Frankfurt",
-    country: "Germany",
-    load: 0,
-    mode: "gaming",
+type BackendAccessInfo = {
+    subscriptionId: string;
+    planCode: string;
+    status:
+        | "active"
+        | "quota_exhausted"
+        | "expired"
+        | "unavailable";
+    dataLimitBytes: number;
+    usedBytes: number;
+    remainingBytes: number;
+    startsAt: string;
+    expiresAt: string;
+    connection?: {
+        dnsServers: string[];
+        proxy?: {
+            host: string;
+            port: number;
+            protocol: string;
+        };
+    };
 };
 
-let mockEvents: ConnectionEvent[] = [
-    {
-        id: "1",
-        type: "info",
-        title: "Connection initialized",
-        time: "Just now",
-    },
-];
-
-/* -------------------------------------------------------------------------- */
-/* Helpers                                                                    */
-/* -------------------------------------------------------------------------- */
-
-function delay(
-    milliseconds = 400
-): Promise<void> {
-    return new Promise((resolve) => {
-        setTimeout(
-            resolve,
-            milliseconds
-        );
-    });
-}
-
-/* -------------------------------------------------------------------------- */
-/* Connection status                                                          */
-/* -------------------------------------------------------------------------- */
-
 export async function getConnectionStatus(): Promise<ConnectionStatus> {
-    /*
-     * BACKEND TODO:
-     *
-     * GET /api/v1/connection/status
-     */
+    try {
+        const response = await apiClient.get<BackendAccessInfo>(
+            "/api/v1/me/network/access"
+        );
 
-    await delay(250);
+        const dnsServers =
+            response.data.connection?.dnsServers ?? [];
 
-    return {
-        ...mockConnection,
-    };
+        return {
+            connected:
+                response.data.status === "active",
+            latency: 0,
+            packetLoss: 0,
+            primaryDns: dnsServers[0] ?? "-",
+            secondaryDns: dnsServers[1] ?? "-",
+            edge: "Managed by DNS Control",
+            region: "-",
+            country: "-",
+            load: 0,
+            mode: "smart",
+        };
+    } catch (error) {
+        if (
+            axios.isAxiosError(error) &&
+            error.response?.status === 404
+        ) {
+            return disconnectedStatus();
+        }
+
+        throw error;
+    }
 }
 
-/* -------------------------------------------------------------------------- */
-/* Connect                                                                    */
-/* -------------------------------------------------------------------------- */
-
+// Connection provisioning is intentionally not exposed by the website
+// backend. dns-control owns network orchestration and edge selection.
 export async function connect(): Promise<void> {
-    /*
-     * BACKEND TODO:
-     *
-     * POST /api/v1/connection/connect
-     */
-
-    await delay(800);
-
-    mockConnection = {
-        ...mockConnection,
-        connected: true,
-        latency: 18,
-        packetLoss: 0,
-        edge: "DE-FRA-01",
-        load: 22,
-    };
-
-    mockEvents = [
-        {
-            id: crypto.randomUUID(),
-            type: "success",
-            title: "Connected to DE-FRA-01",
-            time: "Just now",
-        },
-        ...mockEvents,
-    ];
+    throw new Error(
+        "Network provisioning is not available from the website API yet."
+    );
 }
-
-/* -------------------------------------------------------------------------- */
-/* Disconnect                                                                 */
-/* -------------------------------------------------------------------------- */
 
 export async function disconnect(): Promise<void> {
-    /*
-     * BACKEND TODO:
-     *
-     * POST /api/v1/connection/disconnect
-     */
-
-    await delay(500);
-
-    mockConnection = {
-        ...mockConnection,
-        connected: false,
-        latency: 0,
-        packetLoss: 0,
-        load: 0,
-    };
-
-    mockEvents = [
-        {
-            id: crypto.randomUUID(),
-            type: "info",
-            title: "Connection disconnected",
-            time: "Just now",
-        },
-        ...mockEvents,
-    ];
+    throw new Error(
+        "Network provisioning is not available from the website API yet."
+    );
 }
-
-/* -------------------------------------------------------------------------- */
-/* Connection mode                                                            */
-/* -------------------------------------------------------------------------- */
 
 export async function updateConnectionMode(
-    mode: ConnectionMode
+    _mode: ConnectionMode
 ): Promise<void> {
-    /*
-     * BACKEND TODO:
-     *
-     * PUT /api/v1/connection/mode
-     *
-     * {
-     *     "mode": mode
-     * }
-     */
-
-    await delay(400);
-
-    mockConnection = {
-        ...mockConnection,
-        mode,
-    };
+    throw new Error(
+        "Connection modes are not available from the website API yet."
+    );
 }
-
-/* -------------------------------------------------------------------------- */
-/* Diagnostics                                                                */
-/* -------------------------------------------------------------------------- */
 
 export async function runDiagnostic(
     type: DiagnosticType
 ): Promise<DiagnosticResult> {
-    /*
-     * BACKEND TODO:
-     *
-     * POST /api/v1/diagnostics/{type}
-     */
+    if (type === "dns") {
+        const status = await getConnectionStatus();
 
-    await delay(700);
+        if (
+            status.connected &&
+            status.primaryDns !== "-"
+        ) {
+            return {
+                success: true,
+                value: status.primaryDns,
+            };
+        }
 
-    if (!mockConnection.connected) {
         return {
             success: false,
-            value: "Connection is offline",
+            value: "No active DNS entitlement",
         };
     }
 
-    switch (type) {
-        case "ping":
-            return {
-                success: true,
-                value: `${mockConnection.latency} ms`,
-                latency:
-                mockConnection.latency,
-            };
-
-        case "dns":
-            return {
-                success: true,
-                value: "OK",
-            };
-
-        case "route":
-            return {
-                success: true,
-                value: "Optimized",
-            };
-    }
+    return {
+        success: false,
+        value: "Diagnostic is not available yet",
+    };
 }
 
-/* -------------------------------------------------------------------------- */
-/* Events                                                                     */
-/* -------------------------------------------------------------------------- */
-
 export async function getConnectionEvents(): Promise<ConnectionEvent[]> {
-    /*
-     * BACKEND TODO:
-     *
-     * GET /api/v1/connection/events
-     */
+    return [];
+}
 
-    await delay(200);
-
-    return [...mockEvents];
+function disconnectedStatus(): ConnectionStatus {
+    return {
+        connected: false,
+        latency: 0,
+        packetLoss: 0,
+        primaryDns: "-",
+        secondaryDns: "-",
+        edge: "-",
+        region: "-",
+        country: "-",
+        load: 0,
+        mode: "smart",
+    };
 }
