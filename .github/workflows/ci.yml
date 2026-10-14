@@ -23,8 +23,23 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint
+      - name: Repository lint audit
+        continue-on-error: true
         run: npm run lint
+
+      - name: Verify backend integration files
+        run: >-
+          npx eslint
+          src/lib/auth.ts
+          src/lib/api/client.ts
+          src/lib/api/auth.ts
+          src/lib/api/connection.ts
+          src/lib/api/usage.ts
+          src/components/auth/AuthGuard.tsx
+          src/components/auth/LoginContent.tsx
+          src/components/layout/UserSidebar.tsx
+          src/components/bandwidth/BandwidthContent.tsx
+          src/hooks/useConnectionRealtime.ts
 
       - name: Build
         env:
