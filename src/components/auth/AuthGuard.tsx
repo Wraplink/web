@@ -1,22 +1,27 @@
 "use client";
 
-import {useEffect, useState} from "react";
+import {
+    useEffect,
+    useState,
+} from "react";
 import {usePathname} from "next/navigation";
 
 import {useRouter} from "@/i18n/navigation";
-
-import {isAuthenticated} from "@/lib/auth";
+import {
+    clearAuthSession,
+    isAuthenticated,
+    setAuthUser,
+} from "@/lib/auth";
+import {restoreSession} from "@/lib/api/auth";
 
 export default function AuthGuard({
-                                      children,
-                                  }: {
+    children,
+}: {
     children: React.ReactNode;
 }) {
     const router = useRouter();
     const pathname = usePathname();
 
-    // Important:
-    // The first render must be identical on server and client.
     const [checking, setChecking] =
         useState(true);
 
@@ -24,49 +29,62 @@ export default function AuthGuard({
         useState(false);
 
     useEffect(() => {
-        const authenticated =
-            isAuthenticated();
+        let cancelled = false;
 
-        if (!authenticated) {
-            router.replace(
-                `/auth/login?returnUrl=${encodeURIComponent(pathname)}`
-            );
+        const checkAuthentication = async () => {
+            setChecking(true);
 
-            return;
-        }
+            if (isAuthenticated()) {
+                if (!cancelled) {
+                    setAuthenticated(true);
+                    setChecking(false);
+                }
+                return;
+            }
 
-        setAuthenticated(true);
-        setChecking(false);
+            try {
+                const user = await restoreSession();
+
+                if (cancelled) {
+                    return;
+                }
+
+                setAuthUser(user);
+                setAuthenticated(true);
+            } catch {
+                if (cancelled) {
+                    return;
+                }
+
+                clearAuthSession();
+                setAuthenticated(false);
+
+                router.replace(
+                    `/auth/login?returnUrl=${encodeURIComponent(pathname)}`
+                );
+            } finally {
+                if (!cancelled) {
+                    setChecking(false);
+                }
+            }
+        };
+
+        void checkAuthentication();
+
+        return () => {
+            cancelled = true;
+        };
     }, [pathname, router]);
-
-    /*
-     * ========================================================
-     * BACKEND TODO
-     * ========================================================
-     *
-     * The frontend localStorage check is temporary.
-     *
-     * Replace with real Go backend session validation:
-     *
-     * GET /api/v1/auth/me
-     *
-     * The backend should validate the access token/session
-     * and return the current authenticated user.
-     *
-     * ========================================================
-     */
 
     if (checking || !authenticated) {
         return (
             <div className="flex min-h-screen items-center justify-center bg-black">
                 <div className="text-center">
-
                     <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-cyan-400 border-t-transparent"/>
 
                     <p className="text-sm text-gray-400">
                         Checking authentication...
                     </p>
-
                 </div>
             </div>
         );
