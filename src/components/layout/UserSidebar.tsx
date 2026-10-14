@@ -14,7 +14,14 @@ import {
     Wallet,
     X,
 } from "lucide-react";
-import {useTranslations, useLocale} from "next-intl";
+import {
+    useEffect,
+    useState,
+} from "react";
+import {
+    useTranslations,
+    useLocale,
+} from "next-intl";
 
 import {
     Link,
@@ -22,7 +29,15 @@ import {
     useRouter,
 } from "@/i18n/navigation";
 
-import {clearAuthSession} from "@/lib/auth";
+import {
+    clearAuthSession,
+    getAuthUser,
+    subscribeAuth,
+} from "@/lib/auth";
+import {
+    logout,
+    type AuthUser,
+} from "@/lib/api/auth";
 
 const navigation = [
     {
@@ -66,16 +81,15 @@ const navigation = [
         icon: BarChart3,
     },
     {
-        key:"profile",
-        href:"/profile",
-        icon: User
+        key: "profile",
+        href: "/profile",
+        icon: User,
     },
     {
         key: "notifications",
         href: "/notifications",
         icon: Bell,
     },
-
 ] as const;
 
 type Props = {
@@ -84,42 +98,52 @@ type Props = {
 };
 
 export default function UserSidebar({
-                                        mobileOpen,
-                                        setMobileOpen,
-                                    }: Props) {
+    mobileOpen,
+    setMobileOpen,
+}: Props) {
     const t = useTranslations("UserSidebar");
     const locale = useLocale();
     const pathname = usePathname();
     const router = useRouter();
 
+    const [user, setUser] =
+        useState<AuthUser | null>(getAuthUser());
+
+    const [loggingOut, setLoggingOut] =
+        useState(false);
+
+    useEffect(() => {
+        return subscribeAuth(setUser);
+    }, []);
+
     const isRtl = locale === "fa";
 
-    const handleLogout = () => {
-        /*
-         * ========================================================
-         * BACKEND TODO
-         * ========================================================
-         *
-         * Replace this with:
-         *
-         * POST /api/v1/auth/logout
-         *
-         * The Go backend should invalidate the refresh token /
-         * server-side session.
-         * ========================================================
-         */
+    const handleLogout = async () => {
+        if (loggingOut) {
+            return;
+        }
 
-        clearAuthSession();
+        setLoggingOut(true);
 
-        setMobileOpen(false);
-
-        router.push("/auth/login");
+        try {
+            await logout();
+        } catch (error) {
+            console.error(
+                "Backend logout failed:",
+                error
+            );
+        } finally {
+            clearAuthSession();
+            setMobileOpen(false);
+            setLoggingOut(false);
+            router.push("/auth/login");
+        }
     };
+
+    const initials = getInitials(user?.name);
 
     return (
         <>
-            {/* Mobile menu button */}
-
             <button
                 type="button"
                 onClick={() => setMobileOpen(true)}
@@ -133,8 +157,6 @@ export default function UserSidebar({
                 <Menu size={22}/>
             </button>
 
-            {/* Mobile overlay */}
-
             {mobileOpen && (
                 <button
                     type="button"
@@ -144,25 +166,11 @@ export default function UserSidebar({
                 />
             )}
 
-            {/* Sidebar */}
-
             <aside
                 className={`
-                    fixed
-                    inset-y-0
-                    z-50
-                    flex
-                    w-72
-                    flex-col
-                    border-white/10
-                    bg-[#05080d]/95
-                    backdrop-blur-2xl
-                    transition-transform
-                    duration-300
-                    ${isRtl
-                    ? "right-0 border-l"
-                    : "left-0 border-r"
-                }
+                    fixed inset-y-0 z-50 flex w-72 flex-col border-white/10
+                    bg-[#05080d]/95 backdrop-blur-2xl transition-transform duration-300
+                    ${isRtl ? "right-0 border-l" : "left-0 border-r"}
                     ${
                     mobileOpen
                         ? "translate-x-0"
@@ -172,11 +180,7 @@ export default function UserSidebar({
                 }
                 `}
             >
-
-                {/* Header */}
-
                 <div className="flex h-20 items-center justify-between border-b border-white/10 px-6">
-
                     <Link
                         href="/dashboard"
                         className="flex items-center gap-3"
@@ -207,47 +211,34 @@ export default function UserSidebar({
                     >
                         <X size={22}/>
                     </button>
-
                 </div>
 
-                {/* User */}
-
                 <div className="border-b border-white/10 p-5">
-
                     <div className="flex items-center gap-3">
-
                         <div className="flex h-11 w-11 items-center justify-center rounded-full bg-cyan-400/10 text-cyan-400">
                             <span className="font-bold">
-                                MA
+                                {initials}
                             </span>
                         </div>
 
                         <div className="min-w-0">
-
                             <div className="truncate font-semibold text-white">
-                                Mahdi Asgari
+                                {user?.name || "WrapLink User"}
                             </div>
 
                             <div className="truncate text-xs text-gray-500">
-                                user@example.com
+                                {user?.email || ""}
                             </div>
-
                         </div>
-
                     </div>
-
                 </div>
 
-                {/* Navigation */}
-
                 <div className="flex-1 overflow-y-auto p-4">
-
                     <div className="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
                         {t("navigation")}
                     </div>
 
                     <nav className="space-y-1">
-
                         {navigation.map((item) => {
                             const Icon = item.icon;
 
@@ -283,42 +274,48 @@ export default function UserSidebar({
                                 </Link>
                             );
                         })}
-
                     </nav>
-
                 </div>
 
-                {/* Wallet */}
-
                 <div className="mx-4 mb-4 rounded-2xl border border-cyan-400/20 bg-cyan-400/5 p-4">
-
                     <div className="text-xs text-gray-500">
                         {t("wallet")}
                     </div>
 
                     <div className="mt-1 text-xl font-bold text-cyan-400">
-                        0 تونان
+                        0 تومان
                     </div>
-
                 </div>
-
-                {/* Logout */}
 
                 <div className="border-t border-white/10 p-4">
-
                     <button
                         type="button"
-                        onClick={handleLogout}
-                        className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-400 transition hover:bg-red-400/10 hover:text-red-400"
+                        onClick={() => void handleLogout()}
+                        disabled={loggingOut}
+                        className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-400 transition hover:bg-red-400/10 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         <LogOut size={19}/>
-
                         {t("logout")}
                     </button>
-
                 </div>
-
             </aside>
         </>
     );
+}
+
+function getInitials(
+    name: string | undefined
+): string {
+    if (!name?.trim()) {
+        return "WL";
+    }
+
+    const parts = name
+        .trim()
+        .split(/\s+/)
+        .slice(0, 2);
+
+    return parts
+        .map((part) => part[0]?.toUpperCase() ?? "")
+        .join("") || "WL";
 }
