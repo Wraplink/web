@@ -61,23 +61,41 @@ type BackendAccessInfo = {
     };
 };
 
+type BackendEntitlement = {
+    id: string;
+    subscriptionId: string;
+    clientIp: string;
+    status: "active" | "inactive";
+    planCode: string;
+    dataLimitBytes: number;
+    usedBytes: number;
+    remainingBytes: number;
+    startsAt: string;
+    expiresAt: string;
+    activatedAt: string;
+};
+
 export async function getConnectionStatus(): Promise<ConnectionStatus> {
     try {
-        const response = await apiClient.get<BackendAccessInfo>(
+        const accessResponse = await apiClient.get<BackendAccessInfo>(
             "/api/v1/me/network/access"
         );
 
+        const entitlement = await getCurrentEntitlement();
         const dnsServers =
-            response.data.connection?.dnsServers ?? [];
+            accessResponse.data.connection?.dnsServers ?? [];
 
         return {
             connected:
-                response.data.status === "active",
+                accessResponse.data.status === "active" &&
+                entitlement?.status === "active",
             latency: 0,
             packetLoss: 0,
             primaryDns: dnsServers[0] ?? "-",
             secondaryDns: dnsServers[1] ?? "-",
-            edge: "Managed by DNS Control",
+            edge: entitlement
+                ? `Entitled IP ${entitlement.clientIp}`
+                : "Managed by DNS Control",
             region: "-",
             country: "-",
             load: 0,
@@ -95,18 +113,28 @@ export async function getConnectionStatus(): Promise<ConnectionStatus> {
     }
 }
 
-// Connection provisioning is intentionally not exposed by the website
-// backend. dns-control owns network orchestration and edge selection.
 export async function connect(): Promise<void> {
-    throw new Error(
-        "Network provisioning is not available from the website API yet."
+    await apiClient.post<BackendEntitlement>(
+        "/api/v1/me/network/entitlement"
     );
 }
 
 export async function disconnect(): Promise<void> {
-    throw new Error(
-        "Network provisioning is not available from the website API yet."
-    );
+    try {
+        await apiClient.delete(
+            "/api/v1/me/network/entitlement"
+        );
+    } catch (error) {
+        // Disconnect is idempotent from the UI perspective.
+        if (
+            axios.isAxiosError(error) &&
+            error.response?.status === 404
+        ) {
+            return;
+        }
+
+        throw error;
+    }
 }
 
 export async function updateConnectionMode(
@@ -147,6 +175,25 @@ export async function runDiagnostic(
 
 export async function getConnectionEvents(): Promise<ConnectionEvent[]> {
     return [];
+}
+
+async function getCurrentEntitlement(): Promise<BackendEntitlement | null> {
+    try {
+        const response = await apiClient.get<BackendEntitlement>(
+            "/api/v1/me/network/entitlement"
+        );
+
+        return response.data;
+    } catch (error) {
+        if (
+            axios.isAxiosError(error) &&
+            error.response?.status === 404
+        ) {
+            return null;
+        }
+
+        throw error;
+    }
 }
 
 function disconnectedStatus(): ConnectionStatus {
