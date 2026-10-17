@@ -75,6 +75,10 @@ type BackendEntitlement = {
     activatedAt: string;
 };
 
+type BackendErrorResponse = {
+    error?: string;
+};
+
 export async function getConnectionStatus(): Promise<ConnectionStatus> {
     try {
         const accessResponse = await apiClient.get<BackendAccessInfo>(
@@ -114,9 +118,16 @@ export async function getConnectionStatus(): Promise<ConnectionStatus> {
 }
 
 export async function connect(): Promise<void> {
-    await apiClient.post<BackendEntitlement>(
-        "/api/v1/me/network/entitlement"
-    );
+    try {
+        await apiClient.post<BackendEntitlement>(
+            "/api/v1/me/network/entitlement"
+        );
+    } catch (error) {
+        throw readableBackendError(
+            error,
+            "Could not activate network entitlement"
+        );
+    }
 }
 
 export async function disconnect(): Promise<void> {
@@ -133,7 +144,10 @@ export async function disconnect(): Promise<void> {
             return;
         }
 
-        throw error;
+        throw readableBackendError(
+            error,
+            "Could not deactivate network entitlement"
+        );
     }
 }
 
@@ -194,6 +208,24 @@ async function getCurrentEntitlement(): Promise<BackendEntitlement | null> {
 
         throw error;
     }
+}
+
+function readableBackendError(
+    error: unknown,
+    fallback: string
+): Error {
+    if (axios.isAxiosError<BackendErrorResponse>(error)) {
+        const message = error.response?.data?.error?.trim();
+        if (message) {
+            return new Error(message);
+        }
+    }
+
+    if (error instanceof Error) {
+        return error;
+    }
+
+    return new Error(fallback);
 }
 
 function disconnectedStatus(): ConnectionStatus {
