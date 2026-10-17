@@ -3,11 +3,12 @@ import axios, {
     type InternalAxiosRequestConfig,
 } from "axios";
 
-const DEFAULT_API_BASE_URL = "http://localhost:7080";
+const DEFAULT_API_BASE_URL = "http://127.0.0.1:7080";
 
-export const API_BASE_URL =
+export const API_BASE_URL = normalizeApiBaseUrl(
     process.env.NEXT_PUBLIC_API_BASE_URL ??
-    DEFAULT_API_BASE_URL;
+    DEFAULT_API_BASE_URL
+);
 
 let accessToken: string | null = null;
 let refreshPromise: Promise<string> | null = null;
@@ -132,4 +133,23 @@ function isAuthenticationBootstrapRequest(
         url.includes("/api/v1/auth/login") ||
         url.includes("/api/v1/auth/refresh")
     );
+}
+
+function normalizeApiBaseUrl(value: string): string {
+    const trimmed = value.trim().replace(/\/$/, "");
+
+    try {
+        const url = new URL(trimmed);
+
+        // The backend network-entitlement endpoint is currently IPv4-only.
+        // Browsers can resolve localhost to ::1, which causes activation to
+        // fail with HTTP 400. Use an explicit IPv4 loopback address locally.
+        if (url.hostname === "localhost") {
+            url.hostname = "127.0.0.1";
+        }
+
+        return url.toString().replace(/\/$/, "");
+    } catch {
+        return trimmed;
+    }
 }
