@@ -86,20 +86,22 @@ export async function getConnectionStatus(): Promise<ConnectionStatus> {
         );
 
         const entitlement = await getCurrentEntitlement();
-        const dnsServers =
-            accessResponse.data.connection?.dnsServers ?? [];
+        const connected =
+            accessResponse.data.status === "active" &&
+            entitlement?.status === "active";
+        const dnsServers = connected
+            ? accessResponse.data.connection?.dnsServers ?? []
+            : [];
 
         return {
-            connected:
-                accessResponse.data.status === "active" &&
-                entitlement?.status === "active",
+            connected,
             latency: 0,
             packetLoss: 0,
             primaryDns: dnsServers[0] ?? "-",
             secondaryDns: dnsServers[1] ?? "-",
-            edge: entitlement
+            edge: connected && entitlement
                 ? `Entitled IP ${entitlement.clientIp}`
-                : "Managed by DNS Control",
+                : "-",
             region: "-",
             country: "-",
             load: 0,
