@@ -439,11 +439,27 @@
     "transactions": "Transaction History",
     "filters": {
       "all": "All",
-      "deposit": "Deposits",
-      "withdraw": "Withdrawals"
+      "credit": "Credits",
+      "debit": "Debits"
     },
     "submitDeposit": "Charge Wallet",
-    "submitWithdraw": "Request Withdrawal"
+    "submitWithdraw": "Request Withdrawal",
+    "amountIrr": "Amount (IRR)",
+    "depositNotice": "This creates a pending deposit request only. No money is charged or credited until a payment provider or operator settles it.",
+    "requestDeposit": "Create Deposit Request",
+    "requestCreated": "Deposit request {id} created. Pending settlement.",
+    "requestError": "Could not create deposit request. Retry with the same amount to avoid duplicates.",
+    "invalidAmount": "Enter a positive whole-number amount in IRR.",
+    "withdrawUnavailable": "Withdrawals are not available yet. No payout service is configured, so funds cannot be sent to a bank or crypto wallet.",
+    "pendingDeposits": "Deposit Requests",
+    "depositHistoryNotice": "Latest 50 requests. Pending requests are not included in your wallet balance.",
+    "noDeposits": "No deposit requests yet.",
+    "noTransactions": "No wallet transactions yet.",
+    "recentTransactions": "Latest 100 wallet transactions",
+    "loadError": "Could not load wallet data. Try refreshing.",
+    "loading": "Loading…",
+    "refresh": "Refresh",
+    "submitting": "Submitting…"
   },
   "MarketPage": {
     "badge": "WrapLink Marketplace",
