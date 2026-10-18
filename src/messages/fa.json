@@ -381,17 +381,19 @@
     },
     "diagnostics": {
       "title": "عیب‌یابی اتصال",
+      "run": "اجرای تست",
+      "running": "در حال بررسی...",
       "scopeNote": "این تست‌ها از سمت سرور یا کنترل‌پلین WrapLink اجرا می‌شوند، نه دستگاه شما. بررسی TCP پینگ ICMP نیست و بررسی مسیر نیز تریس‌روت نیست.",
       "ping": {
-        "title": "Ping Test",
+        "title": "تست اتصال TCP",
         "description": "زمان اتصال TCP از سرور به DNS اختصاص‌یافته را بسنجید (نه پینگ ICMP)."
       },
       "dns": {
-        "title": "DNS Test",
+        "title": "تست DNS",
         "description": "دامنه example.com را با DNS اختصاص‌یافته WrapLink بررسی کنید."
       },
       "route": {
-        "title": "Route Test",
+        "title": "بررسی مسیر",
         "description": "بررسی کنید DNS اختصاص‌یافته به یک نود فعال کنترل‌پلین تعلق دارد (نه مسیر واقعی دستگاه)."
       }
     },
