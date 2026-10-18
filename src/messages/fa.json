@@ -9,83 +9,62 @@
     "register": "ثبت‌نام",
     "legal": "قوانین و مقررات"
   },
-
   "HomePage": {
     "badge": "نسل جدید شبکه مخصوص گیمرها",
-
     "heroTitle": "سریع‌تر بازی کنید.",
     "heroTitleAccent": "هوشمندانه‌تر متصل شوید.",
-
     "heroDescription": "WrapLink مسیریابی هوشمند DNS، شتاب‌دهی امن شبکه، مدیریت پهنای باند و اتصال اختصاصی برای گیمرها را در یک پلتفرم مدرن ارائه می‌دهد.",
-
     "getStarted": "شروع کنید",
     "viewPlans": "مشاهده تعرفه‌ها",
-
     "features": {
       "latencyTitle": "تأخیر بسیار پایین",
       "latencyDescription": "مسیریابی هوشمند، مسیرهای غیرضروری شبکه را کاهش می‌دهد.",
-
       "securityTitle": "اتصال امن",
       "securityDescription": "محافظت در سطح سازمانی با کنترل هوشمند ترافیک.",
-
       "dnsTitle": "DNS جهانی",
       "dnsDescription": "DNS بهینه‌شده برای سرویس‌های منتخب بازی."
     },
-
     "stats": {
       "edgeNodes": "نودهای Edge",
       "connections": "اتصال‌های محافظت‌شده",
       "games": "بازی‌های پشتیبانی‌شده",
       "uptime": "آپ‌تایم"
     },
-
     "featuresTitle": "همه امکانات در یک پلتفرم",
     "featuresDescription": "طراحی‌شده برای گیمرها، ساخته‌شده بر پایه زیرساخت سازمانی.",
-
     "platform": {
       "walletTitle": "کیف پول",
       "walletDescription": "شارژ، پرداخت، برداشت و مشاهده تمام تراکنش‌ها.",
-
       "supportTitle": "تیکت پشتیبانی",
       "supportDescription": "سیستم پشتیبانی داخلی با امکان پیگیری تیکت.",
-
       "marketTitle": "فروشگاه",
       "marketDescription": "خرید پلن‌ها و سرویس‌ها از طریق فروشگاه مدرن.",
-
       "connectionTitle": "مدیریت اتصال",
       "connectionDescription": "مشاهده DNS، IP و وضعیت اتصال.",
-
       "bandwidthTitle": "گزارش مصرف",
       "bandwidthDescription": "مشاهده و بررسی مصرف پهنای باند.",
-
       "languageTitle": "چند زبانه",
       "languageDescription": "رابط کاربری فارسی و انگلیسی."
     },
-
     "howItWorksTitle": "WrapLink چگونه کار می‌کند؟",
-
     "steps": {
       "register": "حساب کاربری ایجاد کنید",
       "plan": "پلن اتصال خود را انتخاب کنید",
       "connection": "اطلاعات DNS و اتصال را دریافت کنید",
       "monitor": "متصل شوید و مصرف خود را مشاهده کنید"
     },
-
     "pricingTitle": "پلن‌های منعطف برای گیمرها",
     "pricingDescription": "پرداخت با کیف پول، رمزارز، کارت به کارت یا ISP.",
     "explorePricing": "مشاهده تعرفه‌ها",
-
     "plans": {
       "starter": "پلن Starter",
       "pro": "پلن Pro",
       "ultimate": "پلن Ultimate"
     },
-
     "ctaTitle": "آماده پیوستن به WrapLink هستید؟",
     "ctaDescription": "حساب خود را ایجاد کنید و نسل جدید شبکه مخصوص گیمرها را تجربه کنید.",
     "createAccount": "ایجاد حساب"
   },
-
   "Footer": {
     "description": "پلتفرم نسل جدید شبکه مخصوص گیمرها.",
     "platform": "پلتفرم",
@@ -94,7 +73,6 @@
     "legal": "قوانین و مقررات",
     "privacy": "حریم خصوصی"
   },
-
   "LanguageSwitcher": {
     "english": "انگلیسی",
     "persian": "فارسی"
@@ -103,15 +81,11 @@
     "badge": "زیرساخت سازمانی مخصوص گیمرها",
     "title": "ساخته‌شده برای گیمرها، طراحی‌شده در سطح سازمانی.",
     "description": "WrapLink با ترکیب DNS هوشمند، شتاب‌دهی Edge، بهینه‌سازی ترافیک و زیرساخت سازمانی، تجربه بهتری برای بازی آنلاین فراهم می‌کند.",
-
     "missionTitle": "ماموریت ما",
     "missionText": "کاهش تأخیر، ساده‌سازی اتصال و ارائه شبکه‌ای پایدار برای گیمرها.",
-
     "visionTitle": "چشم‌انداز ما",
     "visionText": "تبدیل شدن به برترین پلتفرم اتصال گیمرها با فناوری Edge و مدیریت شفاف.",
-
     "valuesTitle": "ارزش‌های اصلی",
-
     "values": {
       "performance": {
         "title": "عملکرد در اولویت",
@@ -130,7 +104,6 @@
         "description": "بهبود مداوم."
       }
     },
-
     "architectureTitle": "معماری سازمانی",
     "architectureDescription": "WrapLink بر پایه Edge Nodeهای مقیاس‌پذیر، DNS هوشمند، APIهای امن و مدیریت متمرکز طراحی شده است."
   },
@@ -138,7 +111,6 @@
     "badge": "همیشه کنار شما هستیم",
     "title": "تماس با WrapLink",
     "description": "برای مشکلات اتصال، پرداخت یا حساب کاربری، تیم پشتیبانی آماده کمک به شماست.",
-
     "form": {
       "title": "ارسال پیام",
       "name": "نام و نام خانوادگی",
@@ -147,7 +119,6 @@
       "message": "متن پیام",
       "send": "ارسال پیام"
     },
-
     "info": {
       "title": "اطلاعات تماس",
       "email": "support@wraplink.ir",
@@ -155,7 +126,6 @@
       "discord": "انجمن WrapLink",
       "hours": "پشتیبانی ۲۴ ساعته"
     },
-
     "supportTitle": "کمک فوری نیاز دارید؟",
     "supportDescription": "پس از ورود، از داشبورد کاربری تیکت پشتیبانی ایجاد کنید."
   },
@@ -163,21 +133,16 @@
     "badge": "پلن مناسب خود را انتخاب کنید",
     "title": "پلن‌های منعطف برای هر گیمر",
     "description": "بر اساس میزان مصرف و مدت زمان، بهترین پلن را انتخاب کنید.",
-
     "monthly": "ماهانه",
     "yearly": "سالانه",
-
     "buy": "خرید",
-
     "paymentTitle": "روش‌های پرداخت",
-
     "payments": {
       "wallet": "کیف پول",
       "crypto": "رمزارز",
       "cart": "کارت به کارت",
       "isp": "پرداخت ISP"
     },
-
     "plans": {
       "starter": {
         "name": "Starter",
@@ -206,16 +171,13 @@
     "badge": "ورود امن",
     "title": "خوش آمدید",
     "description": "برای ورود به داشبورد WrapLink وارد شوید.",
-
     "email": "ایمیل",
     "password": "رمز عبور",
     "remember": "این دستگاه را به خاطر بسپار",
     "forgot": "رمز عبور را فراموش کرده‌اید؟",
     "login": "ورود",
-
     "noAccount": "حساب کاربری ندارید؟",
     "register": "ثبت‌نام",
-
     "securityTitle": "ورود محافظت‌شده",
     "securityText": "حساب شما با احراز هویت سطح سازمانی محافظت می‌شود."
   },
@@ -279,40 +241,29 @@
     "badge": "یک قدم تا پایان",
     "title": "ایمیل خود را تأیید کنید",
     "description": "لینک تأیید حساب برای ایمیل شما ارسال شده است. قبل از ورود، حساب خود را تأیید کنید.",
-
     "checkInbox": "صندوق ورودی و پوشه Spam را بررسی کنید.",
     "openMail": "باز کردن برنامه ایمیل",
-
     "resend": "ارسال مجدد ایمیل",
     "resendIn": "ارسال مجدد تا {seconds} ثانیه",
-
     "backToLogin": "بازگشت به ورود",
-
     "success": "ایمیل تأیید دوباره ارسال شد."
   },
   "ResetPasswordPage": {
     "badge": "بازیابی امن رمز عبور",
     "title": "رمز عبور جدید ایجاد کنید",
     "description": "یک رمز عبور قدرتمند برای حساب WrapLink خود انتخاب کنید.",
-
     "newPassword": "رمز عبور جدید",
     "confirmPassword": "تکرار رمز عبور",
-
     "strength": "قدرت رمز عبور",
     "weak": "ضعیف",
     "medium": "متوسط",
     "strong": "قوی",
-
     "passwordHint": "حداقل ۸ کاراکتر شامل حروف بزرگ، کوچک و عدد استفاده کنید.",
-
     "reset": "تغییر رمز عبور",
-
     "successTitle": "رمز عبور تغییر کرد",
     "successDescription": "رمز عبور شما با موفقیت تغییر یافت.",
     "goLogin": "ورود",
-
     "invalidToken": "لینک بازیابی نامعتبر است یا منقضی شده است.",
-
     "validation": {
       "passwordRequired": "رمز عبور الزامی است.",
       "passwordWeak": "رمز عبور باید حداقل ۸ کاراکتر و شامل حروف بزرگ، کوچک و عدد باشد.",
@@ -323,17 +274,13 @@
   "DashboardPage": {
     "welcome": "خوش آمدید",
     "subtitle": "تمام سرویس‌های WrapLink را از یک مکان مدیریت کنید.",
-
     "wallet": "کیف پول",
     "currentPlan": "پلن فعال",
     "connection": "اتصال",
     "bandwidth": "مصرف پهنای باند",
     "orders": "آخرین سفارش‌ها",
-
     "active": "فعال",
-
     "quickActions": "دسترسی سریع",
-
     "actions": {
       "connect": "اتصال به سرور",
       "connectNow": "اتصال سریع",
@@ -341,7 +288,6 @@
       "wallet": "شارژ کیف پول",
       "ticket": "تیکت پشتیبانی"
     },
-
     "connectionInfo": {
       "title": "اطلاعات اتصال",
       "userIp": "IP شما",
@@ -406,7 +352,11 @@
       "todayTime": "امروز · ۱۰:۳۲",
       "yesterday": "دیروز",
       "twoDaysAgo": "۲ روز پیش",
-      "empty": "هنوز رویدادی برای اتصال ثبت نشده است."
+      "empty": "هنوز رویدادی برای اتصال ثبت نشده است.",
+      "loading": "در حال بارگذاری رویدادها…",
+      "loadMore": "نمایش رویدادهای بیشتر",
+      "loadError": "بارگذاری رویدادهای اتصال ناموفق بود.",
+      "retry": "تلاش دوباره"
     },
     "power": {
       "connect": "اتصال",
@@ -466,31 +416,23 @@
   "WalletPage": {
     "title": "کیف پول",
     "subtitle": "موجودی و پرداخت‌های خود را مدیریت کنید.",
-
     "balance": "موجودی فعلی",
-
     "deposit": "شارژ کیف پول",
     "withdraw": "برداشت وجه",
-
     "amount": "مبلغ",
-
     "paymentMethods": "روش‌های پرداخت",
-
     "methods": {
       "wallet": "کیف پول",
       "cart": "کارت به کارت",
       "crypto": "رمزارز",
       "isp": "پرداخت ISP"
     },
-
     "transactions": "تاریخچه تراکنش‌ها",
-
     "filters": {
       "all": "همه",
       "deposit": "واریزها",
       "withdraw": "برداشت‌ها"
     },
-
     "submitDeposit": "شارژ کیف پول",
     "submitWithdraw": "ثبت درخواست برداشت"
   },
@@ -536,297 +478,301 @@
         "description": "یک دستگاه اضافی را به سرویس WrapLink خود متصل کنید."
       }
     }
-  },"OrdersPage": {
-  "badge": "مدیریت سفارش‌ها",
-  "title": "سفارش‌های شما",
-  "subtitle": "خریدهای خود را پیگیری کنید، سفارش‌ها را مدیریت کنید و برای آیتم‌های واجد شرایط درخواست بازپرداخت دهید.",
-  "items": "آیتم",
-  "payment": "روش پرداخت",
-  "itemCount": "تعداد کل آیتم‌ها",
-  "itemsTitle": "آیتم‌های سفارش",
-  "quantity": "تعداد",
-  "refund": "بازپرداخت آیتم",
-  "refunded": "بازپرداخت شده",
-  "cancelOrder": "لغو سفارش",
-  "filters": {
-    "all": "همه",
-    "pending": "در انتظار",
-    "confirmed": "تأیید شده",
-    "provisioning": "در حال فعال‌سازی",
-    "delivered": "تحویل شده",
-    "cancelled": "لغو شده"
   },
-  "stats": {
-    "pending": "سفارش‌های در انتظار",
-    "confirmed": "سفارش‌های در حال پردازش",
-    "active": "سفارش‌های فعال",
-    "refunded": "سفارش‌های بازپرداخت شده"
+  "OrdersPage": {
+    "badge": "مدیریت سفارش‌ها",
+    "title": "سفارش‌های شما",
+    "subtitle": "خریدهای خود را پیگیری کنید، سفارش‌ها را مدیریت کنید و برای آیتم‌های واجد شرایط درخواست بازپرداخت دهید.",
+    "items": "آیتم",
+    "payment": "روش پرداخت",
+    "itemCount": "تعداد کل آیتم‌ها",
+    "itemsTitle": "آیتم‌های سفارش",
+    "quantity": "تعداد",
+    "refund": "بازپرداخت آیتم",
+    "refunded": "بازپرداخت شده",
+    "cancelOrder": "لغو سفارش",
+    "filters": {
+      "all": "همه",
+      "pending": "در انتظار",
+      "confirmed": "تأیید شده",
+      "provisioning": "در حال فعال‌سازی",
+      "delivered": "تحویل شده",
+      "cancelled": "لغو شده"
+    },
+    "stats": {
+      "pending": "سفارش‌های در انتظار",
+      "confirmed": "سفارش‌های در حال پردازش",
+      "active": "سفارش‌های فعال",
+      "refunded": "سفارش‌های بازپرداخت شده"
+    },
+    "status": {
+      "pending": "در انتظار",
+      "confirmed": "تأیید شده",
+      "provisioning": "در حال فعال‌سازی",
+      "active": "فعال",
+      "delivered": "تحویل شده",
+      "cancelled": "لغو شده",
+      "refunded": "بازپرداخت شده"
+    },
+    "empty": {
+      "title": "سفارشی پیدا نشد",
+      "description": "سفارشی مطابق این فیلتر وجود ندارد.",
+      "button": "مشاهده فروشگاه"
+    }
   },
-  "status": {
-    "pending": "در انتظار",
-    "confirmed": "تأیید شده",
-    "provisioning": "در حال فعال‌سازی",
-    "active": "فعال",
-    "delivered": "تحویل شده",
-    "cancelled": "لغو شده",
-    "refunded": "بازپرداخت شده"
+  "SupportPage": {
+    "badge": "پشتیبانی مشتریان",
+    "title": "تیکت‌های پشتیبانی",
+    "subtitle": "درخواست‌های پشتیبانی خود را ایجاد و با تیم پشتیبانی WrapLink مدیریت کنید.",
+    "newTicket": "تیکت جدید",
+    "backToTickets": "بازگشت به تیکت‌ها",
+    "closeTicket": "بستن تیکت",
+    "sendReply": "ارسال پاسخ",
+    "replyPlaceholder": "پاسخ خود را بنویسید...",
+    "noMessages": "هنوز پیامی در این تیکت وجود ندارد.",
+    "you": "شما",
+    "supportTeam": "تیم پشتیبانی",
+    "priorityLabel": "اولویت",
+    "status": {
+      "open": "باز",
+      "pending": "در انتظار",
+      "resolved": "حل شده",
+      "closed": "بسته شده"
+    },
+    "priority": {
+      "low": "کم",
+      "medium": "متوسط",
+      "high": "زیاد"
+    },
+    "create": {
+      "title": "ایجاد تیکت پشتیبانی",
+      "subtitle": "مشکل یا درخواست خود را برای ما بنویسید.",
+      "subject": "موضوع",
+      "subjectPlaceholder": "مشکل خود را توضیح دهید...",
+      "category": "دسته‌بندی",
+      "priority": "اولویت",
+      "submit": "ایجاد تیکت",
+      "categories": {
+        "technical": "فنی",
+        "billing": "مالی",
+        "connection": "اتصال",
+        "other": "سایر"
+      }
+    }
   },
-  "empty": {
-    "title": "سفارشی پیدا نشد",
-    "description": "سفارشی مطابق این فیلتر وجود ندارد.",
-    "button": "مشاهده فروشگاه"
-  }
-},"SupportPage": {
-  "badge": "پشتیبانی مشتریان",
-  "title": "تیکت‌های پشتیبانی",
-  "subtitle": "درخواست‌های پشتیبانی خود را ایجاد و با تیم پشتیبانی WrapLink مدیریت کنید.",
-  "newTicket": "تیکت جدید",
-  "backToTickets": "بازگشت به تیکت‌ها",
-  "closeTicket": "بستن تیکت",
-  "sendReply": "ارسال پاسخ",
-  "replyPlaceholder": "پاسخ خود را بنویسید...",
-  "noMessages": "هنوز پیامی در این تیکت وجود ندارد.",
-  "you": "شما",
-  "supportTeam": "تیم پشتیبانی",
-  "priorityLabel": "اولویت",
-  "status": {
-    "open": "باز",
-    "pending": "در انتظار",
-    "resolved": "حل شده",
-    "closed": "بسته شده"
+  "BandwidthPage": {
+    "badge": "تحلیل شبکه",
+    "title": "گزارش پهنای باند",
+    "subtitle": "مصرف پهنای باند خود را بررسی کنید و نحوه استفاده از اتصال خود را مشاهده کنید.",
+    "currentUsage": "مصرف فعلی",
+    "remaining": "باقی‌مانده",
+    "used": "مصرف شده",
+    "currentPlan": "پلن فعلی",
+    "bandwidthLimit": "سقف پهنای باند",
+    "billingCycle": "دوره صورتحساب",
+    "monthly": "ماهانه",
+    "download": "دریافت",
+    "upload": "ارسال",
+    "totalTraffic": "کل ترافیک",
+    "trafficReceived": "ترافیک دریافتی",
+    "trafficSent": "ترافیک ارسالی",
+    "downloadUploadCombined": "دریافت + ارسال",
+    "usageReport": "گزارش مصرف",
+    "usageReportSubtitle": "مصرف پهنای باند در طول زمان.",
+    "ranges": {
+      "7d": "۷ روز",
+      "30d": "۳۰ روز",
+      "90d": "۹۰ روز"
+    },
+    "reportInfoTitle": "اطلاعات مصرف",
+    "reportInfo": "آمار پهنای باند بر اساس ترافیک شبکه محاسبه می‌شود و ممکن است به‌صورت دوره‌ای به‌روزرسانی شود."
   },
-  "priority": {
-    "low": "کم",
-    "medium": "متوسط",
-    "high": "زیاد"
-  },
-  "create": {
-    "title": "ایجاد تیکت پشتیبانی",
-    "subtitle": "مشکل یا درخواست خود را برای ما بنویسید.",
-    "subject": "موضوع",
-    "subjectPlaceholder": "مشکل خود را توضیح دهید...",
-    "category": "دسته‌بندی",
-    "priority": "اولویت",
-    "submit": "ایجاد تیکت",
-    "categories": {
-      "technical": "فنی",
-      "billing": "مالی",
+  "UserSidebar": {
+    "controlPanel": "پنل کاربری",
+    "navigation": "ناوبری",
+    "wallet": "کیف پول",
+    "logout": "خروج",
+    "openMenu": "باز کردن منو",
+    "closeMenu": "بستن منو",
+    "items": {
+      "dashboard": "داشبورد",
       "connection": "اتصال",
-      "other": "سایر"
+      "wallet": "کیف پول",
+      "market": "فروشگاه",
+      "basket": "سبد خرید",
+      "orders": "سفارش‌ها",
+      "support": "پشتیبانی",
+      "bandwidth": "پهنای باند",
+      "profile": "حساب کاربری",
+      "notifications": "اعلان ها"
+    }
+  },
+  "CheckoutPage": {
+    "loading": "در حال بارگذاری پرداخت...",
+    "badge": "پرداخت امن",
+    "title": "تکمیل خرید",
+    "subtitle": "روش پرداخت را انتخاب کرده و سفارش خود را تکمیل کنید.",
+    "backToBasket": "بازگشت به سبد خرید",
+    "paymentMethod": "روش پرداخت",
+    "paymentMethodDescription": "روش پرداخت سرویس‌های WrapLink را انتخاب کنید.",
+    "processing": "در حال پردازش پرداخت...",
+    "payNow": "پرداخت",
+    "securePayment": "پرداخت شما به‌صورت امن پردازش می‌شود.",
+    "methods": {
+      "wallet": "کیف پول WrapLink",
+      "walletDesc": "پرداخت فوری با موجودی کیف پول.",
+      "card": "کارت به کارت",
+      "cardDesc": "مبلغ را انتقال داده و رسید را بارگذاری کنید.",
+      "crypto": "رمزارز",
+      "cryptoDesc": "پرداخت با رمزارز USDT.",
+      "isp": "پرداخت ISP",
+      "ispDesc": "پرداخت از طریق ارائه‌دهنده اینترنت."
+    },
+    "wallet": {
+      "title": "پرداخت با کیف پول",
+      "description": "مبلغ از موجودی کیف پول WrapLink شما کسر می‌شود.",
+      "balance": "موجودی قابل استفاده",
+      "required": "مبلغ مورد نیاز",
+      "sufficient": "موجودی کیف پول برای تکمیل این پرداخت کافی است.",
+      "insufficient": "موجودی کیف پول کافی نیست."
+    },
+    "card": {
+      "title": "پرداخت کارت به کارت",
+      "description": "مبلغ دقیق را به کارت WrapLink زیر انتقال دهید.",
+      "cardHolder": "صاحب کارت",
+      "cardHolderName": "پرداخت WrapLink",
+      "cardNumber": "شماره کارت",
+      "receipt": "رسید پرداخت",
+      "upload": "برای بارگذاری رسید پرداخت کلیک کنید",
+      "fileTypes": "JPG، PNG یا PDF"
+    },
+    "crypto": {
+      "title": "پرداخت رمزارزی",
+      "description": "مبلغ دقیق را با شبکه انتخاب‌شده ارسال کنید.",
+      "network": "شبکه",
+      "address": "آدرس کیف پول",
+      "warning": "فقط USDT را با شبکه انتخاب‌شده ارسال کنید. ارسال دارایی دیگر یا استفاده از شبکه اشتباه ممکن است باعث از دست رفتن دائمی دارایی شود."
+    },
+    "isp": {
+      "title": "پرداخت از طریق ISP",
+      "description": "ارائه‌دهنده اینترنت خود را انتخاب کنید.",
+      "provider": "ارائه‌دهنده اینترنت",
+      "note": "پس از ثبت سفارش، به سرویس پرداخت ارائه‌دهنده اینترنت منتقل خواهید شد."
+    },
+    "summary": {
+      "title": "خلاصه سفارش",
+      "items": "آیتم",
+      "quantity": "تعداد",
+      "subtotal": "جمع جزء",
+      "discount": "تخفیف",
+      "total": "مبلغ نهایی"
+    },
+    "empty": {
+      "title": "سبد خرید خالی است",
+      "description": "قبل از ادامه پرداخت، حداقل یک محصول به سبد خرید اضافه کنید.",
+      "button": "مشاهده فروشگاه"
+    },
+    "errors": {
+      "emptyBasket": "سبد خرید شما خالی است.",
+      "insufficientBalance": "موجودی کیف پول برای این پرداخت کافی نیست.",
+      "receiptRequired": "لطفاً رسید پرداخت را بارگذاری کنید."
+    }
+  },
+  "BasketPage": {
+    "title": "سبد خرید شما",
+    "subtitle": "محصولات انتخاب‌شده را قبل از پرداخت بررسی کنید.",
+    "items": "آیتم",
+    "clear": "خالی کردن سبد",
+    "remove": "حذف آیتم",
+    "checkout": "ادامه به پرداخت",
+    "continueShopping": "ادامه خرید",
+    "empty": {
+      "title": "سبد خرید شما خالی است",
+      "description": "از فروشگاه WrapLink یک پلن یا سرویس انتخاب کنید و به سبد خرید اضافه کنید.",
+      "button": "مشاهده فروشگاه"
+    },
+    "summary": {
+      "title": "خلاصه سفارش",
+      "subtotal": "جمع جزء",
+      "discount": "تخفیف",
+      "total": "مبلغ نهایی"
+    }
+  },
+  "ProfilePage": {
+    "title": "پروفایل و امنیت",
+    "subtitle": "اطلاعات حساب، رمز عبور، امنیت و نشست‌های فعال خود را مدیریت کنید.",
+    "profile": {
+      "title": "اطلاعات پروفایل",
+      "description": "اطلاعات شخصی حساب خود را به‌روزرسانی کنید.",
+      "name": "نام کامل",
+      "email": "آدرس ایمیل",
+      "save": "ذخیره تغییرات",
+      "saving": "در حال ذخیره...",
+      "saved": "تغییرات ذخیره شد"
+    },
+    "account": {
+      "title": "وضعیت حساب",
+      "emailVerified": "تأیید ایمیل",
+      "accountStatus": "وضعیت حساب",
+      "plan": "پلن فعلی",
+      "verified": "تأیید شده",
+      "active": "فعال"
+    },
+    "security": {
+      "passwordTitle": "تغییر رمز عبور",
+      "passwordDescription": "از یک رمز عبور قوی و غیرقابل استفاده در سرویس‌های دیگر استفاده کنید.",
+      "currentPassword": "رمز عبور فعلی",
+      "newPassword": "رمز عبور جدید",
+      "confirmPassword": "تکرار رمز عبور جدید",
+      "changePassword": "تغییر رمز عبور",
+      "changing": "در حال تغییر...",
+      "passwordRequired": "لطفاً تمام فیلدهای رمز عبور را تکمیل کنید.",
+      "passwordMismatch": "رمزهای عبور جدید یکسان نیستند.",
+      "passwordChanged": "رمز عبور شما با موفقیت تغییر کرد.",
+      "twoFactorTitle": "احراز هویت دو مرحله‌ای",
+      "twoFactorDescription": "یک لایه امنیتی اضافی به حساب WrapLink خود اضافه کنید.",
+      "twoFactorEnabled": "احراز هویت دو مرحله‌ای فعال است.",
+      "twoFactorDisabled": "احراز هویت دو مرحله‌ای غیرفعال است."
+    },
+    "sessions": {
+      "title": "نشست‌های فعال",
+      "description": "دستگاه‌هایی که در حال حاضر به حساب شما وارد هستند را بررسی کنید.",
+      "current": "نشست فعلی",
+      "revoke": "لغو",
+      "logoutAll": "خروج از همه نشست‌ها"
+    }
+  },
+  "NotificationPage": {
+    "badge": "مرکز اعلان‌ها",
+    "title": "اعلان‌ها",
+    "subtitle": "از وضعیت سفارش‌ها، پرداخت‌ها، پشتیبانی و رویدادهای امنیتی مطلع شوید.",
+    "markAll": "خواندن همه",
+    "empty": "اعلانی وجود ندارد",
+    "stats": {
+      "total": "همه",
+      "unread": "خوانده نشده",
+      "read": "خوانده شده",
+      "categories": "دسته‌ها"
+    },
+    "filters": {
+      "all": "همه",
+      "unread": "خوانده نشده",
+      "order": "سفارش‌ها",
+      "payment": "پرداخت‌ها",
+      "support": "پشتیبانی",
+      "security": "امنیت",
+      "system": "سیستم"
+    },
+    "preferences": {
+      "title": "تنظیمات اعلان",
+      "orders": "اعلان سفارش",
+      "payments": "اعلان پرداخت",
+      "support": "اعلان پشتیبانی",
+      "security": "اعلان امنیت",
+      "system": "اعلان سیستم",
+      "email": "ایمیل",
+      "push": "پوش",
+      "sms": "پیامک"
     }
   }
-},"BandwidthPage": {
-  "badge": "تحلیل شبکه",
-  "title": "گزارش پهنای باند",
-  "subtitle": "مصرف پهنای باند خود را بررسی کنید و نحوه استفاده از اتصال خود را مشاهده کنید.",
-  "currentUsage": "مصرف فعلی",
-  "remaining": "باقی‌مانده",
-  "used": "مصرف شده",
-  "currentPlan": "پلن فعلی",
-  "bandwidthLimit": "سقف پهنای باند",
-  "billingCycle": "دوره صورتحساب",
-  "monthly": "ماهانه",
-  "download": "دریافت",
-  "upload": "ارسال",
-  "totalTraffic": "کل ترافیک",
-  "trafficReceived": "ترافیک دریافتی",
-  "trafficSent": "ترافیک ارسالی",
-  "downloadUploadCombined": "دریافت + ارسال",
-  "usageReport": "گزارش مصرف",
-  "usageReportSubtitle": "مصرف پهنای باند در طول زمان.",
-  "ranges": {
-    "7d": "۷ روز",
-    "30d": "۳۰ روز",
-    "90d": "۹۰ روز"
-  },
-  "reportInfoTitle": "اطلاعات مصرف",
-  "reportInfo": "آمار پهنای باند بر اساس ترافیک شبکه محاسبه می‌شود و ممکن است به‌صورت دوره‌ای به‌روزرسانی شود."
-},"UserSidebar": {
-  "controlPanel": "پنل کاربری",
-  "navigation": "ناوبری",
-  "wallet": "کیف پول",
-  "logout": "خروج",
-  "openMenu": "باز کردن منو",
-  "closeMenu": "بستن منو",
-  "items": {
-    "dashboard": "داشبورد",
-    "connection": "اتصال",
-    "wallet": "کیف پول",
-    "market": "فروشگاه",
-    "basket": "سبد خرید",
-    "orders": "سفارش‌ها",
-    "support": "پشتیبانی",
-    "bandwidth": "پهنای باند",
-    "profile": "حساب کاربری",
-    "notifications": "اعلان ها"
-  }
-},"CheckoutPage": {
-  "loading": "در حال بارگذاری پرداخت...",
-  "badge": "پرداخت امن",
-  "title": "تکمیل خرید",
-  "subtitle": "روش پرداخت را انتخاب کرده و سفارش خود را تکمیل کنید.",
-  "backToBasket": "بازگشت به سبد خرید",
-  "paymentMethod": "روش پرداخت",
-  "paymentMethodDescription": "روش پرداخت سرویس‌های WrapLink را انتخاب کنید.",
-  "processing": "در حال پردازش پرداخت...",
-  "payNow": "پرداخت",
-  "securePayment": "پرداخت شما به‌صورت امن پردازش می‌شود.",
-  "methods": {
-    "wallet": "کیف پول WrapLink",
-    "walletDesc": "پرداخت فوری با موجودی کیف پول.",
-    "card": "کارت به کارت",
-    "cardDesc": "مبلغ را انتقال داده و رسید را بارگذاری کنید.",
-    "crypto": "رمزارز",
-    "cryptoDesc": "پرداخت با رمزارز USDT.",
-    "isp": "پرداخت ISP",
-    "ispDesc": "پرداخت از طریق ارائه‌دهنده اینترنت."
-  },
-  "wallet": {
-    "title": "پرداخت با کیف پول",
-    "description": "مبلغ از موجودی کیف پول WrapLink شما کسر می‌شود.",
-    "balance": "موجودی قابل استفاده",
-    "required": "مبلغ مورد نیاز",
-    "sufficient": "موجودی کیف پول برای تکمیل این پرداخت کافی است.",
-    "insufficient": "موجودی کیف پول کافی نیست."
-  },
-  "card": {
-    "title": "پرداخت کارت به کارت",
-    "description": "مبلغ دقیق را به کارت WrapLink زیر انتقال دهید.",
-    "cardHolder": "صاحب کارت",
-    "cardHolderName": "پرداخت WrapLink",
-    "cardNumber": "شماره کارت",
-    "receipt": "رسید پرداخت",
-    "upload": "برای بارگذاری رسید پرداخت کلیک کنید",
-    "fileTypes": "JPG، PNG یا PDF"
-  },
-  "crypto": {
-    "title": "پرداخت رمزارزی",
-    "description": "مبلغ دقیق را با شبکه انتخاب‌شده ارسال کنید.",
-    "network": "شبکه",
-    "address": "آدرس کیف پول",
-    "warning": "فقط USDT را با شبکه انتخاب‌شده ارسال کنید. ارسال دارایی دیگر یا استفاده از شبکه اشتباه ممکن است باعث از دست رفتن دائمی دارایی شود."
-  },
-  "isp": {
-    "title": "پرداخت از طریق ISP",
-    "description": "ارائه‌دهنده اینترنت خود را انتخاب کنید.",
-    "provider": "ارائه‌دهنده اینترنت",
-    "note": "پس از ثبت سفارش، به سرویس پرداخت ارائه‌دهنده اینترنت منتقل خواهید شد."
-  },
-  "summary": {
-    "title": "خلاصه سفارش",
-    "items": "آیتم",
-    "quantity": "تعداد",
-    "subtotal": "جمع جزء",
-    "discount": "تخفیف",
-    "total": "مبلغ نهایی"
-  },
-  "empty": {
-    "title": "سبد خرید خالی است",
-    "description": "قبل از ادامه پرداخت، حداقل یک محصول به سبد خرید اضافه کنید.",
-    "button": "مشاهده فروشگاه"
-  },
-  "errors": {
-    "emptyBasket": "سبد خرید شما خالی است.",
-    "insufficientBalance": "موجودی کیف پول برای این پرداخت کافی نیست.",
-    "receiptRequired": "لطفاً رسید پرداخت را بارگذاری کنید."
-  }
-},"BasketPage": {
-  "title": "سبد خرید شما",
-  "subtitle": "محصولات انتخاب‌شده را قبل از پرداخت بررسی کنید.",
-  "items": "آیتم",
-  "clear": "خالی کردن سبد",
-  "remove": "حذف آیتم",
-  "checkout": "ادامه به پرداخت",
-  "continueShopping": "ادامه خرید",
-  "empty": {
-    "title": "سبد خرید شما خالی است",
-    "description": "از فروشگاه WrapLink یک پلن یا سرویس انتخاب کنید و به سبد خرید اضافه کنید.",
-    "button": "مشاهده فروشگاه"
-  },
-  "summary": {
-    "title": "خلاصه سفارش",
-    "subtotal": "جمع جزء",
-    "discount": "تخفیف",
-    "total": "مبلغ نهایی"
-  }
-},"ProfilePage": {
-  "title": "پروفایل و امنیت",
-  "subtitle": "اطلاعات حساب، رمز عبور، امنیت و نشست‌های فعال خود را مدیریت کنید.",
-
-  "profile": {
-    "title": "اطلاعات پروفایل",
-    "description": "اطلاعات شخصی حساب خود را به‌روزرسانی کنید.",
-    "name": "نام کامل",
-    "email": "آدرس ایمیل",
-    "save": "ذخیره تغییرات",
-    "saving": "در حال ذخیره...",
-    "saved": "تغییرات ذخیره شد"
-  },
-
-  "account": {
-    "title": "وضعیت حساب",
-    "emailVerified": "تأیید ایمیل",
-    "accountStatus": "وضعیت حساب",
-    "plan": "پلن فعلی",
-    "verified": "تأیید شده",
-    "active": "فعال"
-  },
-
-  "security": {
-    "passwordTitle": "تغییر رمز عبور",
-    "passwordDescription": "از یک رمز عبور قوی و غیرقابل استفاده در سرویس‌های دیگر استفاده کنید.",
-    "currentPassword": "رمز عبور فعلی",
-    "newPassword": "رمز عبور جدید",
-    "confirmPassword": "تکرار رمز عبور جدید",
-    "changePassword": "تغییر رمز عبور",
-    "changing": "در حال تغییر...",
-    "passwordRequired": "لطفاً تمام فیلدهای رمز عبور را تکمیل کنید.",
-    "passwordMismatch": "رمزهای عبور جدید یکسان نیستند.",
-    "passwordChanged": "رمز عبور شما با موفقیت تغییر کرد.",
-    "twoFactorTitle": "احراز هویت دو مرحله‌ای",
-    "twoFactorDescription": "یک لایه امنیتی اضافی به حساب WrapLink خود اضافه کنید.",
-    "twoFactorEnabled": "احراز هویت دو مرحله‌ای فعال است.",
-    "twoFactorDisabled": "احراز هویت دو مرحله‌ای غیرفعال است."
-  },
-
-  "sessions": {
-    "title": "نشست‌های فعال",
-    "description": "دستگاه‌هایی که در حال حاضر به حساب شما وارد هستند را بررسی کنید.",
-    "current": "نشست فعلی",
-    "revoke": "لغو",
-    "logoutAll": "خروج از همه نشست‌ها"
-  }
-},"NotificationPage": {
-  "badge": "مرکز اعلان‌ها",
-  "title": "اعلان‌ها",
-  "subtitle": "از وضعیت سفارش‌ها، پرداخت‌ها، پشتیبانی و رویدادهای امنیتی مطلع شوید.",
-  "markAll": "خواندن همه",
-  "empty": "اعلانی وجود ندارد",
-  "stats": {
-    "total": "همه",
-    "unread": "خوانده نشده",
-    "read": "خوانده شده",
-    "categories": "دسته‌ها"
-  },
-  "filters": {
-    "all": "همه",
-    "unread": "خوانده نشده",
-    "order": "سفارش‌ها",
-    "payment": "پرداخت‌ها",
-    "support": "پشتیبانی",
-    "security": "امنیت",
-    "system": "سیستم"
-  },
-  "preferences": {
-    "title": "تنظیمات اعلان",
-    "orders": "اعلان سفارش",
-    "payments": "اعلان پرداخت",
-    "support": "اعلان پشتیبانی",
-    "security": "اعلان امنیت",
-    "system": "اعلان سیستم",
-    "email": "ایمیل",
-    "push": "پوش",
-    "sms": "پیامک"
-  }
-}
 }
