@@ -75,16 +75,21 @@ type BackendEntitlement = {
     activatedAt: string;
 };
 
+type BackendModeResponse = {
+    mode: ConnectionMode;
+};
+
 type BackendErrorResponse = {
     error?: string;
 };
 
 export async function getConnectionStatus(): Promise<ConnectionStatus> {
-    // An active subscription alone does not connect the user to WrapLink.
-    // Do not request or display DNS assignments without an active entitlement.
+    // The mode belongs to the account and persists independently of an
+    // active entitlement, so the selection works before connecting too.
+    const mode = await getCurrentMode();
     const entitlement = await getCurrentEntitlement();
     if (entitlement?.status !== "active") {
-        return disconnectedStatus();
+        return disconnectedStatus(mode);
     }
 
     const accessResponse = await apiClient.get<BackendAccessInfo>(
@@ -92,7 +97,7 @@ export async function getConnectionStatus(): Promise<ConnectionStatus> {
     );
 
     if (accessResponse.data.status !== "active") {
-        return disconnectedStatus();
+        return disconnectedStatus(mode);
     }
 
     // Backend chooses these addresses from the registered dns-control nodes.
@@ -114,7 +119,7 @@ export async function getConnectionStatus(): Promise<ConnectionStatus> {
         region: "-",
         country: "-",
         load: 0,
-        mode: "smart",
+        mode,
     };
 }
 
@@ -153,11 +158,27 @@ export async function disconnect(): Promise<void> {
 }
 
 export async function updateConnectionMode(
-    _mode: ConnectionMode
+    mode: ConnectionMode
 ): Promise<void> {
-    throw new Error(
-        "Connection modes are not available from the website API yet."
+    try {
+        await apiClient.put<BackendModeResponse>(
+            "/api/v1/me/network/mode",
+            {mode}
+        );
+    } catch (error) {
+        throw readableBackendError(error, "Could not update connection mode");
+    }
+}
+
+async function getCurrentMode(): Promise<ConnectionMode> {
+    const response = await apiClient.get<BackendModeResponse>(
+        "/api/v1/me/network/mode"
     );
+    const mode = response.data.mode;
+    if (mode !== "smart" && mode !== "gaming" && mode !== "streaming") {
+        throw new Error("Unsupported connection mode returned by backend");
+    }
+    return mode;
 }
 
 export async function runDiagnostic(
@@ -229,7 +250,7 @@ function readableBackendError(
     return new Error(fallback);
 }
 
-function disconnectedStatus(): ConnectionStatus {
+function disconnectedStatus(mode: ConnectionMode): ConnectionStatus {
     return {
         connected: false,
         latency: 0,
@@ -240,6 +261,6 @@ function disconnectedStatus(): ConnectionStatus {
         region: "-",
         country: "-",
         load: 0,
-        mode: "smart",
+        mode,
     };
 }
