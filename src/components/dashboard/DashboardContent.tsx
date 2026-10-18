@@ -70,7 +70,9 @@ export default function DashboardContent({locale}: Props) {
         ip: connected ? (data.entitlement?.clientIp ?? "-") : "-",
         dns1: connected ? (data.access?.connection?.dnsServers?.[0] ?? "-") : "-",
         dns2: connected ? (data.access?.connection?.dnsServers?.[1] ?? "-") : "-",
-        edge: "-",
+        edge: connected
+            ? (data.access?.connection?.proxy?.host || t("connectionInfo.perDomainEdge"))
+            : t("connectionInfo.noEdge"),
     };
     const payments = data.recentPayments;
 
