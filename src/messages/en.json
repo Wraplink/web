@@ -327,6 +327,8 @@
     },
     "diagnostics": {
       "title": "Connection Diagnostics",
+      "run": "Run Test",
+      "running": "Running...",
       "scopeNote": "Tests run from WrapLink backend or control plane, not from your device. TCP reachability is not an ICMP ping, and route readiness is not a traceroute.",
       "ping": {
         "title": "Ping Test",
