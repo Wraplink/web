@@ -169,13 +169,26 @@ export default function ConnectionContent({
 
             if (connection.connected) {
                 await disconnect();
+                // Never retain assigned DNS addresses after disconnection,
+                // including while the follow-up status request is in flight.
+                setConnection((current) =>
+                    current
+                        ? {
+                            ...current,
+                            connected: false,
+                            primaryDns: "-",
+                            secondaryDns: "-",
+                            edge: "-",
+                        }
+                        : current
+                );
+                setDiagnosticResults({});
             } else {
                 await connect();
             }
 
-            const updated =
-                await getConnectionStatus();
-
+            // Fresh backend selection on each connect and disconnect.
+            const updated = await getConnectionStatus();
             setConnection(updated);
         } catch (err) {
             console.error(
@@ -356,7 +369,7 @@ export default function ConnectionContent({
                 {liveConnection && (
                     <>
                         {/* Top grid */}
-                        <div className="grid gap-6 lg:grid-cols-3">
+                        <div className={`grid gap-6 ${liveConnection.connected ? "lg:grid-cols-3" : "lg:grid-cols-2"}`}>
                             <ConnectionPowerCard
                                 connected={
                                     liveConnection.connected
@@ -375,17 +388,13 @@ export default function ConnectionContent({
                                 }
                             />
 
-                            <DnsCard
-                                primaryDns={
-                                    liveConnection.primaryDns
-                                }
-                                secondaryDns={
-                                    liveConnection.secondaryDns
-                                }
-                                onCopy={
-                                    copyValue
-                                }
-                            />
+                            {liveConnection.connected && (
+                                <DnsCard
+                                    primaryDns={liveConnection.primaryDns}
+                                    secondaryDns={liveConnection.secondaryDns}
+                                    onCopy={copyValue}
+                                />
+                            )}
                         </div>
 
                         {/* Connection details */}
@@ -997,19 +1006,25 @@ function DnsCard({
                 </div>
             </div>
 
-            <div className="space-y-3">
-                <DnsRow
-                    label="Primary"
-                    value={primaryDns}
-                    onCopy={onCopy}
-                />
+            {primaryDns === "-" && secondaryDns === "-" ? (
+                <p className="text-sm text-white/50">
+                    No DNS servers are currently available from the backend.
+                </p>
+            ) : (
+                <div className="space-y-3">
+                    <DnsRow
+                        label="Primary"
+                        value={primaryDns}
+                        onCopy={onCopy}
+                    />
 
-                <DnsRow
-                    label="Secondary"
-                    value={secondaryDns}
-                    onCopy={onCopy}
-                />
-            </div>
+                    <DnsRow
+                        label="Secondary"
+                        value={secondaryDns}
+                        onCopy={onCopy}
+                    />
+                </div>
+            )}
         </section>
     );
 }
@@ -1245,14 +1260,15 @@ function DnsRow({
                 </p>
 
                 <p className="mt-1 truncate font-mono text-sm">
-                    {value}
+                    {value === "-" ? "Not assigned" : value}
                 </p>
             </div>
 
             <button
                 type="button"
+                disabled={value === "-"}
                 onClick={() => onCopy(value)}
-                className="shrink-0 rounded-lg p-2 text-white/40 transition hover:bg-white/5 hover:text-cyan-400"
+                className="shrink-0 rounded-lg p-2 text-white/40 transition hover:bg-white/5 hover:text-cyan-400 disabled:cursor-not-allowed disabled:opacity-30"
                 aria-label={`Copy ${label} DNS`}
             >
                 <Clipboard className="h-4 w-4"/>

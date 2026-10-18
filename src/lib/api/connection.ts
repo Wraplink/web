@@ -80,41 +80,42 @@ type BackendErrorResponse = {
 };
 
 export async function getConnectionStatus(): Promise<ConnectionStatus> {
-    try {
-        const accessResponse = await apiClient.get<BackendAccessInfo>(
-            "/api/v1/me/network/access"
-        );
-
-        const entitlement = await getCurrentEntitlement();
-        const dnsServers =
-            accessResponse.data.connection?.dnsServers ?? [];
-
-        return {
-            connected:
-                accessResponse.data.status === "active" &&
-                entitlement?.status === "active",
-            latency: 0,
-            packetLoss: 0,
-            primaryDns: dnsServers[0] ?? "-",
-            secondaryDns: dnsServers[1] ?? "-",
-            edge: entitlement
-                ? `Entitled IP ${entitlement.clientIp}`
-                : "Managed by DNS Control",
-            region: "-",
-            country: "-",
-            load: 0,
-            mode: "smart",
-        };
-    } catch (error) {
-        if (
-            axios.isAxiosError(error) &&
-            error.response?.status === 404
-        ) {
-            return disconnectedStatus();
-        }
-
-        throw error;
+    // An active subscription alone does not connect the user to WrapLink.
+    // Do not request or display DNS assignments without an active entitlement.
+    const entitlement = await getCurrentEntitlement();
+    if (entitlement?.status !== "active") {
+        return disconnectedStatus();
     }
+
+    const accessResponse = await apiClient.get<BackendAccessInfo>(
+        "/api/v1/me/network/access"
+    );
+
+    if (accessResponse.data.status !== "active") {
+        return disconnectedStatus();
+    }
+
+    // Backend chooses these addresses from the registered dns-control nodes.
+    // Never substitute static frontend IPs or cached values.
+    const dnsServers = Array.from(new Set(
+        (accessResponse.data.connection?.dnsServers ?? [])
+            .filter((value): value is string => typeof value === "string")
+            .map((value) => value.trim())
+            .filter(Boolean)
+    )).slice(0, 2);
+
+    return {
+        connected: true,
+        latency: 0,
+        packetLoss: 0,
+        primaryDns: dnsServers[0] ?? "-",
+        secondaryDns: dnsServers[1] ?? "-",
+        edge: `Entitled IP ${entitlement.clientIp}`,
+        region: "-",
+        country: "-",
+        load: 0,
+        mode: "smart",
+    };
 }
 
 export async function connect(): Promise<void> {
