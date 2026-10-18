@@ -293,7 +293,9 @@
       "userIp": "Your IP",
       "primaryDns": "Primary DNS",
       "secondaryDns": "Secondary DNS",
-      "edgeServer": "Edge Server"
+      "edgeServer": "Edge Server",
+      "perDomainEdge": "Assigned per domain",
+      "noEdge": "Not connected"
     },
     "recentPayments": "Recent Payments",
     "noPayments": "No payments yet.",

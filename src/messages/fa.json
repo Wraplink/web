@@ -293,7 +293,9 @@
       "userIp": "IP شما",
       "primaryDns": "DNS اصلی",
       "secondaryDns": "DNS دوم",
-      "edgeServer": "سرور Edge"
+      "edgeServer": "سرور Edge",
+      "perDomainEdge": "انتخاب پویا برای هر دامنه",
+      "noEdge": "متصل نیست"
     },
     "recentPayments": "پرداخت‌های اخیر",
     "noPayments": "هنوز پرداختی ثبت نشده است.",
