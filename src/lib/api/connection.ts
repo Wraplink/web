@@ -203,9 +203,16 @@ export async function runDiagnostic(
     }
 }
 
-export async function getConnectionEvents(): Promise<ConnectionEvent[]> {
-    const response = await apiClient.get<ConnectionEvent[]>(
-        "/api/v1/me/network/events"
+export type ConnectionEventsPage = {
+    events: ConnectionEvent[];
+    nextCursor?: string;
+};
+
+export async function getConnectionEvents(before?: string): Promise<ConnectionEventsPage> {
+    const params = new URLSearchParams({limit: "10"});
+    if (before) params.set("before", before);
+    const response = await apiClient.get<ConnectionEventsPage>(
+        `/api/v1/me/network/events?${params.toString()}`
     );
     return response.data;
 }
