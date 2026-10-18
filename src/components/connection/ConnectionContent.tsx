@@ -395,64 +395,37 @@ export default function ConnectionContent({
                             />
                         </div>
 
-                        {/* Connection details */}
+                        {/* Connection details sourced from the account's network access. */}
                         <section className="mt-6">
                             <SectionHeader
-                                icon={
-                                    <Globe2 className="h-5 w-5"/>
-                                }
-                                title={t(
-                                    "connectionDetails.title"
-                                )}
+                                icon={<Globe2 className="h-5 w-5"/>}
+                                title={t("connectionDetails.title")}
                             />
-
                             <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                                 <InfoCard
-                                    icon={
-                                        <Server className="h-5 w-5"/>
-                                    }
-                                    label={t(
-                                        "connectionDetails.edgeServer"
-                                    )}
-                                    value={
-                                        liveConnection.edge
-                                    }
+                                    icon={<Network className="h-5 w-5"/>}
+                                    label={t("connectionDetails.clientIp")}
+                                    value={liveConnection.clientIp}
                                 />
-
                                 <InfoCard
-                                    icon={
-                                        <MapPin className="h-5 w-5"/>
-                                    }
-                                    label={t(
-                                        "connectionDetails.region"
-                                    )}
-                                    value={
-                                        liveConnection.region
-                                    }
+                                    icon={<ShieldCheck className="h-5 w-5"/>}
+                                    label={t("connectionDetails.plan")}
+                                    value={liveConnection.planCode}
                                 />
-
                                 <InfoCard
-                                    icon={
-                                        <Globe2 className="h-5 w-5"/>
-                                    }
-                                    label={t(
-                                        "connectionDetails.country"
-                                    )}
-                                    value={
-                                        liveConnection.country
-                                    }
+                                    icon={<Activity className="h-5 w-5"/>}
+                                    label={t("connectionDetails.remainingData")}
+                                    value={formatConnectionBytes(liveConnection.remainingBytes, locale)}
                                 />
-
                                 <InfoCard
-                                    icon={
-                                        <Activity className="h-5 w-5"/>
-                                    }
-                                    label={t(
-                                        "connectionDetails.serverLoad"
-                                    )}
-                                    value={`${liveConnection.load}%`}
+                                    icon={<RefreshCw className="h-5 w-5"/>}
+                                    label={t("connectionDetails.expiresAt")}
+                                    value={formatConnectionExpiry(liveConnection.expiresAt, locale)}
                                 />
                             </div>
+                            <p className="mt-3 text-xs text-white/40">
+                                {t("connectionDetails.note")}
+                            </p>
                         </section>
 
                         {/* Connection mode */}
@@ -1308,4 +1281,24 @@ function EventCard({
             </div>
         </div>
     );
+}
+
+function formatConnectionBytes(value: number | null, locale: string): string {
+    if (value === null || !Number.isFinite(value) || value < 0) return "-";
+    if (value === 0) return "0 B";
+    const unit = Math.min(Math.floor(Math.log(value) / Math.log(1024)), 4);
+    const units = ["B", "KB", "MB", "GB", "TB"];
+    return new Intl.NumberFormat(locale === "fa" ? "fa-IR" : "en-US", {
+        maximumFractionDigits: unit === 0 ? 0 : 2,
+    }).format(value / 1024 ** unit) + " " + units[unit];
+}
+
+function formatConnectionExpiry(value: string | null, locale: string): string {
+    if (!value) return "-";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "-";
+    return new Intl.DateTimeFormat(locale === "fa" ? "fa-IR" : "en-US", {
+        dateStyle: "medium",
+        timeStyle: "short",
+    }).format(date);
 }

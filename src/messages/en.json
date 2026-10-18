@@ -383,7 +383,12 @@
       "edgeServer": "Edge Server",
       "region": "Region",
       "country": "Country",
-      "serverLoad": "Server Load"
+      "serverLoad": "Server Load",
+      "clientIp": "Authorized client IP",
+      "plan": "Active plan",
+      "remainingData": "Remaining data",
+      "expiresAt": "Access expires",
+      "note": "These details come from your active network entitlement. Edge location and live load will appear when the control plane supplies verified telemetry."
     },
     "modes": {
       "title": "Connection Mode",
