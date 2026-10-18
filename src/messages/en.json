@@ -389,15 +389,15 @@
       "title": "Connection Mode",
       "smart": {
         "title": "Smart",
-        "description": "Automatically optimize your connection."
+        "description": "Apply all configured managed DNS rules."
       },
       "gaming": {
         "title": "Gaming",
-        "description": "Prioritize low latency and gaming traffic."
+        "description": "Apply gaming DNS rules where configured."
       },
       "streaming": {
         "title": "Streaming",
-        "description": "Optimize the connection for video streaming."
+        "description": "Apply streaming DNS rules where configured."
       }
     }
   },
