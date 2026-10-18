@@ -11,7 +11,10 @@ export type DashboardSummary = {
         dataLimitBytes: number;
         usedBytes: number;
         remainingBytes: number;
-        connection?: {dnsServers: string[]};
+        connection?: {
+            dnsServers: string[];
+            proxy?: {host: string; port: number; protocol: string};
+        };
     } | null;
     entitlement: {
         clientIp: string;
