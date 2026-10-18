@@ -352,7 +352,11 @@
       "todayTime": "Today · 10:32",
       "yesterday": "Yesterday",
       "twoDaysAgo": "2 days ago",
-      "empty": "No connection events yet."
+      "empty": "No connection events yet.",
+      "loading": "Loading events…",
+      "loadMore": "Load more events",
+      "loadError": "Couldn't load connection events.",
+      "retry": "Retry"
     },
     "power": {
       "connect": "Connect",

@@ -54,6 +54,11 @@ export default function ConnectionContent({
 
     const [events, setEvents] =
         useState<ConnectionEvent[]>([]);
+    const [eventsCursor, setEventsCursor] =
+        useState<string | null>(null);
+    const [eventsLoading, setEventsLoading] = useState(true);
+    const [eventsLoadingMore, setEventsLoadingMore] = useState(false);
+    const [eventsError, setEventsError] = useState(false);
 
     const [loading, setLoading] =
         useState(true);
@@ -83,11 +88,36 @@ export default function ConnectionContent({
      * GET /api/v1/connection/events
      */
     const refreshEvents = async () => {
+        setEventsLoading(true);
         try {
-            setEvents(await getConnectionEvents());
+            const page = await getConnectionEvents();
+            setEvents(page.events);
+            setEventsCursor(page.nextCursor ?? null);
+            setEventsError(false);
         } catch (err) {
             console.error("Failed to load connection events:", err);
-            setError(t("errors.loadFailed"));
+            setEventsError(true);
+        } finally {
+            setEventsLoading(false);
+        }
+    };
+
+    const loadMoreEvents = async () => {
+        if (!eventsCursor || eventsLoading || eventsLoadingMore) return;
+        setEventsLoadingMore(true);
+        try {
+            const page = await getConnectionEvents(eventsCursor);
+            setEvents((current) => {
+                const existing = new Set(current.map((event) => event.id));
+                return [...current, ...page.events.filter((event) => !existing.has(event.id))];
+            });
+            setEventsCursor(page.nextCursor ?? null);
+            setEventsError(false);
+        } catch (err) {
+            console.error("Failed to load more connection events:", err);
+            setEventsError(true);
+        } finally {
+            setEventsLoadingMore(false);
         }
     };
 
@@ -96,9 +126,10 @@ export default function ConnectionContent({
             setLoading(true);
             setError(null);
 
+            // Fetch independently; event history must not delay connection status.
+            void refreshEvents();
             const connectionStatus = await getConnectionStatus();
             setConnection(connectionStatus);
-            await refreshEvents();
         } catch (err) {
             console.error(
                 "Failed to load connection:",
@@ -620,7 +651,11 @@ export default function ConnectionContent({
                         )}
                     />
 
-                    {events.length === 0 ? (
+                    {eventsLoading && events.length === 0 ? (
+                        <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-8 text-center text-sm text-white/40">
+                            {t("events.loading")}
+                        </div>
+                    ) : events.length === 0 && !eventsError ? (
                         <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-8 text-center text-sm text-white/40">
                             {t(
                                 "events.empty"
@@ -641,6 +676,21 @@ export default function ConnectionContent({
                                     />
                                 )
                             )}
+                        </div>
+                    )}
+                    {eventsError && (
+                        <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl border border-yellow-400/20 bg-yellow-400/5 px-5 py-3 text-sm text-yellow-200">
+                            <span>{t("events.loadError")}</span>
+                            <button type="button" onClick={() => void refreshEvents()} className="rounded-lg border border-yellow-400/30 px-3 py-1 hover:bg-yellow-400/10">
+                                {t("events.retry")}
+                            </button>
+                        </div>
+                    )}
+                    {eventsCursor && !eventsLoading && (
+                        <div className="mt-4 flex justify-center">
+                            <button type="button" onClick={() => void loadMoreEvents()} disabled={eventsLoadingMore} className="rounded-xl border border-white/15 bg-white/5 px-5 py-2 text-sm text-white/80 hover:bg-white/10 disabled:opacity-50">
+                                {eventsLoadingMore ? t("events.loading") : t("events.loadMore")}
+                            </button>
                         </div>
                     )}
                 </section>
