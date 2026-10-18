@@ -294,7 +294,14 @@
       "primaryDns": "Primary DNS",
       "secondaryDns": "Secondary DNS",
       "edgeServer": "Edge Server"
-    }
+    },
+    "recentPayments": "Recent Payments",
+    "noPayments": "No payments yet.",
+    "inactive": "Inactive",
+    "noPlan": "No active plan",
+    "loading": "Loading dashboard…",
+    "loadError": "Could not load your dashboard.",
+    "retry": "Retry"
   },
   "ConnectionPage": {
     "badge": "Connection Dashboard",

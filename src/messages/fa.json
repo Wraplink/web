@@ -294,7 +294,14 @@
       "primaryDns": "DNS اصلی",
       "secondaryDns": "DNS دوم",
       "edgeServer": "سرور Edge"
-    }
+    },
+    "recentPayments": "پرداخت‌های اخیر",
+    "noPayments": "هنوز پرداختی ثبت نشده است.",
+    "inactive": "غیرفعال",
+    "noPlan": "بدون پلن فعال",
+    "loading": "در حال بارگذاری داشبورد…",
+    "loadError": "بارگذاری داشبورد ناموفق بود.",
+    "retry": "تلاش مجدد"
   },
   "ConnectionPage": {
     "badge": "داشبورد اتصال",

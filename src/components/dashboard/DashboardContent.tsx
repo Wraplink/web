@@ -1,3 +1,5 @@
+"use client";
+
 import {
     Wallet,
     Wifi,
@@ -10,7 +12,9 @@ import {
     Globe
 } from "lucide-react";
 
-import {getTranslations} from "next-intl/server";
+import {useTranslations} from "next-intl";
+import {useEffect, useState} from "react";
+import {getDashboardSummary, type DashboardSummary} from "@/lib/api/dashboard";
 
 import {Link} from "@/i18n/navigation";
 
@@ -18,55 +22,57 @@ type Props = {
     locale: string;
 };
 
-export default async function DashboardContent({locale}: Props) {
+export default function DashboardContent({locale}: Props) {
+    const t = useTranslations("DashboardPage");
+    const [data, setData] = useState<DashboardSummary | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
 
-    const t = await getTranslations({
-        locale,
-        namespace: "DashboardPage"
-    });
+    useEffect(() => {
+        let active = true;
+        setLoading(true);
+        setError(false);
+        getDashboardSummary()
+            .then((response) => { if (active) setData(response); })
+            .catch((err) => {
+                console.error("Dashboard summary failed:", err);
+                if (active) setError(true);
+            })
+            .finally(() => { if (active) setLoading(false); });
+        return () => { active = false; };
+    }, [reloadKey]);
 
-    /*
-     * ============================================================
-     * BACKEND TODO
-     * ============================================================
-     *
-     * GET /api/v1/dashboard/summary
-     * GET /api/v1/connection/current
-     * GET /api/v1/wallet/balance
-     * GET /api/v1/orders/recent
-     *
-     * Replace these mock values with API responses.
-     * ============================================================
-     */
+    if (loading) {
+        return <section className="mx-auto max-w-7xl px-6 py-12 text-white/60">{t("loading")}</section>;
+    }
+    if (error || !data) {
+        return (
+            <section className="mx-auto max-w-7xl px-6 py-12">
+                <p className="text-red-300">{t("loadError")}</p>
+                <button type="button" onClick={() => setReloadKey((value) => value + 1)} className="mt-4 rounded-xl bg-cyan-400 px-5 py-2 font-semibold text-black">
+                    {t("retry")}
+                </button>
+            </section>
+        );
+    }
 
+    const connected = data.entitlement?.status === "active" && data.access?.status === "active";
     const summary = {
-        wallet: "0",
-        plan: "Pro",
-        connection: t("active"),
-        bandwidth: "0 GB / 0 GB"
+        wallet: formatMoney(data.wallet.balanceMinor, data.wallet.currency, locale),
+        plan: data.access?.planCode ?? t("noPlan"),
+        connection: connected ? t("active") : t("inactive"),
+        bandwidth: data.access
+            ? `${formatBytes(data.access.usedBytes, locale)} / ${formatBytes(data.access.dataLimitBytes, locale)}`
+            : "-",
     };
-
     const connection = {
-        ip: "192.168.1.25",
-        dns1: "10.10.10.10",
-        dns2: "10.10.10.11",
-        edge: "Frankfurt-01"
+        ip: connected ? (data.entitlement?.clientIp ?? "-") : "-",
+        dns1: connected ? (data.access?.connection?.dnsServers?.[0] ?? "-") : "-",
+        dns2: connected ? (data.access?.connection?.dnsServers?.[1] ?? "-") : "-",
+        edge: "-",
     };
-
-    const orders = [
-        {
-            id: "#WL-1001",
-            status: "Completed"
-        },
-        {
-            id: "#WL-1002",
-            status: "Pending"
-        },
-        {
-            id: "#WL-1003",
-            status: "Completed"
-        }
-    ];
+    const payments = data.recentPayments;
 
     return (
         <section className="mx-auto max-w-7xl px-6 py-12">
@@ -133,7 +139,7 @@ export default async function DashboardContent({locale}: Props) {
                         href="/connection"
                         locale={locale}
                         primary
-                        badge={t("active")}
+                        badge={connected ? t("active") : undefined}
                         buttonText={t("actions.connectNow")}
                     />
 
@@ -219,22 +225,25 @@ export default async function DashboardContent({locale}: Props) {
                 <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
 
                     <h2 className="text-2xl font-bold">
-                        {t("orders")}
+                        {t("recentPayments")}
                     </h2>
 
                     <div className="mt-6 space-y-4">
 
-                        {orders.map((order) => (
+                        {payments.length === 0 ? (
+                            <p className="text-sm text-white/40">{t("noPayments")}</p>
+                        ) : payments.map((payment) => (
                             <div
-                                key={order.id}
-                                className="flex items-center justify-between rounded-xl border border-white/10 bg-black/20 px-4 py-3"
+                                key={payment.id}
+                                className="flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-black/20 px-4 py-3"
                             >
-                                <span>{order.id}</span>
-
-                                <span className="rounded-full bg-green-400/10 px-3 py-1 text-sm text-green-400">
-                                    {order.status}
+                                <div className="min-w-0">
+                                    <p className="truncate text-sm font-medium">{payment.id.slice(0, 8)}</p>
+                                    <p className="text-xs text-white/40">{formatMoney(payment.amountMinor, payment.currency, locale)}</p>
+                                </div>
+                                <span className={payment.status === "succeeded" ? "rounded-full bg-green-400/10 px-3 py-1 text-sm text-green-400" : "rounded-full bg-yellow-400/10 px-3 py-1 text-sm text-yellow-300"}>
+                                    {payment.status}
                                 </span>
-
                             </div>
                         ))}
 
@@ -387,4 +396,20 @@ function InfoRow({
 
         </div>
     );
+}
+function formatMoney(minor: number, currency: string, locale: string): string {
+    if (!Number.isFinite(minor)) return "-";
+    try {
+        return new Intl.NumberFormat(locale === "fa" ? "fa-IR" : "en-US", {
+            style: "currency", currency, maximumFractionDigits: 0,
+        }).format(minor);
+    } catch {
+        return `${minor} ${currency}`;
+    }
+}
+function formatBytes(value: number, locale: string): string {
+    if (!Number.isFinite(value) || value < 0) return "-";
+    if (value === 0) return "0 B";
+    const unit = Math.min(Math.floor(Math.log(value) / Math.log(1024)), 4);
+    return `${new Intl.NumberFormat(locale === "fa" ? "fa-IR" : "en-US", {maximumFractionDigits: 1}).format(value / 1024 ** unit)} ${["B", "KB", "MB", "GB", "TB"][unit]}`;
 }
