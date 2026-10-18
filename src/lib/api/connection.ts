@@ -204,7 +204,10 @@ export async function runDiagnostic(
 }
 
 export async function getConnectionEvents(): Promise<ConnectionEvent[]> {
-    return [];
+    const response = await apiClient.get<ConnectionEvent[]>(
+        "/api/v1/me/network/events"
+    );
+    return response.data;
 }
 
 async function getCurrentEntitlement(): Promise<BackendEntitlement | null> {

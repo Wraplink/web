@@ -82,21 +82,23 @@ export default function ConnectionContent({
      * GET /api/v1/connection/status
      * GET /api/v1/connection/events
      */
+    const refreshEvents = async () => {
+        try {
+            setEvents(await getConnectionEvents());
+        } catch (err) {
+            console.error("Failed to load connection events:", err);
+            setError(t("errors.loadFailed"));
+        }
+    };
+
     const loadConnection = async () => {
         try {
             setLoading(true);
             setError(null);
 
-            const [
-                connectionStatus,
-                connectionEvents,
-            ] = await Promise.all([
-                getConnectionStatus(),
-                getConnectionEvents(),
-            ]);
-
+            const connectionStatus = await getConnectionStatus();
             setConnection(connectionStatus);
-            setEvents(connectionEvents);
+            await refreshEvents();
         } catch (err) {
             console.error(
                 "Failed to load connection:",
@@ -190,6 +192,7 @@ export default function ConnectionContent({
             // Fresh backend selection on each connect and disconnect.
             const updated = await getConnectionStatus();
             setConnection(updated);
+            void refreshEvents();
         } catch (err) {
             console.error(
                 "Failed to change connection state:",
@@ -280,6 +283,7 @@ export default function ConnectionContent({
             );
 
             await updateConnectionMode(mode);
+            void refreshEvents();
         } catch (err) {
             console.error(
                 "Failed to update connection mode:",
@@ -633,6 +637,7 @@ export default function ConnectionContent({
                                         event={
                                             event
                                         }
+                                        locale={locale}
                                     />
                                 )
                             )}
@@ -1266,8 +1271,10 @@ function DnsRow({
 
 function EventCard({
     event,
+    locale,
 }: {
     event: ConnectionEvent;
+    locale: string;
 }) {
     const icon =
         event.type === "success"
@@ -1294,11 +1301,20 @@ function EventCard({
                 </p>
 
                 <p className="mt-1 text-xs text-white/40">
-                    {event.time}
+                    {formatConnectionEventTime(event.time, locale)}
                 </p>
             </div>
         </div>
     );
+}
+
+function formatConnectionEventTime(value: string, locale: string): string {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "-";
+    return new Intl.DateTimeFormat(locale === "fa" ? "fa-IR" : "en-US", {
+        dateStyle: "medium",
+        timeStyle: "short",
+    }).format(date);
 }
 
 function formatConnectionBytes(value: number | null, locale: string): string {
