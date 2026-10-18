@@ -518,6 +518,9 @@ export default function ConnectionContent({
                                     "diagnostics.title"
                                 )}
                             />
+                            <p className="mt-3 text-sm text-white/40">
+                                {t("diagnostics.scopeNote")}
+                            </p>
 
                             <div className="mt-4 grid gap-4 md:grid-cols-3">
                                 <DiagnosticCard
@@ -1120,9 +1123,14 @@ function DiagnosticCard({
                         <XCircle className="h-4 w-4 text-red-400"/>
                     )}
 
-                    <span className="text-sm text-white/70">
-                        {result.value}
-                    </span>
+                    <div className="min-w-0 text-sm text-white/70">
+                        <p className="break-words">{result.value}</p>
+                        {typeof result.latency === "number" && result.success && (
+                            <p className="mt-1 text-xs text-white/40">
+                                {result.latency.toFixed(1)} ms
+                            </p>
+                        )}
+                    </div>
                 </div>
             )}
 
