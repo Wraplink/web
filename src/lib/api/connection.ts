@@ -18,6 +18,10 @@ export type ConnectionStatus = {
     country: string;
     load: number;
     mode: ConnectionMode;
+    clientIp: string;
+    planCode: string;
+    remainingBytes: number | null;
+    expiresAt: string | null;
 };
 
 export type DiagnosticType =
@@ -120,6 +124,10 @@ export async function getConnectionStatus(): Promise<ConnectionStatus> {
         country: "-",
         load: 0,
         mode,
+        clientIp: entitlement.clientIp,
+        planCode: accessResponse.data.planCode,
+        remainingBytes: accessResponse.data.remainingBytes,
+        expiresAt: accessResponse.data.expiresAt,
     };
 }
 
@@ -262,5 +270,9 @@ function disconnectedStatus(mode: ConnectionMode): ConnectionStatus {
         country: "-",
         load: 0,
         mode,
+        clientIp: "-",
+        planCode: "-",
+        remainingBytes: null,
+        expiresAt: null,
     };
 }
