@@ -327,17 +327,18 @@
     },
     "diagnostics": {
       "title": "Connection Diagnostics",
+      "scopeNote": "Tests run from WrapLink backend or control plane, not from your device. TCP reachability is not an ICMP ping, and route readiness is not a traceroute.",
       "ping": {
         "title": "Ping Test",
-        "description": "Check latency to the WrapLink edge server."
+        "description": "Measure backend-to-DNS TCP/53 connection time (not ICMP)."
       },
       "dns": {
         "title": "DNS Test",
-        "description": "Verify that WrapLink DNS is working correctly."
+        "description": "Resolve example.com using your assigned WrapLink DNS."
       },
       "route": {
         "title": "Route Test",
-        "description": "Check whether your network route is optimized."
+        "description": "Verify the assigned DNS belongs to a recently registered control node (not your device route)."
       }
     },
     "events": {
