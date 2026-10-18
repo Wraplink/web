@@ -33,6 +33,7 @@ export type DiagnosticResult = {
     success: boolean;
     value: string;
     latency?: number;
+    scope?: "backend" | "control-plane";
 };
 
 export type ConnectionEvent = {
@@ -192,29 +193,14 @@ async function getCurrentMode(): Promise<ConnectionMode> {
 export async function runDiagnostic(
     type: DiagnosticType
 ): Promise<DiagnosticResult> {
-    if (type === "dns") {
-        const status = await getConnectionStatus();
-
-        if (
-            status.connected &&
-            status.primaryDns !== "-"
-        ) {
-            return {
-                success: true,
-                value: status.primaryDns,
-            };
-        }
-
-        return {
-            success: false,
-            value: "No active DNS entitlement",
-        };
+    try {
+        const response = await apiClient.post<DiagnosticResult>(
+            `/api/v1/me/network/diagnostics/${type}`
+        );
+        return response.data;
+    } catch (error) {
+        throw readableBackendError(error, "Could not run network diagnostic");
     }
-
-    return {
-        success: false,
-        value: "Diagnostic is not available yet",
-    };
 }
 
 export async function getConnectionEvents(): Promise<ConnectionEvent[]> {
