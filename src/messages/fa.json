@@ -380,18 +380,19 @@
       "load": "بار سرور"
     },
     "diagnostics": {
-      "title": "Connection Diagnostics",
+      "title": "عیب‌یابی اتصال",
+      "scopeNote": "این تست‌ها از سمت سرور یا کنترل‌پلین WrapLink اجرا می‌شوند، نه دستگاه شما. بررسی TCP پینگ ICMP نیست و بررسی مسیر نیز تریس‌روت نیست.",
       "ping": {
         "title": "Ping Test",
-        "description": "Check latency to the WrapLink edge server."
+        "description": "زمان اتصال TCP از سرور به DNS اختصاص‌یافته را بسنجید (نه پینگ ICMP)."
       },
       "dns": {
         "title": "DNS Test",
-        "description": "Verify that WrapLink DNS is working correctly."
+        "description": "دامنه example.com را با DNS اختصاص‌یافته WrapLink بررسی کنید."
       },
       "route": {
         "title": "Route Test",
-        "description": "Check whether your network route is optimized."
+        "description": "بررسی کنید DNS اختصاص‌یافته به یک نود فعال کنترل‌پلین تعلق دارد (نه مسیر واقعی دستگاه)."
       }
     },
     "events": {
