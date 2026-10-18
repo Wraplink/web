@@ -545,6 +545,8 @@ export default function ConnectionContent({
                                     onRun={
                                         handleDiagnostic
                                     }
+                                    runLabel={t("diagnostics.run")}
+                                    runningLabel={t("diagnostics.running")}
                                 />
 
                                 <DiagnosticCard
@@ -569,6 +571,8 @@ export default function ConnectionContent({
                                     onRun={
                                         handleDiagnostic
                                     }
+                                    runLabel={t("diagnostics.run")}
+                                    runningLabel={t("diagnostics.running")}
                                 />
 
                                 <DiagnosticCard
@@ -593,6 +597,8 @@ export default function ConnectionContent({
                                     onRun={
                                         handleDiagnostic
                                     }
+                                    runLabel={t("diagnostics.run")}
+                                    runningLabel={t("diagnostics.running")}
                                 />
                             </div>
                         </section>
@@ -1086,6 +1092,8 @@ function DiagnosticCard({
     result,
     loading,
     onRun,
+    runLabel,
+    runningLabel,
 }: {
     type: DiagnosticType;
     icon: React.ReactNode;
@@ -1096,6 +1104,8 @@ function DiagnosticCard({
     onRun: (
         type: DiagnosticType
     ) => void;
+    runLabel: string;
+    runningLabel: string;
 }) {
     return (
         <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
@@ -1143,12 +1153,12 @@ function DiagnosticCard({
                 {loading ? (
                     <>
                         <Loader2 className="h-4 w-4 animate-spin"/>
-                        Running...
+                        {runningLabel}
                     </>
                 ) : (
                     <>
                         <RefreshCw className="h-4 w-4"/>
-                        Run Test
+                        {runLabel}
                     </>
                 )}
             </button>
