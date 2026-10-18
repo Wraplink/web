@@ -369,7 +369,7 @@ export default function ConnectionContent({
                 {liveConnection && (
                     <>
                         {/* Top grid */}
-                        <div className={`grid gap-6 ${liveConnection.connected ? "lg:grid-cols-3" : "lg:grid-cols-2"}`}>
+                        <div className="grid gap-6 lg:grid-cols-3">
                             <ConnectionPowerCard
                                 connected={
                                     liveConnection.connected
@@ -388,13 +388,11 @@ export default function ConnectionContent({
                                 }
                             />
 
-                            {liveConnection.connected && (
-                                <DnsCard
-                                    primaryDns={liveConnection.primaryDns}
-                                    secondaryDns={liveConnection.secondaryDns}
-                                    onCopy={copyValue}
-                                />
-                            )}
+                            <DnsCard
+                                primaryDns={liveConnection.primaryDns}
+                                secondaryDns={liveConnection.secondaryDns}
+                                onCopy={copyValue}
+                            />
                         </div>
 
                         {/* Connection details */}
@@ -1006,25 +1004,19 @@ function DnsCard({
                 </div>
             </div>
 
-            {primaryDns === "-" && secondaryDns === "-" ? (
-                <p className="text-sm text-white/50">
-                    No DNS servers are currently available from the backend.
-                </p>
-            ) : (
-                <div className="space-y-3">
-                    <DnsRow
-                        label="Primary"
-                        value={primaryDns}
-                        onCopy={onCopy}
-                    />
+            <div className="space-y-3">
+                <DnsRow
+                    label="Primary"
+                    value={primaryDns}
+                    onCopy={onCopy}
+                />
 
-                    <DnsRow
-                        label="Secondary"
-                        value={secondaryDns}
-                        onCopy={onCopy}
-                    />
-                </div>
-            )}
+                <DnsRow
+                    label="Secondary"
+                    value={secondaryDns}
+                    onCopy={onCopy}
+                />
+            </div>
         </section>
     );
 }
@@ -1259,8 +1251,8 @@ function DnsRow({
                     {label}
                 </p>
 
-                <p className="mt-1 truncate font-mono text-sm">
-                    {value === "-" ? "Not assigned" : value}
+                <p className="mt-1 min-h-5 truncate font-mono text-sm">
+                    {value === "-" ? "" : value}
                 </p>
             </div>
 
