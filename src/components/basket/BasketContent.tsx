@@ -59,6 +59,18 @@ export default function BasketContent({
         [items]
     );
 
+    const currency = items[0]?.currency ?? "";
+    const mixedCurrencies = items.some(item => item.currency !== currency);
+    const formatMoney = (minor: number) => {
+        if (!currency) return "—";
+        const digits = new Intl.NumberFormat("en-US", {
+            style: "currency", currency,
+        }).resolvedOptions().maximumFractionDigits;
+        return new Intl.NumberFormat(locale === "fa" ? "fa-IR" : "en-US", {
+            style: "currency", currency,
+        }).format(minor / 10 ** digits);
+    };
+
     const totalItems = useMemo(
         () =>
             items.reduce(
@@ -220,7 +232,7 @@ export default function BasketContent({
                                                 </p>
 
                                                 <p className="mt-1 text-sm text-cyan-400">
-                                                    ${item.price}/month
+                                                    {item.currency ? (() => { const digits = new Intl.NumberFormat("en-US", {style: "currency", currency: item.currency}).resolvedOptions().maximumFractionDigits; return new Intl.NumberFormat(locale === "fa" ? "fa-IR" : "en-US", {style: "currency", currency: item.currency}).format(item.price / 10 ** digits); })() : "—"}{item.durationDays ? ` / ${item.durationDays} days` : ""}
                                                 </p>
 
                                             </div>
@@ -266,11 +278,7 @@ export default function BasketContent({
                                             </div>
 
                                             <div className="min-w-20 text-right font-bold">
-                                                $
-                                                {(
-                                                    item.price *
-                                                    item.quantity
-                                                ).toFixed(2)}
+                                                {item.currency ? (() => { const digits = new Intl.NumberFormat("en-US", {style: "currency", currency: item.currency}).resolvedOptions().maximumFractionDigits; return new Intl.NumberFormat(locale === "fa" ? "fa-IR" : "en-US", {style: "currency", currency: item.currency}).format(item.price * item.quantity / 10 ** digits); })() : "—"}
                                             </div>
 
                                             <button
@@ -308,14 +316,14 @@ export default function BasketContent({
                                     <span>{t("summary.subtotal")}</span>
 
                                     <span className="text-white">
-                                        ${subtotal.toFixed(2)}
+                                        {mixedCurrencies ? "Multiple currencies" : formatMoney(subtotal)}
                                     </span>
                                 </div>
 
                                 <div className="flex justify-between text-gray-400">
                                     <span>{t("summary.discount")}</span>
 
-                                    <span>$0.00</span>
+                                    <span>{formatMoney(0)}</span>
                                 </div>
 
                                 <div className="border-t border-white/10 pt-4">
@@ -327,7 +335,7 @@ export default function BasketContent({
                                         </span>
 
                                         <span className="text-2xl font-black text-cyan-400">
-                                            ${subtotal.toFixed(2)}
+                                            {mixedCurrencies ? "Multiple currencies" : formatMoney(subtotal)}
                                         </span>
 
                                     </div>
@@ -337,7 +345,8 @@ export default function BasketContent({
                             </div>
 
                             <Link
-                                href="/checkout"
+                                aria-disabled={mixedCurrencies}
+                                href={mixedCurrencies ? "/basket" : "/checkout"}
                                 className="mt-8 flex w-full items-center justify-center gap-2 rounded-xl bg-cyan-400 py-3 font-bold text-black transition hover:scale-[1.02]"
                             >
                                 <CreditCard size={19}/>
