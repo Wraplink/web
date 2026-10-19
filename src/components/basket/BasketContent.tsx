@@ -71,6 +71,17 @@ export default function BasketContent({
         }).format(minor / 10 ** digits);
     };
 
+    const formatItemPrice = (item: BasketItem, quantity = 1) => {
+        const itemCurrency = item.currency;
+        if (!itemCurrency) return "—";
+        const digits = new Intl.NumberFormat("en-US", {
+            style: "currency", currency: itemCurrency,
+        }).resolvedOptions().maximumFractionDigits;
+        return new Intl.NumberFormat(locale === "fa" ? "fa-IR" : "en-US", {
+            style: "currency", currency: itemCurrency,
+        }).format(item.price * quantity / 10 ** digits);
+    };
+
     const totalItems = useMemo(
         () =>
             items.reduce(
@@ -232,7 +243,7 @@ export default function BasketContent({
                                                 </p>
 
                                                 <p className="mt-1 text-sm text-cyan-400">
-                                                    {item.currency ? (() => { const digits = new Intl.NumberFormat("en-US", {style: "currency", currency: item.currency}).resolvedOptions().maximumFractionDigits; return new Intl.NumberFormat(locale === "fa" ? "fa-IR" : "en-US", {style: "currency", currency: item.currency}).format(item.price / 10 ** digits); })() : "—"}{item.durationDays ? ` / ${item.durationDays} days` : ""}
+                                                    {formatItemPrice(item)}{item.durationDays ? ` / ${item.durationDays} days` : ""}
                                                 </p>
 
                                             </div>
@@ -278,7 +289,7 @@ export default function BasketContent({
                                             </div>
 
                                             <div className="min-w-20 text-right font-bold">
-                                                {item.currency ? (() => { const digits = new Intl.NumberFormat("en-US", {style: "currency", currency: item.currency}).resolvedOptions().maximumFractionDigits; return new Intl.NumberFormat(locale === "fa" ? "fa-IR" : "en-US", {style: "currency", currency: item.currency}).format(item.price * item.quantity / 10 ** digits); })() : "—"}
+                                                {formatItemPrice(item, item.quantity)}
                                             </div>
 
                                             <button
