@@ -490,10 +490,7 @@ function OrderCard({
                         />
 
                         <div className="font-bold text-cyan-400">
-                            $
-                            {order.total.toFixed(
-                                2
-                            )}
+                            {formatMoney(order.total, order.currency, locale)}
                         </div>
 
                         {expanded ? (
@@ -615,13 +612,7 @@ function OrderCard({
                                             <div className="flex items-center gap-5">
 
                                                 <div className="font-bold">
-                                                    $
-                                                    {(
-                                                        item.price *
-                                                        item.quantity
-                                                    ).toFixed(
-                                                        2
-                                                    )}
+                                                    {formatMoney(item.price * item.quantity, order.currency, locale)}
                                                 </div>
 
                                                 {item.refunded && (
