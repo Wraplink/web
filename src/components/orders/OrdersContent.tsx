@@ -1,6 +1,7 @@
 "use client";
 
 import {useEffect, useMemo, useState} from "react";
+import {getCardReceipt} from "@/lib/api/checkout";
 import {cancelPendingSubscription, listSubscriptions, type UserSubscription} from "@/lib/api/subscriptions";
 
 import {
@@ -50,6 +51,7 @@ type Order = {
     date: string;
     status: OrderStatus;
     payment: string;
+    receiptStatus?: string;
     total: number;
     currency: string;
     items: OrderItem[];
@@ -91,7 +93,26 @@ export default function OrdersContent({
     const reload = async () => {
         setFetching(true);
         setApiError("");
-        try { setOrders((await listSubscriptions()).map(toOrder)); }
+        try {
+            const subscriptions = await listSubscriptions();
+            const enriched = await Promise.all(subscriptions.map(async subscription => {
+                const order = toOrder(subscription);
+                try {
+                    const receipt = await getCardReceipt(subscription.id);
+                    if (receipt) {
+                        order.receiptStatus = receipt.status;
+                        order.payment = receipt.status === "pending_review" ? "Card transfer — awaiting review" :
+                            receipt.status === "approved" ? "Card transfer — approved" : "Card transfer — rejected";
+                        order.total = receipt.payableMinor;
+                        order.items = order.items.map(item => ({...item, price: receipt.payableMinor}));
+                    }
+                } catch {
+                    // Keep subscription history available when receipt lookup fails.
+                }
+                return order;
+            }));
+            setOrders(enriched);
+        }
         catch { setApiError("Unable to load subscriptions. Please retry."); }
         finally { setFetching(false); }
     };
@@ -644,7 +665,7 @@ function OrderCard({
                     {/* Cancel */}
 
                     {order.status ===
-                        "pending" && (
+                        "pending" && order.receiptStatus !== "pending_review" && (
                             <div className="mt-6 border-t border-white/10 pt-5">
 
                                 <button
