@@ -27,6 +27,7 @@ export default function CheckoutContent({locale}: Props) {
     const [error, setError] = useState("");
     const pendingId = useRef<string | null>(null);
     const submitting = useRef(false);
+    const paymentKey = useRef<string | null>(null);
 
     const load = async () => {
         setChecking(true);
@@ -79,7 +80,8 @@ export default function CheckoutContent({locale}: Props) {
                 );
                 pendingId.current = existing?.id ?? (await createPendingSubscription(plan.code)).id;
             }
-            const result = await paySubscriptionWithWallet(pendingId.current);
+            if (!paymentKey.current) paymentKey.current = crypto.randomUUID();
+            const result = await paySubscriptionWithWallet(pendingId.current, paymentKey.current);
             if (!result || (typeof result === "object" && "status" in result &&
                 !["active", "paid", "completed", "succeeded"].includes(String(result.status)))) {
                 // Check authoritative subscription state instead of assuming payment succeeded.
