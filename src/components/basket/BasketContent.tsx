@@ -14,6 +14,7 @@ import {
 import {useTranslations} from "next-intl";
 
 import {Link} from "@/i18n/navigation";
+import {getMarketPlans, type MarketPlan} from "@/lib/api/plans";
 
 import {
     getBasket,
@@ -35,28 +36,40 @@ export default function BasketContent({
     const [items, setItems] =
         useState<BasketItem[]>([]);
 
-    const [loaded, setLoaded] =
-        useState(false);
+    const [loaded, setLoaded] = useState(false);
+    const [plans, setPlans] = useState<MarketPlan[]>([]);
+    const [error, setError] = useState("");
+    const [validating, setValidating] = useState(true);
 
     useEffect(() => {
         setItems(getBasket());
         setLoaded(true);
+        getMarketPlans().then(setPlans).catch(() => setError("Unable to verify current plan prices. Please retry before checkout.")).finally(() => setValidating(false));
     }, []);
 
     const refreshBasket = () => {
         setItems(getBasket());
     };
 
+    const verifiedItems = useMemo(() => items.map(item => {
+        const plan = plans.find(p => p.code === item.id);
+        return plan ? {...item, name: plan.name, price: plan.priceMinor, currency: plan.currency} : {...item, currency: ""};
+    }), [items, plans]);
+    const valid = !validating && !error && verifiedItems.every(item => Boolean(item.currency));
+    const currency = verifiedItems[0]?.currency ?? "";
+    const sameCurrency = verifiedItems.every(item => item.currency === currency);
+    const money = (amount: number) => currency ? new Intl.NumberFormat(locale === "fa" ? "fa-IR" : "en-US", {style: "currency", currency, maximumFractionDigits: currency === "IRR" ? 0 : 2}).format(amount / (currency === "IRR" ? 1 : 100)) : "—";
+
     const subtotal = useMemo(
         () =>
-            items.reduce(
+            verifiedItems.reduce(
                 (sum, item) =>
                     sum +
                     item.price *
                     item.quantity,
                 0
             ),
-        [items]
+        [verifiedItems]
     );
 
     const totalItems = useMemo(
@@ -68,29 +81,6 @@ export default function BasketContent({
             ),
         [items]
     );
-
-    /*
-     * ========================================================
-     * BACKEND TODO
-     * ========================================================
-     *
-     * GET /api/v1/cart
-     *
-     * Response:
-     *
-     * {
-     *   "items": [...],
-     *   "subtotal": 0,
-     *   "discount": 0,
-     *   "total": 0
-     * }
-     *
-     * PATCH /api/v1/cart/items/{id}
-     * DELETE /api/v1/cart/items/{id}
-     * DELETE /api/v1/cart
-     *
-     * ========================================================
-     */
 
     if (!loaded) {
         return (
@@ -134,6 +124,7 @@ export default function BasketContent({
 
                 </div>
 
+                {error && <div role="alert" className="mb-6 rounded-xl border border-red-400/30 p-4 text-red-300">{error} <button className="ml-3 underline" onClick={() => {setValidating(true); setError(""); getMarketPlans().then(setPlans).catch(() => setError("Unable to verify plan prices")).finally(() => setValidating(false));}}>Retry</button></div>}
                 {items.length === 0 ? (
 
                     <div className="rounded-3xl border border-white/10 bg-white/5 py-20 text-center backdrop-blur-xl">
@@ -191,7 +182,7 @@ export default function BasketContent({
 
                             </div>
 
-                            {items.map((item) => (
+                            {verifiedItems.map((item) => (
 
                                 <div
                                     key={item.id}
@@ -220,7 +211,7 @@ export default function BasketContent({
                                                 </p>
 
                                                 <p className="mt-1 text-sm text-cyan-400">
-                                                    ${item.price}/month
+                                                    {money(item.price)}
                                                 </p>
 
                                             </div>
@@ -308,7 +299,7 @@ export default function BasketContent({
                                     <span>{t("summary.subtotal")}</span>
 
                                     <span className="text-white">
-                                        ${subtotal.toFixed(2)}
+                                        {money(subtotal)}
                                     </span>
                                 </div>
 
@@ -336,7 +327,10 @@ export default function BasketContent({
 
                             </div>
 
+                            {(!valid || !sameCurrency) && <p role="status" className="mt-4 text-sm text-amber-300">{validating ? "Verifying prices…" : "Checkout unavailable: invalid plans or mixed currencies."}</p>}
                             <Link
+                                aria-disabled={!valid || !sameCurrency}
+                                onClick={(event) => {if (!valid || !sameCurrency) event.preventDefault();}}
                                 href="/checkout"
                                 className="mt-8 flex w-full items-center justify-center gap-2 rounded-xl bg-cyan-400 py-3 font-bold text-black transition hover:scale-[1.02]"
                             >
