@@ -5,7 +5,6 @@ import {useTranslations} from "next-intl";
 import {Link, useRouter} from "@/i18n/navigation";
 import {clearBasket, getBasket, type BasketItem} from "@/lib/basket";
 import {getMarketPlans, createPendingSubscription, paySubscriptionWithWallet, type MarketPlan} from "@/lib/api/plans";
-import {getWalletBalance, type WalletBalance} from "@/lib/api/wallet";
 import {listSubscriptions} from "@/lib/api/subscriptions";
 import {quoteDiscount, submitCardReceipt, type DiscountQuote} from "@/lib/api/checkout";
 
@@ -22,7 +21,6 @@ export default function CheckoutContent({locale}: Props) {
     const router = useRouter();
     const [items, setItems] = useState<BasketItem[]>([]);
     const [plans, setPlans] = useState<MarketPlan[]>([]);
-    const [wallet, setWallet] = useState<WalletBalance | null>(null);
     const [checking, setChecking] = useState(true);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -38,10 +36,9 @@ export default function CheckoutContent({locale}: Props) {
         setChecking(true);
         setError("");
         try {
-            const [catalog, balance] = await Promise.all([getMarketPlans(), getWalletBalance()]);
+            const catalog = await getMarketPlans();
             setItems(getBasket());
             setPlans(catalog);
-            setWallet(balance);
         } catch {
             setError("Could not verify plan prices or wallet balance. Please retry.");
         } finally {
@@ -60,7 +57,6 @@ export default function CheckoutContent({locale}: Props) {
         plan.currency === currency && Number.isSafeInteger(plan.priceMinor) && plan.priceMinor >= 0
     );
     const total = valid ? lines.reduce((sum, {item, plan}) => sum + item.quantity * plan!.priceMinor, 0) : 0;
-    const canPay = valid && wallet?.currency === currency && wallet.balanceMinor >= total;
 
     const prepareSubscription = async () => {
         if (lines.length !== 1 || lines[0].item.quantity !== 1 || !valid) throw new Error("Checkout supports one valid plan at a time.");
