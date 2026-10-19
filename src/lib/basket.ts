@@ -2,7 +2,10 @@ export type BasketItem = {
     id: string;
     name: string;
     category: string;
+    // Price is in the currency's minor units, as returned by the backend.
     price: number;
+    currency?: string;
+    durationDays?: number;
     quantity: number;
 };
 
@@ -46,6 +49,12 @@ export function addBasketItem(
     );
 
     if (existing) {
+        // Refresh stale local pricing from the authoritative catalog.
+        existing.name = item.name;
+        existing.category = item.category;
+        existing.price = item.price;
+        existing.currency = item.currency;
+        existing.durationDays = item.durationDays;
         existing.quantity += 1;
     } else {
         basket.push({
