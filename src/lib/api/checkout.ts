@@ -17,3 +17,16 @@ export async function submitCardReceipt(subscriptionId: string, file: File, disc
         `/api/v1/me/subscriptions/${encodeURIComponent(subscriptionId)}/card-receipt`, form);
     return data;
 }
+
+export async function getCardReceipt(subscriptionId: string): Promise<CardReceiptResult | null> {
+    try {
+        const {data} = await apiClient.get<CardReceiptResult>(
+            `/api/v1/me/subscriptions/${encodeURIComponent(subscriptionId)}/card-receipt`
+        );
+        return data;
+    } catch (error) {
+        if (typeof error === "object" && error !== null && "response" in error &&
+            (error as {response?: {status?: number}}).response?.status === 404) return null;
+        throw error;
+    }
+}
