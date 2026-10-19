@@ -1,6 +1,7 @@
 "use client";
 
-import {useMemo, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
+import {cancelPendingSubscription, listSubscriptions, type UserSubscription} from "@/lib/api/subscriptions";
 
 import {
     Activity,
@@ -50,79 +51,52 @@ type Order = {
     status: OrderStatus;
     payment: string;
     total: number;
+    currency: string;
     items: OrderItem[];
 };
 
 const initialOrders: Order[] = [];
-    /*[
-    {
-        id: "#WL-1001",
-        date: "2026-09-18",
-        status: "delivered",
-        payment: "Wallet",
-        total: 24,
-        items: [
-            {
-                id: "pro",
-                name: "Pro Plan",
-                quantity: 1,
-                price: 12,
-                refundable: true,
-                refunded: false,
-            },
-            {
-                id: "static-ip",
-                name: "Static IP",
-                quantity: 3,
-                price: 4,
-                refundable: true,
-                refunded: false,
-            },
-        ],
-    },
-    {
-        id: "#WL-1002",
-        date: "2026-09-19",
-        status: "pending",
-        payment: "Crypto",
-        total: 25,
-        items: [
-            {
-                id: "ultimate",
-                name: "Ultimate Plan",
-                quantity: 1,
-                price: 25,
-                refundable: true,
-                refunded: false,
-            },
-        ],
-    },
-    {
-        id: "#WL-1003",
-        date: "2026-09-15",
-        status: "confirmed",
-        payment: "Card-to-Card",
-        total: 8,
-        items: [
-            {
-                id: "extra-device",
-                name: "Extra Device",
-                quantity: 2,
-                price: 4,
-                refundable: false,
-                refunded: false,
-            },
-        ],
-    },
-];*/
+
+function toOrder(subscription: UserSubscription): Order {
+    const status: OrderStatus = subscription.status === "pending_payment" ? "pending" :
+        subscription.status === "active" ? "active" :
+        subscription.status === "cancelled" ? "cancelled" : "delivered";
+    return {
+        id: subscription.id,
+        date: subscription.createdAt,
+        status,
+        payment: subscription.status === "pending_payment" ? "Unpaid" : "Subscription",
+        total: subscription.priceMinor,
+        currency: subscription.currency,
+        items: [{id: subscription.planCode, name: subscription.planName, quantity: 1,
+            price: subscription.priceMinor, refundable: false, refunded: false}],
+    };
+}
+
+function formatMoney(amount: number, currency: string, locale: string): string {
+    return new Intl.NumberFormat(locale === "fa" ? "fa-IR" : "en-US", {
+        style: "currency", currency,
+    }).format(amount / (currency === "IRR" ? 1 : 100));
+}
 
 export default function OrdersContent({
                                           locale,
                                       }: Props) {
     const t = useTranslations("OrdersPage");
 
-    const [orders, setOrders] =
-        useState<Order[]>(initialOrders);
+    const [orders, setOrders] = useState<Order[]>(initialOrders);
+    const [fetching, setFetching] = useState(true);
+    const [apiError, setApiError] = useState("");
+
+    const reload = async () => {
+        setFetching(true);
+        setApiError("");
+        try { setOrders((await listSubscriptions()).map(toOrder)); }
+        catch { setApiError("Unable to load subscriptions. Please retry."); }
+        finally { setFetching(false); }
+    };
+
+    useEffect(() => { void reload(); }, []);
 
     const [expandedOrder, setExpandedOrder] =
         useState<string | null>(null);
@@ -149,98 +123,14 @@ export default function OrdersContent({
     ) => {
         setActionLoading(orderId);
 
-        /*
-         * BACKEND TODO
-         *
-         * POST /api/v1/orders/{orderId}/cancel
-         *
-         * Backend must verify that the order
-         * is still cancellable.
-         */
-
-        await new Promise((resolve) =>
-            setTimeout(resolve, 700)
-        );
-
-        setOrders((current) =>
-            current.map((order) =>
-                order.id === orderId
-                    ? {
-                        ...order,
-                        status: "cancelled",
-                    }
-                    : order
-            )
-        );
-
-        setActionLoading(null);
-    };
-
-    const refundItem = async (
-        orderId: string,
-        itemId: string
-    ) => {
-        const actionId =
-            `${orderId}-${itemId}`;
-
-        setActionLoading(actionId);
-
-        /*
-         * BACKEND TODO
-         *
-         * POST
-         * /api/v1/orders/{orderId}/items/{itemId}/refund
-         *
-         * Backend verifies:
-         *
-         * - item is refundable
-         * - item has not already been refunded
-         * - refund policy allows refund
-         */
-
-        await new Promise((resolve) =>
-            setTimeout(resolve, 700)
-        );
-
-        setOrders((current) =>
-            current.map((order) => {
-                if (order.id !== orderId) {
-                    return order;
-                }
-
-                const items =
-                    order.items.map(
-                        (item) =>
-                            item.id === itemId
-                                ? {
-                                    ...item,
-                                    refunded: true,
-                                }
-                                : item
-                    );
-
-                const allRefunded =
-                    items
-                        .filter(
-                            (item) =>
-                                item.refundable
-                        )
-                        .every(
-                            (item) =>
-                                item.refunded
-                        );
-
-                return {
-                    ...order,
-                    items,
-                    status: allRefunded
-                        ? "refunded"
-                        : order.status,
-                };
-            })
-        );
-
-        setActionLoading(null);
+        try {
+            await cancelPendingSubscription(orderId);
+            await reload();
+        } catch {
+            setApiError("Could not cancel this subscription. It may no longer be pending.");
+        } finally {
+            setActionLoading(null);
+        }
     };
 
     return (
@@ -440,11 +330,13 @@ export default function OrdersContent({
 
                 </div>
 
+                {apiError && <div role="alert" className="mb-5 rounded-xl border border-red-400/30 p-4 text-red-300">{apiError} <button type="button" className="ml-3 underline" onClick={() => void reload()}>Retry</button></div>}
+                {fetching && <p role="status" className="mb-5 text-gray-400">Loading orders…</p>}
                 {/* Orders */}
 
                 <div className="space-y-4">
 
-                    {filteredOrders.length ===
+                    {!fetching && !apiError && filteredOrders.length ===
                     0 ? (
                         <div className="rounded-3xl border border-white/10 bg-white/5 px-6 py-16 text-center">
 
@@ -501,6 +393,7 @@ export default function OrdersContent({
                                             actionLoading
                                         }
                                         t={t}
+                                        locale={locale}
                                         onToggle={() =>
                                             setExpandedOrder(
                                                 expanded
@@ -513,14 +406,7 @@ export default function OrdersContent({
                                                 order.id
                                             )
                                         }
-                                        onRefund={(
-                                            itemId
-                                        ) =>
-                                            refundItem(
-                                                order.id,
-                                                itemId
-                                            )
-                                        }
+
                                     />
                                 );
                             }
@@ -546,7 +432,7 @@ function OrderCard({
                        t,
                        onToggle,
                        onCancel,
-                       onRefund,
+                       locale,
                    }: {
     order: Order;
     expanded: boolean;
@@ -554,7 +440,7 @@ function OrderCard({
     t: ReturnType<typeof useTranslations>;
     onToggle: () => void;
     onCancel: () => void;
-    onRefund: (itemId: string) => void;
+    locale: string;
 }) {
     return (
         <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl">
@@ -737,43 +623,6 @@ function OrderCard({
                                                         2
                                                     )}
                                                 </div>
-
-                                                {item.refundable &&
-                                                    !item.refunded && (
-                                                        <button
-                                                            type="button"
-                                                            onClick={() =>
-                                                                onRefund(
-                                                                    item.id
-                                                                )
-                                                            }
-                                                            disabled={
-                                                                loading ===
-                                                                `${order.id}-${item.id}`
-                                                            }
-                                                            className="flex items-center gap-2 rounded-lg border border-yellow-400/20 bg-yellow-400/5 px-3 py-2 text-xs text-yellow-300 transition hover:bg-yellow-400/10 disabled:opacity-50"
-                                                        >
-                                                            {loading ===
-                                                            `${order.id}-${item.id}` ? (
-                                                                <RefreshCcw
-                                                                    size={
-                                                                        14
-                                                                    }
-                                                                    className="animate-spin"
-                                                                />
-                                                            ) : (
-                                                                <RefreshCcw
-                                                                    size={
-                                                                        14
-                                                                    }
-                                                                />
-                                                            )}
-
-                                                            {t(
-                                                                "refund"
-                                                            )}
-                                                        </button>
-                                                    )}
 
                                                 {item.refunded && (
                                                     <span className="flex items-center gap-1 text-xs text-green-400">
