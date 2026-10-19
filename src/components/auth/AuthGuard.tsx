@@ -5,6 +5,7 @@ import {
     useState,
 } from "react";
 import {usePathname} from "next/navigation";
+import axios from "axios";
 
 import {useRouter} from "@/i18n/navigation";
 import {
@@ -27,12 +28,15 @@ export default function AuthGuard({
 
     const [authenticated, setAuthenticated] =
         useState(false);
+    const [restoreError, setRestoreError] = useState(false);
+    const [retry, setRetry] = useState(0);
 
     useEffect(() => {
         let cancelled = false;
 
         const checkAuthentication = async () => {
             setChecking(true);
+            setRestoreError(false);
 
             if (isAuthenticated()) {
                 if (!cancelled) {
@@ -51,17 +55,20 @@ export default function AuthGuard({
 
                 setAuthUser(user);
                 setAuthenticated(true);
-            } catch {
+            } catch (error) {
                 if (cancelled) {
                     return;
                 }
 
-                clearAuthSession();
                 setAuthenticated(false);
-
-                router.replace(
+                if (!axios.isAxiosError(error) || error.response?.status === 401 || error.response?.status === 403) {
+                    clearAuthSession();
+                    router.replace(
                     `/auth/login?returnUrl=${encodeURIComponent(pathname)}`
-                );
+                    );
+                } else {
+                    setRestoreError(true);
+                }
             } finally {
                 if (!cancelled) {
                     setChecking(false);
@@ -74,7 +81,14 @@ export default function AuthGuard({
         return () => {
             cancelled = true;
         };
-    }, [pathname, router]);
+    }, [pathname, router, retry]);
+
+    if (restoreError) {
+        return <div role="alert" className="flex min-h-screen flex-col items-center justify-center gap-4 bg-black text-white">
+            <p>Unable to reach the authentication service. Your session may still be active.</p>
+            <button type="button" className="rounded-lg bg-cyan-400 px-5 py-2 font-semibold text-black" onClick={() => setRetry(value => value + 1)}>Retry connection</button>
+        </div>;
+    }
 
     if (checking || !authenticated) {
         return (
