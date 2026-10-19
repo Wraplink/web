@@ -7,6 +7,7 @@ import {clearBasket, getBasket, type BasketItem} from "@/lib/basket";
 import {getMarketPlans, createPendingSubscription, paySubscriptionWithWallet, type MarketPlan} from "@/lib/api/plans";
 import {getWalletBalance, type WalletBalance} from "@/lib/api/wallet";
 import {listSubscriptions} from "@/lib/api/subscriptions";
+import {quoteDiscount, submitCardReceipt, type DiscountQuote} from "@/lib/api/checkout";
 
 type Props = {locale: string};
 
@@ -25,6 +26,10 @@ export default function CheckoutContent({locale}: Props) {
     const [checking, setChecking] = useState(true);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [method, setMethod] = useState<"card" | "isp" | "crypto">("card");
+    const [receipt, setReceipt] = useState<File | null>(null);
+    const [discountCode, setDiscountCode] = useState("");
+    const [quote, setQuote] = useState<DiscountQuote | null>(null);
     const pendingId = useRef<string | null>(null);
     const submitting = useRef(false);
     const paymentKey = useRef<string | null>(null);
@@ -57,6 +62,26 @@ export default function CheckoutContent({locale}: Props) {
     const total = valid ? lines.reduce((sum, {item, plan}) => sum + item.quantity * plan!.priceMinor, 0) : 0;
     const canPay = valid && wallet?.currency === currency && wallet.balanceMinor >= total;
 
+    const prepareSubscription = async () => {
+        if (lines.length !== 1 || lines[0].item.quantity !== 1 || !valid) throw new Error("Checkout supports one valid plan at a time.");
+        const plan = lines[0].plan!;
+        if (!pendingId.current) {
+            const existing = (await listSubscriptions()).find(s => s.planCode === plan.code && s.status === "pending_payment" && s.priceMinor === plan.priceMinor && s.currency === plan.currency);
+            pendingId.current = existing?.id ?? (await createPendingSubscription(plan.code)).id;
+        }
+        return pendingId.current;
+    };
+
+    const applyDiscount = async () => {
+        setError("");
+        setLoading(true);
+        try {
+            const id = await prepareSubscription();
+            setQuote(await quoteDiscount(id, discountCode));
+        } catch (e) { setQuote(null); setError(e instanceof Error ? e.message : "Invalid discount"); }
+        finally { setLoading(false); }
+    };
+
     const pay = async () => {
         if (submitting.current || loading) return;
         if (!canPay || !wallet) {
@@ -67,29 +92,9 @@ export default function CheckoutContent({locale}: Props) {
         setLoading(true);
         setError("");
         try {
-            // A subscription represents exactly one plan; multi-item checkout needs a server-side order API.
-            if (lines.length !== 1 || lines[0].item.quantity !== 1) {
-                throw new Error("Only one plan per checkout is supported. Update your basket and retry.");
-            }
-            const plan = lines[0].plan!;
-            if (!pendingId.current) {
-                // Reuse an existing pending subscription to avoid creating duplicates on retries.
-                const existing = (await listSubscriptions()).find(s =>
-                    s.planCode === plan.code && s.status === "pending_payment" &&
-                    s.currency === plan.currency && s.priceMinor === plan.priceMinor
-                );
-                pendingId.current = existing?.id ?? (await createPendingSubscription(plan.code)).id;
-            }
-            if (!paymentKey.current) paymentKey.current = crypto.randomUUID();
-            const result = await paySubscriptionWithWallet(pendingId.current, paymentKey.current);
-            if (!result || (typeof result === "object" && "status" in result &&
-                !["active", "paid", "completed", "succeeded"].includes(String(result.status)))) {
-                // Check authoritative subscription state instead of assuming payment succeeded.
-                const subscriptions = await listSubscriptions();
-                if (!subscriptions.some(s => s.id === pendingId.current && s.status === "active")) {
-                    throw new Error("Payment is not confirmed. Check Orders before retrying.");
-                }
-            }
+            const id = await prepareSubscription();
+            const saved = await submitCardReceipt(id, receipt, discountCode);
+            if (saved.status !== "pending_review") throw new Error("Receipt was not accepted.");
             clearBasket();
             router.push("/orders");
         } catch (e) {
@@ -124,18 +129,30 @@ export default function CheckoutContent({locale}: Props) {
                             </div>
                         </div>
                         <div className="h-fit rounded-2xl border border-cyan-400/20 bg-white/5 p-6">
-                            <h2 className="text-xl font-bold">{t("methods.wallet")}</h2>
-                            <p className="mt-3 text-sm text-gray-400">{t("wallet.balance")}</p>
-                            <p className="mt-1 font-bold">{wallet ? formatMoney(wallet.balanceMinor, wallet.currency, locale) : "—"}</p>
-                            {!canPay && <p className="mt-4 text-sm text-amber-300">Wallet checkout unavailable: verify your basket, currency and available balance.</p>}
-                            {(lines.length !== 1 || lines[0]?.item.quantity !== 1) && <p className="mt-4 text-sm text-amber-300">Checkout currently supports one plan at a time.</p>}
-                            <button type="button" disabled={loading || !canPay || lines.length !== 1 || lines[0].item.quantity !== 1}
-                                onClick={() => void pay()}
-                                className="mt-6 w-full rounded-xl bg-cyan-400 px-5 py-3 font-bold text-black disabled:cursor-not-allowed disabled:opacity-40">
-                                {loading ? t("processing") : t("payNow")}
+                            <h2 className="text-xl font-bold">{t("paymentMethod")}</h2>
+                            <div className="mt-4 space-y-2">
+                                {(["card", "isp", "crypto"] as const).map(value => (
+                                    <label key={value} className="flex items-center gap-2 text-sm">
+                                        <input type="radio" name="paymentMethod" checked={method === value} onChange={() => setMethod(value)} />
+                                        {value === "card" ? t("methods.card") : value === "isp" ? t("methods.isp") : t("methods.crypto")}
+                                        {value !== "card" && <span className="text-amber-300">(Coming soon)</span>}
+                                    </label>
+                                ))}
+                            </div>
+                            {method === "card" && <>
+                                <p className="mt-4 text-sm text-gray-400">Upload your transfer receipt (JPEG, PNG, WebP or PDF, maximum 5 MB). Payment requires manual approval.</p>
+                                <input className="mt-3 w-full text-sm" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" onChange={event => setReceipt(event.target.files?.[0] ?? null)} />
+                                <label className="mt-4 block text-sm">Discount code (optional)</label>
+                                <input className="mt-2 w-full rounded-lg border border-white/20 bg-black/30 p-2" value={discountCode} onChange={event => {setDiscountCode(event.target.value);setQuote(null);}} placeholder="Discount code" />
+                                <button type="button" disabled={loading || !valid} onClick={() => void applyDiscount()} className="mt-2 text-sm text-cyan-400">Apply discount</button>
+                                {quote && <p className="mt-2 text-sm text-green-300">Discount: {formatMoney(quote.discountMinor, quote.currency, locale)} — Payable: {formatMoney(quote.payableMinor, quote.currency, locale)}</p>}
+                                <p className="mt-4 text-sm text-gray-400">Amount to transfer: {valid ? formatMoney(quote?.payableMinor ?? total, currency, locale) : "—"}. Bank transfer details must be provided by an authorized payment administrator.</p>
+                            </>}
+                            <button type="button" disabled={loading || method !== "card" || !valid || !receipt || lines.length !== 1 || lines[0].item.quantity !== 1}
+                                onClick={() => void pay()} className="mt-6 w-full rounded-xl bg-cyan-400 px-5 py-3 font-bold text-black disabled:cursor-not-allowed disabled:opacity-40">
+                                {loading ? t("processing") : "Submit receipt for review"}
                             </button>
-                            <button type="button" onClick={() => void load()} disabled={loading} className="mt-4 w-full text-sm text-cyan-400">Refresh balance and prices</button>
-                            <p className="mt-4 text-xs text-gray-500">Only wallet payment is supported by the current subscription API. Card, crypto and ISP payment are not available.</p>
+                            <button type="button" onClick={() => void load()} disabled={loading} className="mt-4 w-full text-sm text-cyan-400">Refresh prices</button>
                         </div>
                     </div>
                 )}
