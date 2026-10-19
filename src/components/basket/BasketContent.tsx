@@ -318,7 +318,7 @@ export default function BasketContent({
                                         </span>
 
                                         <span className="text-2xl font-black text-cyan-400">
-                                            ${subtotal.toFixed(2)}
+                                            {money(subtotal)}
                                         </span>
 
                                     </div>
