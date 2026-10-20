@@ -65,3 +65,9 @@ export async function createWalletDeposit(
     );
     return response.data;
 }
+
+export async function submitWalletCardReceipt(amountMinor:number,paymentCardId:string,receipt:File,key:string):Promise<{id:string;status:string}>{
+ const form=new FormData();form.append("amountMinor",String(amountMinor));form.append("paymentCardId",paymentCardId);form.append("receipt",receipt);
+ const {data}=await apiClient.post<{id:string;status:string}>("/api/v1/me/deposits/card-receipt",form,{headers:{"Idempotency-Key":key}});
+ return data;
+}
