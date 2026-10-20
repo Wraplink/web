@@ -1,8 +1,10 @@
 "use client";
 import {useCallback,useEffect,useState} from "react";
+import {useSearchParams} from "next/navigation";
 import {changeTicketStatus,createTicket,getTicket,listTickets,replyTicket,type SupportTicket,type SupportMessage,type TicketStatus} from "@/lib/api/support";
 export default function SupportContent({admin=false,locale="en"}:{admin?:boolean;locale?:string}){
  const fa=locale==="fa";
+ const ticketFromNotification=useSearchParams().get("ticket");
  const [tickets,setTickets]=useState<SupportTicket[]>([]);
  const [selected,setSelected]=useState<SupportTicket|null>(null);
  const [messages,setMessages]=useState<SupportMessage[]>([]);
@@ -11,6 +13,7 @@ export default function SupportContent({admin=false,locale="en"}:{admin?:boolean
  const [subject,setSubject]=useState("");const [category,setCategory]=useState("technical");const [priority,setPriority]=useState("medium");const [orderNumber,setOrderNumber]=useState("");const [initialMessage,setInitialMessage]=useState("");const [reply,setReply]=useState("");
  const load=useCallback(async()=>{setLoading(true);setError("");try{const data=await listTickets(admin,{search,status,limit:25,offset:page*25});setTickets(data.tickets);}catch{setError(fa?"دریافت تیکت‌ها ناموفق بود":"Unable to load tickets")}finally{setLoading(false)}},[admin,search,status,page,fa]);
  useEffect(()=>{void load()},[load]);
+ useEffect(()=>{if(!ticketFromNotification)return;let active=true;void getTicket(ticketFromNotification,admin).then(detail=>{if(active){setSelected(detail.ticket);setMessages(detail.messages)}}).catch(()=>setError("Unable to open linked ticket"));return()=>{active=false}},[ticketFromNotification,admin]);
  const open=async(t:SupportTicket)=>{setError("");try{const detail=await getTicket(t.id,admin);setSelected({...detail.ticket,customerUnread:false,staffUnread:false});setMessages(detail.messages);setTickets(current=>current.map(item=>item.id===t.id?{...item,customerUnread:false,staffUnread:false}:item))}catch{setError("Unable to load conversation")}};
  const send=async()=>{if(!selected||!reply.trim())return;setBusy(true);try{await replyTicket(selected.id,reply.trim(),admin);setReply("");await open(selected);await load()}catch{setError("Unable to send message")}finally{setBusy(false)}};
  const update=async(next:TicketStatus)=>{if(!selected)return;setBusy(true);try{await changeTicketStatus(selected.id,next,admin);await open(selected);await load()}catch{setError("Unable to update status")}finally{setBusy(false)}};
