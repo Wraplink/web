@@ -11,5 +11,5 @@ export default async function LocaleSupportPage({
                                                 }: Props) {
     const {locale} = await params;
 
-    return <SupportContent key={locale}/>;
+    return <SupportContent key={locale} locale={locale}/>;
 }
