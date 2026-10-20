@@ -23,6 +23,7 @@ import {
 } from "@/lib/notifications";
 
 import NotificationPreferences from "./NotificationPreferences";
+import {Link} from "@/i18n/navigation";
 
 type Props = {
     locale: string;
@@ -239,6 +240,7 @@ function NotificationCard({
                         {notification.message}
                     </p>
 
+                    {notification.link&&<Link href={notification.link} onClick={onRead} className="mt-3 inline-block rounded-lg border border-cyan-400/40 px-3 py-2 text-sm text-cyan-300 hover:bg-cyan-400/10">{notification.type==="support"?"Open ticket and reply":"View details"} →</Link>}
                     <div className="mt-4 text-xs text-gray-500">
                         {new Date(notification.createdAt).toLocaleString()}
                     </div>
