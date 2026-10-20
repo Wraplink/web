@@ -5,7 +5,6 @@ import {useTranslations} from "next-intl";
 import {Link, useRouter} from "@/i18n/navigation";
 import {clearBasket, getBasket, type BasketItem} from "@/lib/basket";
 import {getMarketPlans, createPendingSubscription, paySubscriptionWithWallet, type MarketPlan} from "@/lib/api/plans";
-import {listSubscriptions} from "@/lib/api/subscriptions";
 import {quoteDiscount, submitCardReceipt, type DiscountQuote} from "@/lib/api/checkout";
 
 type Props = {locale: string};
@@ -76,8 +75,7 @@ export default function CheckoutContent({locale}: Props) {
         if (lines.length !== 1 || lines[0].item.quantity !== 1 || !valid) throw new Error("Checkout supports one valid plan at a time.");
         const plan = lines[0].plan!;
         if (!pendingId.current) {
-            const existing = (await listSubscriptions()).find(s => s.planCode === plan.code && s.status === "pending_payment" && s.priceMinor === plan.priceMinor && s.currency === plan.currency);
-            pendingId.current = existing?.id ?? (await createPendingSubscription(plan.code)).id;
+            pendingId.current = (await createPendingSubscription(plan.code)).id;
         }
         return pendingId.current;
     };
