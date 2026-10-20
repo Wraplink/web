@@ -1,12 +1,19 @@
 "use client";
 import {useEffect,useState} from "react";
-import {adminUsers,type AdminUser} from "@/lib/api/admin";
+import {adminUsers,updateAdminUserStatus,type AdminUser} from "@/lib/api/admin";
 
 export default function AdminUsersContent(){
  const [users,setUsers]=useState<AdminUser[]>([]);
  const [search,setSearch]=useState("");
  const [error,setError]=useState("");
  const [loading,setLoading]=useState(false);
+ const [acting,setActing]=useState<string|null>(null);
+ async function changeStatus(u:AdminUser,action:"suspend"|"restore"|"delete"){
+  const message=action==="delete"?`Delete ${u.email}? This permanently disables access and cannot be undone from this panel.`:`${action==="suspend"?"Suspend":"Restore"} ${u.email}?`;
+  if(!window.confirm(message))return;
+  setActing(u.id);setError("");
+  try{await updateAdminUserStatus(u.id,action);await load(search)}catch(e){setError((e as {response?:{data?:{error?:string}}}).response?.data?.error||"Unable to update account")}finally{setActing(null)}
+ }
  async function load(term:string){
   setLoading(true);setError("");
   try{setUsers(await adminUsers(term))}
@@ -22,8 +29,8 @@ export default function AdminUsersContent(){
   </form>
   {error&&<p role="alert" className="mb-4 text-red-400">{error}</p>}
   {loading?<p>Loading…</p>:<div className="overflow-x-auto rounded-xl border border-white/15">
-   <table className="w-full text-left text-sm"><thead className="bg-white/10"><tr><th className="p-3">Name</th><th className="p-3">Email</th><th className="p-3">Status</th><th className="p-3">Verified</th><th className="p-3">Registered</th></tr></thead>
-   <tbody>{users.map(u=><tr key={u.id} className="border-t border-white/10"><td className="p-3">{u.name}</td><td className="p-3">{u.email}</td><td className="p-3">{u.status}</td><td className="p-3">{u.emailVerified?"Yes":"No"}</td><td className="p-3">{new Date(u.createdAt).toLocaleDateString()}</td></tr>)}</tbody></table>
+   <table className="w-full text-left text-sm"><thead className="bg-white/10"><tr><th className="p-3">Name</th><th className="p-3">Email</th><th className="p-3">Status</th><th className="p-3">Verified</th><th className="p-3">Registered</th><th className="p-3">Actions</th></tr></thead>
+   <tbody>{users.map(u=><tr key={u.id} className="border-t border-white/10"><td className="p-3">{u.name}</td><td className="p-3">{u.email}</td><td className="p-3">{u.status}</td><td className="p-3">{u.emailVerified?"Yes":"No"}</td><td className="p-3">{new Date(u.createdAt).toLocaleDateString()}</td><td className="p-3"><div className="flex gap-2">{u.status==="active"&&<button type="button" disabled={acting!==null} onClick={()=>void changeStatus(u,"suspend")} className="rounded border border-amber-500 px-2 py-1 text-amber-300">Suspend</button>}{u.status==="suspended"&&<button type="button" disabled={acting!==null} onClick={()=>void changeStatus(u,"restore")} className="rounded border border-green-500 px-2 py-1 text-green-300">Restore</button>}{u.status!=="deleted"&&<button type="button" disabled={acting!==null} onClick={()=>void changeStatus(u,"delete")} className="rounded border border-red-500 px-2 py-1 text-red-300">Delete</button>}</div></td></tr>)}</tbody></table>
   </div>}
   <p className="mt-3 text-xs text-gray-500">Showing up to 100 users. Account modifications are not enabled until audited backend actions are available.</p>
  </main>;
