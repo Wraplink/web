@@ -19,6 +19,7 @@ export default function AdminHome({locale}:{locale:string}){
  const sections=[
   {href:"/admin/users",title:"Users",description:"Search customer accounts and review status",count:counts.users},
   {href:"/admin/orders",title:"Orders",description:"Inspect subscriptions and payment status"},
+  {href:"/admin/payment-methods",title:locale==="fa"?"روش‌های پرداخت":"Payment methods",description:locale==="fa"?"مدیریت کارت‌های مقصد کارت‌به‌کارت":"Manage card-to-card destination accounts"},
   {href:"/admin/payment-reviews",title:"Payment reviews",description:"Verify bank transfer receipts",count:counts.reviews},
   {href:"/admin/discounts",title:"Discounts",description:"Create and disable promotional codes"},
   {href:"/admin/access",title:"Staff permissions",description:"Grant and revoke administrative permissions",count:counts.staff},
