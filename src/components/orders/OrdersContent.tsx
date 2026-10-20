@@ -49,6 +49,7 @@ type OrderItem = {
 
 type Order = {
     id: string;
+    orderNumber: number;
     date: string;
     status: OrderStatus;
     payment: string;
@@ -67,6 +68,7 @@ function toOrder(subscription: UserSubscription): Order {
         subscription.status === "cancelled" ? "cancelled" : "delivered";
     return {
         id: subscription.id,
+        orderNumber: subscription.orderNumber,
         date: subscription.createdAt,
         status,
         payment: subscription.status === "pending_payment" ? "Unpaid" : subscription.status === "confirmed" ? "Paid — reserved for next activation" : "Subscription",
@@ -479,9 +481,10 @@ function OrderCard({
                         <div>
 
                             <div className="font-bold">
-                                {order.id}
+                                {locale === "fa" ? "شماره سفارش" : "Order"} #WL-{order.orderNumber}
                             </div>
 
+                            <div className="mt-1 text-xs text-gray-500">{order.id}</div>
                             <div className="mt-1 text-sm text-gray-500">
                                 {order.date}
                             </div>
