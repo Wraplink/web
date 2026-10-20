@@ -19,3 +19,7 @@ export async function adminPermissions():Promise<AdminPermission[]>{
 export async function updateAdminPermission(userId:string,permission:"payment_review"|"discount_admin",enabled:boolean):Promise<void>{
  await apiClient.put(`/api/v1/admin/access/users/${encodeURIComponent(userId)}/permissions/${permission}`,{enabled});
 }
+
+export async function updateAdminUserStatus(userId:string,action:"suspend"|"restore"|"delete"):Promise<void>{
+ await apiClient.patch(`/api/v1/admin/access/users/${encodeURIComponent(userId)}/status`,{action});
+}
