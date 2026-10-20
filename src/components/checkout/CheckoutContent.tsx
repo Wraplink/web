@@ -80,16 +80,17 @@ export default function CheckoutContent({locale}: Props) {
 
     const pay = async () => {
         if (submitting.current || loading) return;
-        if (!canPay || !wallet) {
-            setError("The wallet balance is insufficient or the basket could not be verified.");
+        if (!valid || method !== "card" || !receipt || lines.length !== 1 || lines[0].item.quantity !== 1) {
+            setError("Select a valid plan and attach a transfer receipt.");
             return;
         }
+        const selectedReceipt = receipt;
         submitting.current = true;
         setLoading(true);
         setError("");
         try {
             const id = await prepareSubscription();
-            const saved = await submitCardReceipt(id, receipt, discountCode);
+            const saved = await submitCardReceipt(id, selectedReceipt, discountCode);
             if (saved.status !== "pending_review") throw new Error("Receipt was not accepted.");
             clearBasket();
             router.push("/orders");
