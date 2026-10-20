@@ -1,12 +1,11 @@
 "use client";
 import {useEffect,useState,type ReactNode} from "react";
-import Link from "next/link";
+import {Link} from "@/i18n/navigation";
 import {useLocale} from "next-intl";
 import {apiClient} from "@/lib/api/client";
 
 export default function AdminLayoutGate({children}:{children:ReactNode}){
  const locale=useLocale();
- const prefix=locale==="fa"?"/fa":"";
  const [status,setStatus]=useState<"loading"|"allowed"|"denied">("loading");
  useEffect(()=>{
   let active=true;
@@ -22,7 +21,7 @@ export default function AdminLayoutGate({children}:{children:ReactNode}){
  const tabs=[["","Overview"],["users","Users"],["orders","Orders"],["payment-reviews","Payments"],["discounts","Discounts"],["access","Permissions"],["network","Network"]];
  return <div>
   <nav aria-label="Administrator navigation" className="flex flex-wrap gap-2 border-b border-white/10 px-6 py-4">
-   {tabs.map(([href,label])=><Link key={href} href={prefix+"/admin"+(href?"/"+href:"")} className="rounded-lg border border-white/15 px-3 py-2 text-sm text-gray-200 hover:border-cyan-400 hover:text-cyan-300">{label}</Link>)}
+   {tabs.map(([href,label])=><Link key={href} href={"/admin"+(href?"/"+href:"")} locale={locale} className="rounded-lg border border-white/15 px-3 py-2 text-sm text-gray-200 hover:border-cyan-400 hover:text-cyan-300">{label}</Link>)}
   </nav>
   {children}
  </div>;
