@@ -5,7 +5,7 @@ import {useTranslations} from "next-intl";
 import {Link, useRouter} from "@/i18n/navigation";
 import {clearBasket, getBasket, type BasketItem} from "@/lib/basket";
 import {getMarketPlans, createPendingSubscription, paySubscriptionWithWallet, type MarketPlan} from "@/lib/api/plans";
-import {quoteDiscount, submitCardReceipt, type DiscountQuote} from "@/lib/api/checkout";
+import {quoteDiscount, submitGroupedCardReceipt, type DiscountQuote} from "@/lib/api/checkout";
 import {listPaymentCards, type PaymentCard} from "@/lib/api/paymentCards";
 
 type Props = {locale: string};
@@ -27,13 +27,13 @@ export default function CheckoutContent({locale}: Props) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [method, setMethod] = useState<"card" | "isp" | "crypto">("card");
-    const [receipts, setReceipts] = useState<File[]>([]);
+    const [receipt, setReceipt] = useState<File | null>(null);
     const [receiptError, setReceiptError] = useState("");
     const receiptInputRef = useRef<HTMLInputElement>(null);
     const [discountCode, setDiscountCode] = useState("");
     const [quote, setQuote] = useState<DiscountQuote | null>(null);
     const pendingIds = useRef<string[]>([]);
-    const [submittedCount, setSubmittedCount] = useState(0);
+
     const submitting = useRef(false);
     const paymentKey = useRef<string | null>(null);
 
@@ -66,17 +66,17 @@ export default function CheckoutContent({locale}: Props) {
     const total = valid ? lines.reduce((sum, {item, plan}) => sum + item.quantity * plan!.priceMinor, 0) : 0;
 
     const units = useMemo(() => lines.flatMap(({item, plan}) => Array.from({length: Math.min(item.quantity, 100)}, () => plan)), [lines]);
-    const canSubmit = !loading && method === "card" && valid && units.length > 0 && units.length <= 100 && receipts.length === units.length && !!selectedCardId && !receiptError;
+    const canSubmit = !loading && method === "card" && valid && units.length > 0 && units.length <= 100 && receipt !== null && !!selectedCardId && !receiptError;
     const onReceiptChange = (files: FileList | null) => {
-        setReceipts([]);
+        setReceipt(null);
         setReceiptError("");
         if (!files) return;
         const selected = Array.from(files);
         const allowed = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
         if (selected.some(file => !allowed.includes(file.type))) {setReceiptError(locale === "fa" ? "فرمت فایل باید JPG، PNG، WebP یا PDF باشد." : "Each receipt must be JPG, PNG, WebP or PDF.");return;}
         if (selected.some(file => file.size === 0 || file.size > 5 * 1024 * 1024)) {setReceiptError(locale === "fa" ? "حجم هر فایل باید حداکثر ۵ مگابایت باشد." : "Each receipt must be nonempty and at most 5 MB.");return;}
-        if (selected.length !== units.length) {setReceiptError(locale === "fa" ? `برای ${units.length} سفارش باید ${units.length} رسید جداگانه انتخاب کنید.` : `Select ${units.length} separate receipts for ${units.length} orders.`);return;}
-        setReceipts(selected);
+        if (selected.length !== 1) {setReceiptError(locale === "fa" ? "فقط یک رسید برای کل سبد انتخاب کنید." : "Select one receipt for the entire basket.");return;}
+        setReceipt(selected[0]);
     };
 
     const prepareSubscription = async (index: number) => {
@@ -111,12 +111,10 @@ export default function CheckoutContent({locale}: Props) {
         setLoading(true);
         setError("");
         try {
-            for (let i = submittedCount; i < units.length; i++) {
-                const id = await prepareSubscription(i);
-                const saved = await submitCardReceipt(id, receipts[i], units.length === 1 ? discountCode : "", selectedCardId);
-                if (saved.status !== "pending_review") throw new Error("Receipt was not accepted.");
-                setSubmittedCount(i + 1);
-            }
+            const ids: string[] = [];
+            for (let i = 0; i < units.length; i++) ids.push(await prepareSubscription(i));
+            const saved = await submitGroupedCardReceipt(ids, receipt!, selectedCardId);
+            if (saved.status !== "pending_review") throw new Error("Receipt was not accepted.");
             clearBasket();
             router.push("/orders");
         } catch (e) {
@@ -179,15 +177,15 @@ export default function CheckoutContent({locale}: Props) {
                                 <div className="mt-5 rounded-2xl border-2 border-dashed border-cyan-400/70 bg-cyan-400/10 p-5 text-center">
                                     <div className="text-3xl" aria-hidden="true">📎</div>
                                     <h3 className="mt-2 text-base font-bold">{locale === "fa" ? "پیوست رسید پرداخت" : "Attach your payment receipt"}</h3>
-                                    <p className="mt-2 text-sm text-gray-300">{locale === "fa" ? "برای هر پلن یک رسید انتقال جداگانه انتخاب کنید. هر سفارش جداگانه بررسی می‌شود." : "Select one payment receipt per plan unit. Each order is reviewed separately."}</p>
-                                    <input ref={receiptInputRef} id="transfer-receipt" aria-label={locale === "fa" ? "انتخاب تصویر رسید پرداخت" : "Choose payment receipt image"} type="file" accept=".jpg,.jpeg,.png,.webp,.pdf,image/jpeg,image/png,image/webp,application/pdf" className="sr-only" multiple={units.length > 1} onChange={event => onReceiptChange(event.target.files)} />
+                                    <p className="mt-2 text-sm text-gray-300">{locale === "fa" ? "یک رسید انتقال برای مبلغ کل سبد بارگذاری کنید. همه پلن‌ها با هم بررسی می‌شوند." : "Upload one transfer receipt covering the full basket total. All plans will be reviewed together."}</p>
+                                    <input ref={receiptInputRef} id="transfer-receipt" aria-label={locale === "fa" ? "انتخاب تصویر رسید پرداخت" : "Choose payment receipt image"} type="file" accept=".jpg,.jpeg,.png,.webp,.pdf,image/jpeg,image/png,image/webp,application/pdf" className="sr-only" onChange={event => onReceiptChange(event.target.files)} />
                                     <button type="button" onClick={() => receiptInputRef.current?.click()} className="mt-4 inline-flex min-h-12 items-center justify-center rounded-xl bg-cyan-400 px-6 py-3 font-bold text-black shadow-lg shadow-cyan-500/20 hover:bg-cyan-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300">
                                         {locale === "fa" ? "📁 انتخاب تصویر یا فایل رسید" : "📁 Choose receipt image or PDF"}
                                     </button>
                                     <p className="mt-3 text-xs text-gray-400">{locale === "fa" ? "JPG، PNG، WebP یا PDF — حداکثر ۵ مگابایت" : "JPG, PNG, WebP or PDF — maximum 5 MB"}</p>
-                                    {receipts.length > 0 && <p className="mt-3 break-all rounded-lg bg-green-500/10 px-3 py-2 text-sm font-medium text-green-300">✓ {locale === "fa" ? "رسیدهای انتخاب‌شده:" : "Selected receipts:"} {receipts.map(file => file.name).join(", ")}</p>}
+                                    {receipt && <p className="mt-3 break-all rounded-lg bg-green-500/10 px-3 py-2 text-sm font-medium text-green-300">✓ {locale === "fa" ? "رسیدهای انتخاب‌شده:" : "Selected receipts:"} {receipt.name}</p>}
                                     {receiptError && <p role="alert" className="mt-3 text-sm text-red-300">{receiptError}</p>}
-                                    {receipts.length === 0 && !receiptError && <p className="mt-3 text-xs text-amber-300">{locale === "fa" ? "پیوست رسید برای ثبت پرداخت الزامی است." : "A receipt is required before submitting payment."}</p>}
+                                    {!receipt && !receiptError && <p className="mt-3 text-xs text-amber-300">{locale === "fa" ? "پیوست رسید برای ثبت پرداخت الزامی است." : "A receipt is required before submitting payment."}</p>}
                                 </div>
                                 <label className="mt-4 block text-sm">{locale === "fa" ? "کد تخفیف (اختیاری)" : "Discount code (optional)"}</label>
                                 <input className="mt-2 w-full rounded-lg border border-white/20 bg-black/30 p-2" value={discountCode} onChange={event => {setDiscountCode(event.target.value);setQuote(null);}} placeholder={locale === "fa" ? "کد تخفیف" : "Discount code"} />
@@ -195,7 +193,7 @@ export default function CheckoutContent({locale}: Props) {
                                 {quote && <p className="mt-2 text-sm text-green-300">{locale === "fa" ? "تخفیف:" : "Discount:"} {formatMoney(quote.discountMinor, quote.currency, locale)} — {locale === "fa" ? "مبلغ قابل پرداخت:" : "Payable:"} {formatMoney(quote.payableMinor, quote.currency, locale)}</p>}
                                 <p className="mt-4 text-sm text-gray-400">{locale === "fa" ? "مبلغ انتقال:" : "Amount to transfer:"} {valid ? formatMoney(quote?.payableMinor ?? total, currency, locale) : "—"}. {locale === "fa" ? "اطلاعات حساب مقصد باید توسط مدیر پرداخت اعلام شود." : "Bank transfer details must be provided by an authorized payment administrator."}</p>
                             </>}
-                            {valid && units.length > 1 && <p role="status" className="mt-4 text-sm text-amber-300">{locale === "fa" ? `برای ${units.length} پلن، ${units.length} رسید جداگانه بارگذاری کنید. پرداخت‌ها جداگانه ثبت و بررسی می‌شوند.` : `Upload ${units.length} separate receipts for ${units.length} plans. Each order will be submitted and reviewed separately.`}</p>}
+                            {valid && units.length > 1 && <p role="status" className="mt-4 text-sm text-amber-300">{locale === "fa" ? `یک رسید برای هر ${units.length} پلن کافی است. مدیر مبلغ کل پرداخت را بررسی می‌کند.` : `One receipt covers all ${units.length} plans. The administrator will review the combined payment.`}</p>}
                             {!valid && !checking && <p role="status" className="mt-3 text-sm text-amber-300">{locale === "fa" ? "قیمت یا پلن معتبر نیست؛ سبد خرید را بررسی کنید." : "Plan or price is invalid. Check your basket."}</p>}
                             <button type="button" disabled={!canSubmit}
                                 onClick={() => void pay()} className="mt-6 w-full rounded-xl bg-cyan-400 px-5 py-3 font-bold text-black disabled:cursor-not-allowed disabled:opacity-40">
