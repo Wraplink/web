@@ -1,6 +1,7 @@
 "use client";
 
-import {useState} from "react";
+import {useEffect,useState} from "react";
+import {getProfile,updateProfile,changeProfilePassword,getProfileSessions,revokeProfileSession,revokeOtherProfileSessions,type Profile,type ManagedSession} from "@/lib/api/profile";
 import {
     User,
     Mail,
@@ -17,49 +18,28 @@ import {
 
 import {useTranslations} from "next-intl";
 
-import {clearAuthSession} from "@/lib/auth";
-import {useRouter} from "@/i18n/navigation";
+
+
 
 type Props = {
     locale: string;
 };
-
-type Session = {
-    id: string;
-    device: string;
-    location: string;
-    lastActive: string;
-    current?: boolean;
-};
-
-const sessions: Session[] = [
-    {
-        id: "session-1",
-        device: "Chrome · Linux",
-        location: "Frankfurt, Germany",
-        lastActive: "Active now",
-        current: true,
-    },
-    {
-        id: "session-2",
-        device: "Chrome · Windows",
-        location: "Berlin, Germany",
-        lastActive: "2 hours ago",
-    },
-];
 
 export default function ProfileContent({
                                            locale,
                                        }: Props) {
 
     const t = useTranslations("ProfilePage");
-    const router = useRouter();
 
-    const [name, setName] =
-        useState("Mahdi Asgari");
 
-    const [email] =
-        useState("user@example.com");
+    const [name, setName] = useState("");
+    const [profile,setProfile]=useState<Profile|null>(null);
+    const [sessions,setSessions]=useState<ManagedSession[]>([]);
+    const [loading,setLoading]=useState(true);
+    const [error,setError]=useState("");
+    useEffect(()=>{let active=true;void Promise.all([getProfile(),getProfileSessions()]).then(([p,s])=>{if(active){setProfile(p);setName(p.full_name);setSessions(s)}}).catch(()=>{if(active)setError("Unable to load profile or sessions")}).finally(()=>{if(active)setLoading(false)});return()=>{active=false}},[]);
+
+    const email=profile?.email??"";
 
     const [saving, setSaving] =
         useState(false);
@@ -79,162 +59,20 @@ export default function ProfileContent({
     const [confirmPassword, setConfirmPassword] =
         useState("");
 
-    const [twoFactorEnabled, setTwoFactorEnabled] =
-        useState(false);
+
 
     const [message, setMessage] =
         useState("");
 
-    const saveProfile = async () => {
-
-        setSaving(true);
-        setSaved(false);
-        setMessage("");
-
-        /*
-         * ============================================================
-         * BACKEND TODO
-         * ============================================================
-         *
-         * PUT /api/v1/users/me
-         *
-         * {
-         *     "name": "Mahdi Asgari"
-         * }
-         *
-         * ============================================================
-         */
-
-        await new Promise((resolve) =>
-            setTimeout(resolve, 800)
-        );
-
-        setSaving(false);
-        setSaved(true);
-
-        setTimeout(() => {
-            setSaved(false);
-        }, 2500);
-    };
-
-    const changePassword = async () => {
-
-        setMessage("");
-
-        if (
-            !currentPassword ||
-            !newPassword ||
-            !confirmPassword
-        ) {
-            setMessage(
-                t("security.passwordRequired")
-            );
-            return;
-        }
-
-        if (newPassword !== confirmPassword) {
-            setMessage(
-                t("security.passwordMismatch")
-            );
-            return;
-        }
-
-        setChangingPassword(true);
-
-        /*
-         * ============================================================
-         * BACKEND TODO
-         * ============================================================
-         *
-         * POST /api/v1/auth/change-password
-         *
-         * {
-         *     "currentPassword": "...",
-         *     "newPassword": "..."
-         * }
-         *
-         * Backend should invalidate existing refresh tokens
-         * according to the security policy.
-         *
-         * ============================================================
-         */
-
-        await new Promise((resolve) =>
-            setTimeout(resolve, 1000)
-        );
-
-        setCurrentPassword("");
-        setNewPassword("");
-        setConfirmPassword("");
-
-        setChangingPassword(false);
-
-        setMessage(
-            t("security.passwordChanged")
-        );
-    };
-
-    const toggleTwoFactor = async () => {
-
-        /*
-         * ============================================================
-         * BACKEND TODO
-         * ============================================================
-         *
-         * POST /api/v1/auth/2fa/enable
-         * POST /api/v1/auth/2fa/disable
-         *
-         * For enabling 2FA, backend should return a setup secret
-         * and QR provisioning URI.
-         *
-         * ============================================================
-         */
-
-        setTwoFactorEnabled(
-            (current) => !current
-        );
-    };
-
-    const logoutSession = async (
-        sessionId: string
-    ) => {
-
-        /*
-         * ============================================================
-         * BACKEND TODO
-         * ============================================================
-         *
-         * POST /api/v1/auth/sessions/{sessionId}/revoke
-         *
-         * ============================================================
-         */
-
-        console.log(
-            "Revoke session:",
-            sessionId
-        );
-    };
-
-    const logoutAllSessions = async () => {
-
-        /*
-         * ============================================================
-         * BACKEND TODO
-         * ============================================================
-         *
-         * POST /api/v1/auth/sessions/revoke-all
-         *
-         * ============================================================
-         */
-
-        clearAuthSession();
-
-        router.push("/auth/login");
-    };
-
+    const saveProfile=async()=>{setSaving(true);setSaved(false);setError("");try{const p=await updateProfile(name.trim());setProfile(p);setName(p.full_name);setSaved(true)}catch{setError("Could not update profile")}finally{setSaving(false)}};
+    const changePassword=async()=>{setMessage("");if(!currentPassword||!newPassword||!confirmPassword){setMessage(t("security.passwordRequired"));return}if(newPassword!==confirmPassword){setMessage(t("security.passwordMismatch"));return}setChangingPassword(true);try{await changeProfilePassword(currentPassword,newPassword);setCurrentPassword("");setNewPassword("");setConfirmPassword("");setMessage(t("security.passwordChanged"))}catch{setMessage("Password change failed. Verify your current password and password requirements.")}finally{setChangingPassword(false)}};
+    const logoutSession=async(sessionId:string)=>{setError("");try{await revokeProfileSession(sessionId);setSessions(current=>current.filter(s=>s.id!==sessionId))}catch{setError("Could not revoke session")}};
+    const logoutAllSessions=async()=>{setError("");try{await revokeOtherProfileSessions();setSessions(await getProfileSessions())}catch{setError("Could not revoke other sessions")}};
     return (
         <section className="mx-auto max-w-7xl px-6 py-10">
 
+            {loading&&<p role="status">Loading profile…</p>}
+            {error&&<p role="alert" className="mb-5 text-red-300">{error}</p>}
             {/* Header */}
 
             <div className="mb-8">
@@ -354,20 +192,20 @@ export default function ProfileContent({
 
                         <StatusRow
                             label={t("account.emailVerified")}
-                            value={t("account.verified")}
-                            success
+                            value={profile?.email_verified?t("account.verified"):"Not verified"}
+                            success={!!profile?.email_verified}
                         />
 
                         <StatusRow
                             label={t("account.accountStatus")}
-                            value={t("account.active")}
-                            success
+                            value={profile?.account_status??"Unknown"}
+                            success={profile?.account_status==="active"}
                         />
 
                         <StatusRow
                             label={t("account.plan")}
-                            value="Pro"
-                            success
+                            value="See Orders"
+                            success={false}
                         />
 
                     </div>
@@ -442,87 +280,7 @@ export default function ProfileContent({
 
             </div>
 
-            {/* 2FA */}
-
-            <div className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
-
-                <div className="flex items-start justify-between gap-6">
-
-                    <div className="flex gap-4">
-
-                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-400">
-                            <ShieldCheck size={22}/>
-                        </div>
-
-                        <div>
-
-                            <h2 className="text-xl font-bold">
-                                {t("security.twoFactorTitle")}
-                            </h2>
-
-                            <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                                {t("security.twoFactorDescription")}
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                    <button
-                        type="button"
-                        onClick={toggleTwoFactor}
-                        className={`
-                            relative h-7 w-12 shrink-0 rounded-full transition
-                            ${
-                            twoFactorEnabled
-                                ? "bg-cyan-400"
-                                : "bg-gray-700"
-                        }
-                        `}
-                    >
-                        <span
-                            className={`
-                                absolute top-1 h-5 w-5 rounded-full bg-white transition
-                                ${
-                                twoFactorEnabled
-                                    ? "left-6"
-                                    : "left-1"
-                            }
-                            `}
-                        />
-                    </button>
-
-                </div>
-
-                <div className="mt-6 flex items-center gap-2 text-sm">
-
-                    {twoFactorEnabled ? (
-                        <>
-                            <CheckCircle2
-                                size={17}
-                                className="text-green-400"
-                            />
-
-                            <span className="text-green-400">
-                                {t("security.twoFactorEnabled")}
-                            </span>
-                        </>
-                    ) : (
-                        <>
-                            <AlertTriangle
-                                size={17}
-                                className="text-yellow-400"
-                            />
-
-                            <span className="text-yellow-400">
-                                {t("security.twoFactorDisabled")}
-                            </span>
-                        </>
-                    )}
-
-                </div>
-
-            </div>
+            <div className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-8"><div className="flex items-center gap-3"><ShieldCheck className="text-cyan-400"/><h2 className="text-xl font-bold">{t("security.twoFactorTitle")}</h2></div><p className="mt-3 text-sm text-yellow-300">Two-factor authentication is not available yet. It cannot be enabled until secure enrollment and verification APIs are implemented.</p></div>
 
             {/* Sessions */}
 
@@ -570,7 +328,7 @@ export default function ProfileContent({
                             <div className="flex items-center gap-4">
 
                                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 text-gray-400">
-                                    {session.device.includes("Windows")
+                                    {session.userAgent.includes("Windows")
                                         ? <Monitor size={19}/>
                                         : <Smartphone size={19}/>
                                     }
@@ -579,33 +337,18 @@ export default function ProfileContent({
                                 <div>
 
                                     <div className="font-semibold">
-                                        {session.device}
+                                        {session.userAgent||"Unknown device"}
                                     </div>
 
                                     <div className="mt-1 text-xs text-gray-500">
-                                        {session.location} · {session.lastActive}
+                                        {session.ipAddress||"Unknown IP"} · Expires {new Date(session.expiresAt).toLocaleString()}
                                     </div>
 
                                 </div>
 
                             </div>
 
-                            {session.current ? (
-                                <span className="rounded-full bg-green-400/10 px-3 py-1 text-xs font-semibold text-green-400">
-                                    {t("sessions.current")}
-                                </span>
-                            ) : (
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        logoutSession(session.id)
-                                    }
-                                    className="text-sm text-red-400 hover:text-red-300"
-                                >
-                                    {t("sessions.revoke")}
-                                </button>
-                            )}
-
+                            <button type="button" onClick={()=>void logoutSession(session.id)} className="text-sm text-red-400 hover:text-red-300">{t("sessions.revoke")}</button>
                         </div>
                     ))}
 
