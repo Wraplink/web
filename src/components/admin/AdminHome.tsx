@@ -1,11 +1,10 @@
 "use client";
-import Link from "next/link";
+import {Link} from "@/i18n/navigation";
 import {useEffect,useState} from "react";
 import {adminPermissions,adminUsers} from "@/lib/api/admin";
 import {listPendingReceipts} from "@/lib/api/paymentReviews";
 
 export default function AdminHome({locale}:{locale:string}){
- const prefix=locale==="fa"?"/fa":"";
  const [counts,setCounts]=useState<{users?:number;reviews?:number;staff?:number}>({});
  const [error,setError]=useState("");
  useEffect(()=>{let mounted=true;Promise.allSettled([adminUsers(),listPendingReceipts(),adminPermissions()]).then(results=>{
@@ -30,7 +29,7 @@ export default function AdminHome({locale}:{locale:string}){
   <p className="mt-2 text-gray-400">Administrative tools are permission-restricted and backed by authenticated APIs.</p>
   {error&&<p role="alert" className="mt-5 text-amber-300">{error}</p>}
   <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">{sections.map(s=>
-   <Link key={s.href} href={prefix+s.href} className="rounded-2xl border border-white/15 bg-white/5 p-6 transition hover:border-cyan-400/50">
+   <Link key={s.href} href={s.href} locale={locale} className="rounded-2xl border border-white/15 bg-white/5 p-6 transition hover:border-cyan-400/50">
     <h2 className="text-xl font-semibold">{s.title}</h2>
     <p className="mt-2 text-sm text-gray-400">{s.description}</p>
     {s.count!==undefined&&<p className="mt-4 text-sm text-cyan-300">{s.count} in current result set</p>}
