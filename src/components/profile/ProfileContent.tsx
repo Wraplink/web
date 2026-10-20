@@ -25,6 +25,13 @@ type Props = {
     locale: string;
 };
 
+const passwordRules=(value:string)=>[
+ {key:"length",ok:new TextEncoder().encode(value).length>=12&&new TextEncoder().encode(value).length<=128},
+ {key:"upper",ok:/\p{Lu}/u.test(value)},
+ {key:"lower",ok:/\p{Ll}/u.test(value)},
+ {key:"number",ok:/\p{Nd}/u.test(value)},
+ {key:"symbol",ok:/[\p{P}\p{S}]/u.test(value)}
+];
 export default function ProfileContent({
                                            locale,
                                        }: Props) {
@@ -61,11 +68,16 @@ export default function ProfileContent({
 
 
 
+    const rules=passwordRules(newPassword);
+    const passwordValid=rules.every(rule=>rule.ok);
+    const passwordScore=rules.filter(rule=>rule.ok).length;
+    const passwordLabel=locale==="fa"?["بسیار ضعیف","ضعیف","ضعیف","متوسط","خوب","قوی"]:["Very weak","Weak","Weak","Fair","Good","Strong"];
+    const ruleLabels:Record<string,string>=locale==="fa"?{length:"۱۲ تا ۱۲۸ بایت",upper:"حرف بزرگ",lower:"حرف کوچک",number:"عدد",symbol:"نماد ویژه"}:{length:"12–128 bytes",upper:"Uppercase letter",lower:"Lowercase letter",number:"Number",symbol:"Special character"};
     const [message, setMessage] =
         useState("");
 
     const saveProfile=async()=>{setSaving(true);setSaved(false);setError("");try{const p=await updateProfile(name.trim());setProfile(p);setName(p.full_name);setSaved(true)}catch{setError("Could not update profile")}finally{setSaving(false)}};
-    const changePassword=async()=>{setMessage("");if(!currentPassword||!newPassword||!confirmPassword){setMessage(t("security.passwordRequired"));return}if(newPassword!==confirmPassword){setMessage(t("security.passwordMismatch"));return}setChangingPassword(true);try{await changeProfilePassword(currentPassword,newPassword);setCurrentPassword("");setNewPassword("");setConfirmPassword("");setMessage(t("security.passwordChanged"))}catch{setMessage("Password change failed. Verify your current password and password requirements.")}finally{setChangingPassword(false)}};
+    const changePassword=async()=>{setMessage("");if(!currentPassword||!newPassword||!confirmPassword){setMessage(t("security.passwordRequired"));return}if(!passwordValid){setMessage(locale==="fa"?"رمز عبور جدید شرایط امنیتی را ندارد":"New password does not meet the required complexity rules");return}if(newPassword!==confirmPassword){setMessage(t("security.passwordMismatch"));return}setChangingPassword(true);try{await changeProfilePassword(currentPassword,newPassword);setCurrentPassword("");setNewPassword("");setConfirmPassword("");setMessage(t("security.passwordChanged"))}catch{setMessage("Password change failed. Verify your current password and password requirements.")}finally{setChangingPassword(false)}};
     const logoutSession=async(sessionId:string)=>{setError("");try{await revokeProfileSession(sessionId);setSessions(current=>current.filter(s=>s.id!==sessionId))}catch{setError("Could not revoke session")}};
     const logoutAllSessions=async()=>{setError("");try{await revokeOtherProfileSessions();setSessions(await getProfileSessions())}catch{setError("Could not revoke other sessions")}};
     return (
@@ -258,6 +270,12 @@ export default function ProfileContent({
 
                 </div>
 
+                <div className="mt-5 max-w-xl space-y-3" aria-live="polite">
+                    <div className="flex items-center justify-between text-sm"><span>{locale==="fa"?"قدرت رمز عبور":"Password strength"}</span><span className={passwordValid?"text-green-400":"text-amber-300"}>{newPassword?passwordLabel[passwordScore]:"—"}</span></div>
+                    <div role="progressbar" aria-label="Password complexity" aria-valuemin={0} aria-valuemax={5} aria-valuenow={passwordScore} className="grid grid-cols-5 gap-1.5">{[1,2,3,4,5].map(step=><div key={step} className={`h-2 rounded-full ${passwordScore>=step?(passwordValid?"bg-green-400":"bg-amber-400"):"bg-white/10"}`}/>)}</div>
+                    <div className="grid gap-2 sm:grid-cols-2">{rules.map(rule=><div key={rule.key} className={`flex items-center gap-2 text-xs ${rule.ok?"text-green-400":"text-gray-400"}`}>{rule.ok?<CheckCircle2 size={14}/>:<span aria-hidden="true" className="inline-block h-3.5 w-3.5 rounded-full border border-current"/>}{ruleLabels[rule.key]}</div>)}</div>
+                    {confirmPassword&&<p className={confirmPassword===newPassword?"text-sm text-green-400":"text-sm text-red-300"}>{confirmPassword===newPassword?(locale==="fa"?"تکرار رمز عبور مطابقت دارد":"Passwords match"):(locale==="fa"?"رمزها مطابقت ندارند":"Passwords do not match")}</p>}
+                </div>
                 {message && (
                     <div className="mt-5 rounded-xl border border-cyan-400/20 bg-cyan-400/5 px-4 py-3 text-sm text-cyan-300">
                         {message}
@@ -267,7 +285,7 @@ export default function ProfileContent({
                 <button
                     type="button"
                     onClick={changePassword}
-                    disabled={changingPassword}
+                    disabled={changingPassword||!passwordValid||!currentPassword||newPassword!==confirmPassword}
                     className="mt-6 flex items-center gap-2 rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-5 py-3 font-semibold text-cyan-400 transition hover:bg-cyan-400/20 disabled:opacity-50"
                 >
                     <KeyRound size={18}/>
