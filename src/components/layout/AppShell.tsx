@@ -24,6 +24,9 @@ const authenticatedRoutes = [
     "/orders",
     "/support",
     "/bandwidth",
+    "/notifications",
+    "/profile",
+    "/admin",
 ];
 
 export default function AppShell({
@@ -32,7 +35,7 @@ export default function AppShell({
     const pathname = usePathname();
 
     const locale =
-        pathname === "/en" || pathname.startsWith("/en/")
+        pathname === "/en" || pathname.startsWith("/en/") || (pathname!=="/fa"&&!pathname.startsWith("/fa/"))
             ? "en"
             : "fa";
 
