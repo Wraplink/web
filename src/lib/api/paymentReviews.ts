@@ -2,6 +2,7 @@ import {apiClient} from "@/lib/api/client";
 
 export type PendingReceipt = {
     id: string;
+    customer?: {email:string;fullName:string;accountStatus:string;emailVerified:boolean};
     plans?: {orderNumber:number;subscriptionId:string;planName:string;planCode:string;amountMinor:number;currency:string;durationDays:number;dataLimitBytes:number}[];
     orderCount?: number;
     paymentGroupId?: string | null;
@@ -14,8 +15,9 @@ export type PendingReceipt = {
     createdAt: string;
 };
 
-export async function listPendingReceipts(): Promise<PendingReceipt[]> {
-    const {data} = await apiClient.get<{receipts: PendingReceipt[]}>("/api/v1/admin/payment-reviews/receipts");
+export type ReviewFilters = {orderNumber?:string;account?:string;dateFrom?:string;dateTo?:string};
+export async function listPendingReceipts(filters:ReviewFilters = {}): Promise<PendingReceipt[]> {
+    const {data} = await apiClient.get<{receipts: PendingReceipt[]}>("/api/v1/admin/payment-reviews/receipts", {params:filters});
     return data.receipts;
 }
 
