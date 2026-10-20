@@ -4,6 +4,7 @@ import {useEffect, useState} from "react";
 import {Bell, Mail, Smartphone} from "lucide-react";
 import {useTranslations} from "next-intl";
 import {useLocale} from "next-intl";
+import {getPreferences,savePreferences} from "@/lib/notifications";
 
 const KEY = "wraplink_notification_preferences";
 
@@ -35,14 +36,15 @@ export default function NotificationPreferences() {
     const [prefs, setPrefs] = useState(defaults);
 
     useEffect(() => {
-        const raw = localStorage.getItem(KEY);
-        if (raw) setPrefs(JSON.parse(raw));
+        void getPreferences().then(p=>setPrefs(old=>({...old,...p}))).catch(()=>{});
     }, []);
 
     const toggle = (key: keyof Preferences) => {
         const next = {...prefs, [key]: !prefs[key]};
         setPrefs(next);
-        localStorage.setItem(KEY, JSON.stringify(next));
+        if (["orders","payments","support","security","system"].includes(key)) {
+          void savePreferences({orders:next.orders,payments:next.payments,support:next.support,security:next.security,system:next.system}).catch(()=>setPrefs(prefs));
+        } else {localStorage.setItem(KEY,JSON.stringify(next));}
 
         /*
          * BACKEND TODO
