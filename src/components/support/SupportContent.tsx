@@ -27,8 +27,8 @@ export default function SupportContent({admin=false,locale="en"}:{admin?:boolean
     </form>
     <button type="button" onClick={()=>void load()} className="rounded-lg border px-3 py-2">Refresh</button>
     {loading&&<p>Loading…</p>}
-    {tickets.map(t=><button type="button" key={t.id} onClick={()=>void open(t)} className={"w-full rounded-xl border p-4 text-left "+(selected?.id===t.id?"border-cyan-400":"border-white/15")}>
-      <div className="flex justify-between gap-2"><strong>TKT-{t.ticketNumber}</strong><span className="text-xs text-cyan-300">{t.status}</span></div>
+    {tickets.map(t=><button type="button" key={t.id} onClick={()=>void open(t)} className={"w-full rounded-xl border p-4 text-left transition "+(selected?.id===t.id?"border-cyan-400":(admin?t.staffUnread:t.customerUnread)?"border-amber-400 bg-amber-400/10 shadow-sm shadow-amber-400/20":"border-white/15")}>
+      <div className="flex justify-between gap-2"><strong>TKT-{t.ticketNumber}</strong>{(admin?t.staffUnread:t.customerUnread)&&<span className="rounded-full bg-amber-400 px-2 py-0.5 text-xs font-bold text-black">{admin?"New customer reply":"New support reply"}</span>}<span className="text-xs text-cyan-300">{t.status}</span></div>
       <div className="mt-1 font-medium">{t.subject}</div><div className="mt-1 text-xs text-gray-400">{admin?t.email:t.category} · {new Date(t.updatedAt).toLocaleString()}</div>
       {t.orderNumber&&<div className="text-xs text-gray-400">WL-{t.orderNumber}</div>}
      </button>)}
