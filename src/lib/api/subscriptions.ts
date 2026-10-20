@@ -2,6 +2,7 @@ import {apiClient} from "@/lib/api/client";
 
 export type UserSubscription = {
     id: string;
+    orderNumber: number;
     planCode: string;
     planName: string;
     priceMinor: number;
