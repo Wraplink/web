@@ -905,13 +905,15 @@ function StatusBadge({
             "border-red-400/20 bg-red-400/10 text-red-300",
         refunded:
             "border-gray-400/20 bg-gray-400/10 text-gray-300",
+        rejected:
+            "border-red-400/20 bg-red-400/10 text-red-300",
     };
 
     return (
         <span
             className={`rounded-full border px-3 py-1 text-xs font-semibold ${styles[status]}`}
         >
-            {t(`status.${status}`)}
+            {status === "rejected" ? "Rejected" : t(`status.${status}`)}
         </span>
     );
 }
