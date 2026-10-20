@@ -2,6 +2,7 @@ import {apiClient} from "@/lib/api/client";
 
 export type PendingReceipt = {
     id: string;
+    plans?: {orderNumber:number;subscriptionId:string;planName:string;planCode:string;amountMinor:number;currency:string;durationDays:number;dataLimitBytes:number}[];
     orderCount?: number;
     paymentGroupId?: string | null;
     subscriptionId: string;
