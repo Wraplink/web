@@ -82,6 +82,7 @@ export default function PaymentReviewContent({locale}: {locale: string}) {
                                 <p className="mt-1 text-sm text-gray-400">{item.paymentGroupId ? (locale === "fa" ? "شناسه پرداخت گروهی:" : "Payment group:") : "Subscription:"} {item.paymentGroupId ?? item.subscriptionId}</p>
                                 <p className="text-sm text-gray-400">Customer: {item.userId}</p>
                                 <p className="text-sm text-gray-400">Submitted: {new Date(item.createdAt).toLocaleString()}</p>
+                                <div className="mt-4 rounded-xl border border-white/10 bg-black/20 p-4"><h3 className="mb-3 font-semibold">{locale === "fa" ? "جزئیات سفارش و پلن‌ها" : "Order and plan preview"}</h3><div className="space-y-3">{item.plans?.map(plan => <div key={plan.subscriptionId} className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-3 text-sm"><div><p className="font-semibold text-white">#WL-{plan.orderNumber} — {plan.planName}</p><p className="text-gray-400">{plan.planCode} · {plan.durationDays} {locale === "fa" ? "روز" : "days"} · {(plan.dataLimitBytes / (1024 ** 3)).toFixed(1)} GB</p></div><span className="font-semibold">{money(plan.amountMinor,plan.currency)}</span></div>)}</div></div>
                                 <p className="mt-2 font-semibold text-cyan-200">{locale === "fa" ? "مبلغ کل قابل بررسی:" : "Total payment to verify:"} {money(item.payableMinor, item.currency)}</p>
                             </div>
                             <div className="flex flex-wrap gap-2">
