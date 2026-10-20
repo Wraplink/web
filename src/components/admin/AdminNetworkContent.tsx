@@ -1,5 +1,5 @@
 "use client";
-import Link from "next/link";
+import {Link} from "@/i18n/navigation";
 import {useEffect,useState} from "react";
 import {useLocale} from "next-intl";
 import {apiClient} from "@/lib/api/client";
@@ -8,7 +8,6 @@ type DNSNode={id:string;region:string;addresses:string[];lastSeenAt:string;onlin
 
 export default function AdminNetworkContent(){
  const locale=useLocale();
- const prefix=locale==="fa"?"/fa":"";
  const [nodes,setNodes]=useState<DNSNode[]>([]);
  const [loading,setLoading]=useState(true);
  const [error,setError]=useState("");
@@ -33,6 +32,6 @@ export default function AdminNetworkContent(){
    </article>)}
   </div>}
   <div className="mt-8 rounded-xl border border-white/15 p-5"><h2 className="font-semibold">Edge agents and routing</h2><p className="mt-2 text-sm text-gray-400">Live agent inventory, allocation policies and routing actions require a separately authenticated dns-control integration. No operational controls are exposed until that connection is secured.</p></div>
-  <Link href={prefix+"/admin"} className="mt-8 inline-block text-cyan-300">Back to admin overview</Link>
+  <Link href="/admin" locale={locale} className="mt-8 inline-block text-cyan-300">Back to admin overview</Link>
  </main>;
 }
