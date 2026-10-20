@@ -9,9 +9,10 @@ export async function quoteDiscount(subscriptionId: string, code: string): Promi
     return data;
 }
 
-export async function submitCardReceipt(subscriptionId: string, file: File, discountCode: string): Promise<CardReceiptResult> {
+export async function submitCardReceipt(subscriptionId: string, file: File, discountCode: string, paymentCardId: string): Promise<CardReceiptResult> {
     const form = new FormData();
     form.append("receipt", file);
+    form.append("paymentCardId", paymentCardId);
     if (discountCode.trim()) form.append("discountCode", discountCode.trim());
     const {data} = await apiClient.post<CardReceiptResult>(
         `/api/v1/me/subscriptions/${encodeURIComponent(subscriptionId)}/card-receipt`, form);
