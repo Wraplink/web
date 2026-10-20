@@ -3,18 +3,19 @@
 import {useEffect, useState} from "react";
 import {Bell} from "lucide-react";
 import {Link} from "@/i18n/navigation";
-import {unreadCount} from "@/lib/notifications";
+import {getNotifications} from "@/lib/notifications";
 
 export default function NotificationBell() {
     const [count, setCount] =
         useState(0);
 
     useEffect(() => {
-        setCount(unreadCount());
+        const refresh=()=>{void getNotifications(1).then(data=>setCount(data.unreadCount)).catch(()=>{});};
+        refresh();
 
         const timer = setInterval(() => {
-            setCount(unreadCount());
-        }, 1000);
+            refresh();
+        }, 30000);
 
         return () =>
             clearInterval(timer);
