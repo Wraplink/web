@@ -13,6 +13,7 @@ import {
     ShoppingBag,
     Wallet,
     X,
+    Shield,
 } from "lucide-react";
 import {
     useEffect,
@@ -28,6 +29,8 @@ import {
     usePathname,
     useRouter,
 } from "@/i18n/navigation";
+
+import {apiClient} from "@/lib/api/client";
 
 import {
     clearAuthSession,
@@ -115,6 +118,20 @@ export default function UserSidebar({
     useEffect(() => {
         return subscribeAuth(setUser);
     }, []);
+
+    const [canAdmin, setCanAdmin] = useState(false);
+    useEffect(() => {
+        if (!user) {setCanAdmin(false);return;}
+        let active = true;
+        Promise.allSettled([
+            apiClient.get("/api/v1/admin/access/permissions"),
+            apiClient.get("/api/v1/admin/payment-reviews/receipts"),
+            apiClient.get("/api/v1/admin/payment-reviews/discounts"),
+        ]).then(results => {
+            if (active) setCanAdmin(results.some(result => result.status === "fulfilled"));
+        });
+        return () => {active = false;};
+    }, [user?.email]);
 
     const isRtl = locale === "fa";
 
@@ -274,6 +291,13 @@ export default function UserSidebar({
                                 </Link>
                             );
                         })}
+                        {canAdmin && (
+                            <Link href="/admin" onClick={() => setMobileOpen(false)}
+                                className="mt-4 flex items-center gap-3 rounded-xl border border-cyan-400/20 px-4 py-3 text-sm font-medium text-cyan-300 hover:bg-cyan-400/10">
+                                <Shield size={19}/>
+                                <span>{locale === "fa" ? "مدیریت" : "Administration"}</span>
+                            </Link>
+                        )}
                     </nav>
                 </div>
 
