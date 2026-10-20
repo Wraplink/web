@@ -3,15 +3,18 @@ import {Link} from "@/i18n/navigation";
 import {useEffect,useState} from "react";
 import {adminPermissions,adminUsers} from "@/lib/api/admin";
 import {listPendingReceipts} from "@/lib/api/paymentReviews";
+import {apiClient} from "@/lib/api/client";
 
 export default function AdminHome({locale}:{locale:string}){
- const [counts,setCounts]=useState<{users?:number;reviews?:number;staff?:number}>({});
+ const [counts,setCounts]=useState<{users?:number;reviews?:number;orderReviews?:number;walletReviews?:number;staff?:number}>({});
  const [error,setError]=useState("");
- useEffect(()=>{let mounted=true;Promise.allSettled([adminUsers(),listPendingReceipts(),adminPermissions()]).then(results=>{
+ useEffect(()=>{let mounted=true;Promise.allSettled([adminUsers(),listPendingReceipts(),adminPermissions(),apiClient.get<{receipts:unknown[]}>("/api/v1/admin/payment-reviews/wallet-receipts")]).then(results=>{
   if(!mounted)return;
-  const next:{users?:number;reviews?:number;staff?:number}={};
+  const next:{users?:number;reviews?:number;orderReviews?:number;walletReviews?:number;staff?:number}={};
   if(results[0].status==="fulfilled")next.users=results[0].value.length;
-  if(results[1].status==="fulfilled")next.reviews=results[1].value.length;
+  if(results[1].status==="fulfilled")next.orderReviews=results[1].value.length;
+  if(results[3].status==="fulfilled")next.walletReviews=results[3].value.data.receipts.length;
+  if(next.orderReviews!==undefined&&next.walletReviews!==undefined)next.reviews=next.orderReviews+next.walletReviews;
   if(results[2].status==="fulfilled")next.staff=results[2].value.length;
   if(Object.keys(next).length===0)setError("You do not have administrator access, or the admin API is unavailable.");
   setCounts(next);
@@ -21,7 +24,7 @@ export default function AdminHome({locale}:{locale:string}){
   {href:"/admin/support",title:"Support tickets",description:"Review customer requests, reply and update ticket status"},
   {href:"/admin/orders",title:"Orders",description:"Inspect subscriptions and payment status"},
   {href:"/admin/payment-methods",title:locale==="fa"?"روش‌های پرداخت":"Payment methods",description:locale==="fa"?"مدیریت کارت‌های مقصد کارت‌به‌کارت":"Manage card-to-card destination accounts"},
-  {href:"/admin/payment-reviews",title:"Payment reviews",description:"Verify bank transfer receipts",count:counts.reviews},
+  {href:"/admin/payment-reviews",title:"Payment reviews",description:locale==="fa"?"بررسی رسید سفارش‌ها و شارژ کیف پول":"Review order payments and wallet top-ups",count:counts.reviews},
   {href:"/admin/discounts",title:"Discounts",description:"Create and disable promotional codes"},
   {href:"/admin/access",title:"Staff permissions",description:"Grant and revoke administrative permissions",count:counts.staff},
   {href:"/admin/network",title:"Network operations",description:"DNS control, edge agents and network health"},
@@ -34,7 +37,9 @@ export default function AdminHome({locale}:{locale:string}){
    <Link key={s.href} href={s.href} locale={locale} className="rounded-2xl border border-white/15 bg-white/5 p-6 transition hover:border-cyan-400/50">
     <h2 className="text-xl font-semibold">{s.title}</h2>
     <p className="mt-2 text-sm text-gray-400">{s.description}</p>
-    {s.count!==undefined&&<p className="mt-4 text-sm text-cyan-300">{s.count} in current result set</p>}
+    {s.count!==undefined&&<p className="mt-4 text-sm text-cyan-300">{s.href==="/admin/payment-reviews"?(locale==="fa"?`${s.count} رسید در انتظار بررسی`:`${s.count} pending reviews`):`${s.count} in current result set`}</p>}
+    {s.href==="/admin/payment-reviews"&&counts.orderReviews!==undefined&&counts.walletReviews!==undefined&&<p className="mt-1 text-xs text-gray-400">{locale==="fa"?`سفارش‌ها: ${counts.orderReviews} · کیف پول: ${counts.walletReviews}`:`Orders: ${counts.orderReviews} · Wallet: ${counts.walletReviews}`}</p>}
+    {s.href==="/admin/payment-reviews"&&counts.reviews===undefined&&<p className="mt-4 text-xs text-amber-300">{locale==="fa"?"آمار بررسی پرداخت‌ها در دسترس نیست":"Review count unavailable"}</p>}
    </Link>)}</div>
  </main>;
 }
