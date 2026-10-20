@@ -7,7 +7,7 @@ export type UserSubscription = {
     priceMinor: number;
     currency: string;
     durationDays: number;
-    status: "pending_payment" | "active" | "expired" | "cancelled";
+    status: "pending_payment" | "confirmed" | "active" | "expired" | "cancelled";
     createdAt: string;
     startsAt?: string | null;
     expiresAt?: string | null;
