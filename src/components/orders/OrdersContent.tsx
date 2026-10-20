@@ -35,7 +35,8 @@ type OrderStatus =
     | "active"
     | "delivered"
     | "cancelled"
-    | "refunded";
+    | "refunded"
+    | "rejected";
 
 type OrderItem = {
     id: string;
@@ -102,7 +103,8 @@ export default function OrdersContent({
                     const receipt = await getCardReceipt(subscription.id);
                     if (receipt) {
                         order.receiptStatus = receipt.status;
-                        if (subscription.status === "confirmed") order.status = "confirmed";
+                        if (receipt.status === "rejected") order.status = "rejected";
+                        else if (subscription.status === "confirmed") order.status = "confirmed";
                         order.payment = receipt.status === "pending_review" ? "Card transfer — awaiting review" :
                             receipt.status === "approved" ? "Card transfer — approved" : "Card transfer — rejected";
                         order.total = receipt.payableMinor;
@@ -320,6 +322,10 @@ export default function OrdersContent({
                         {t(
                             "filters.delivered"
                         )}
+                    </FilterButton>
+
+                    <FilterButton active={filter === "rejected"} onClick={() => setFilter("rejected")}>
+                        {locale === "fa" ? "رد شده" : "Rejected"}
                     </FilterButton>
 
                     <FilterButton
