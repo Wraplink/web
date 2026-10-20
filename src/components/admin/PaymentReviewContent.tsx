@@ -1,6 +1,7 @@
 "use client";
 
 import {useCallback, useEffect, useState} from "react";
+import WalletReceiptReview from "./WalletReceiptReview";
 import {downloadReceipt, listPendingReceipts, reviewReceipt, type PendingReceipt} from "@/lib/api/paymentReviews";
 
 export default function PaymentReviewContent({locale}: {locale: string}) {
@@ -121,5 +122,6 @@ export default function PaymentReviewContent({locale}: {locale: string}) {
                     <img alt="Submitted payment receipt" src={preview.url} className="min-h-0 flex-1 object-contain"/>}
             </div>
         </div>}
-    </main>;
+    <WalletReceiptReview locale={locale}/>
+</main>;
 }
