@@ -83,7 +83,7 @@ export default function WalletContent({locale}: Props) {
         if (!pendingKey.current) pendingKey.current = crypto.randomUUID();
         try {
             const request = await submitWalletCardReceipt(value,selectedCardId,receipt,pendingKey.current);
-            setMessage(t("requestCreated", {id: request.id.slice(0, 8)}));
+            setMessage(locale==="fa"?`رسید ثبت شد و در انتظار تایید مدیر است (${request.id.slice(0,8)})`:`Receipt submitted for admin review (${request.id.slice(0,8)}). Your balance will update after approval.`);
             setAmount("");
             setReceipt(null);
             pendingKey.current = null;
@@ -182,7 +182,7 @@ export default function WalletContent({locale}: Props) {
                                     <p className="font-semibold">{formatMoney(deposit.amountMinor, locale)}</p>
                                     <p className="text-xs text-gray-400">{new Date(deposit.createdAt).toLocaleString(locale === "fa" ? "fa-IR" : "en-US")}</p>
                                 </div>
-                                <span className="rounded-full border border-white/10 px-3 py-1 text-sm">{deposit.status}</span>
+                                <span className="rounded-full border border-white/10 px-3 py-1 text-sm">{deposit.provider==="card_transfer"&&deposit.status==="pending"?(locale==="fa"?"در انتظار بررسی رسید":"Pending receipt review"):deposit.status}</span>
                             </div>
                         ))}
                 </div>
