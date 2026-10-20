@@ -9,7 +9,7 @@ export default function SupportContent({admin=false,locale="en"}:{admin?:boolean
  const [search,setSearch]=useState("");const [status,setStatus]=useState("");
  const [page,setPage]=useState(0);const [loading,setLoading]=useState(false);const [busy,setBusy]=useState(false);const [error,setError]=useState("");
  const [subject,setSubject]=useState("");const [category,setCategory]=useState("technical");const [priority,setPriority]=useState("medium");const [orderNumber,setOrderNumber]=useState("");const [initialMessage,setInitialMessage]=useState("");const [reply,setReply]=useState("");
- const load=useCallback(async()=>{setLoading(true);setError("");try{const data=await listTickets(admin,{search,status,limit:25,offset:page*25});setTickets(data.tickets);}catch{setError(fa?"دریافت تیکت‌ها ناموفق بود":"Unable to load tickets"}finally{setLoading(false)}},[admin,search,status,page,fa]);
+ const load=useCallback(async()=>{setLoading(true);setError("");try{const data=await listTickets(admin,{search,status,limit:25,offset:page*25});setTickets(data.tickets);}catch{setError(fa?"دریافت تیکت‌ها ناموفق بود":"Unable to load tickets")}finally{setLoading(false)}},[admin,search,status,page,fa]);
  useEffect(()=>{void load()},[load]);
  const open=async(t:SupportTicket)=>{setError("");try{const detail=await getTicket(t.id,admin);setSelected(detail.ticket);setMessages(detail.messages)}catch{setError("Unable to load conversation")}};
  const send=async()=>{if(!selected||!reply.trim())return;setBusy(true);try{await replyTicket(selected.id,reply.trim(),admin);setReply("");await open(selected);await load()}catch{setError("Unable to send message")}finally{setBusy(false)}};
