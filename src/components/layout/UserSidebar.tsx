@@ -44,57 +44,19 @@ import {
 } from "@/lib/api/auth";
 
 const navigation = [
-    {
-        key: "dashboard",
-        href: "/dashboard",
-        icon: BarChart3,
-    },
-    {
-        key: "connection",
-        href: "/connection",
-        icon: Server,
-    },
-    {
-        key: "wallet",
-        href: "/wallet",
-        icon: Wallet,
-    },
-    {
-        key: "market",
-        href: "/market",
-        icon: ShoppingBag,
-    },
-    {
-        key: "basket",
-        href: "/basket",
-        icon: Package,
-    },
-    {
-        key: "orders",
-        href: "/orders",
-        icon: Activity,
-    },
-    {
-        key: "support",
-        href: "/support",
-        icon: Headphones,
-    },
-    {
-        key: "bandwidth",
-        href: "/bandwidth",
-        icon: BarChart3,
-    },
-    {
-        key: "profile",
-        href: "/profile",
-        icon: User,
-    },
-    {
-        key: "notifications",
-        href: "/notifications",
-        icon: Bell,
-    },
+ {key:"dashboard",href:"/dashboard",icon:BarChart3,group:"overview"},
+ {key:"connection",href:"/connection",icon:Server,group:"services"},
+ {key:"bandwidth",href:"/bandwidth",icon:Activity,group:"services"},
+ {key:"market",href:"/market",icon:ShoppingBag,group:"commerce"},
+ {key:"basket",href:"/basket",icon:Package,group:"commerce"},
+ {key:"orders",href:"/orders",icon:BarChart3,group:"commerce"},
+ {key:"wallet",href:"/wallet",icon:Wallet,group:"commerce"},
+ {key:"notifications",href:"/notifications",icon:Bell,group:"account"},
+ {key:"support",href:"/support",icon:Headphones,group:"account"},
+ {key:"profile",href:"/profile",icon:User,group:"account"},
 ] as const;
+const navigationGroups=["overview","services","commerce","account"] as const;
+const groupLabels={en:{overview:"Overview",services:"My services",commerce:"Shop & billing",account:"Account & help"},fa:{overview:"نمای کلی",services:"سرویس‌های من",commerce:"خرید و پرداخت",account:"حساب و پشتیبانی"}} as const;
 
 type Props = {
     mobileOpen: boolean;
@@ -258,8 +220,12 @@ export default function UserSidebar({
                         {t("navigation")}
                     </div>
 
-                    <nav className="space-y-1">
-                        {navigation.map((item) => {
+                    <nav aria-label={isRtl?"منوی حساب کاربری":"Customer navigation"} className="space-y-5">
+                        {navigationGroups.map(group=>(
+                         <div key={group}>
+                          <div className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-gray-500">{groupLabels[isRtl?"fa":"en"][group]}</div>
+                          <div className="space-y-1">
+                        {navigation.filter(item=>item.group===group).map((item) => {
                             const Icon = item.icon;
 
                             const active =
@@ -275,6 +241,7 @@ export default function UserSidebar({
                                     onClick={() =>
                                         setMobileOpen(false)
                                     }
+                                    aria-current={active?"page":undefined}
                                     className={`
                                         flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition
                                         ${
@@ -294,7 +261,9 @@ export default function UserSidebar({
                                     {item.key==="notifications"&&unreadNotifications>0&&<span aria-label={`${unreadNotifications} unread notifications`} className="ml-auto rounded-full bg-red-500 px-2 py-0.5 text-xs font-bold text-white">{unreadNotifications>99?"99+":unreadNotifications}</span>}
                                 </Link>
                             );
-                        })}
+                        })}                          </div>
+                         </div>
+                        ))}
                         {canAdmin && user && (
                             <Link href="/admin" onClick={() => setMobileOpen(false)}
                                 className="mt-4 flex items-center gap-3 rounded-xl border border-cyan-400/20 px-4 py-3 text-sm font-medium text-cyan-300 hover:bg-cyan-400/10">
