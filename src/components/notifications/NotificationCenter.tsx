@@ -34,6 +34,7 @@ export default function NotificationCenter({locale}: Props) {
     const [notifications, setNotifications] =
         useState<Notification[]>([]);
 
+    const [error,setError]=useState("");
     const [filter, setFilter] =
         useState<
             | "all"
@@ -46,7 +47,7 @@ export default function NotificationCenter({locale}: Props) {
         >("all");
 
     useEffect(() => {
-        setNotifications(getNotifications());
+        void getNotifications().then(data=>setNotifications(data.notifications)).catch(()=>setError("Unable to load notifications"));
     }, []);
 
     const filtered = useMemo(() => {
@@ -58,13 +59,11 @@ export default function NotificationCenter({locale}: Props) {
     }, [notifications, filter]);
 
     const handleRead = (id: string) => {
-        markRead(id);
-        setNotifications(getNotifications());
+        void markRead(id).then(()=>getNotifications()).then(data=>setNotifications(data.notifications)).catch(()=>setError("Unable to mark notification read"));
     };
 
     const handleReadAll = () => {
-        markAllRead();
-        setNotifications(getNotifications());
+        void markAllRead().then(()=>getNotifications()).then(data=>setNotifications(data.notifications)).catch(()=>setError("Unable to mark notifications read"));
     };
 
     const unread = notifications.filter((n) => !n.read).length;
@@ -102,6 +101,7 @@ export default function NotificationCenter({locale}: Props) {
 
                 </div>
 
+                {error&&<p role="alert" className="mb-4 text-red-300">{error}</p>}
                 <div className="mb-6 grid gap-3 sm:grid-cols-4">
 
                     <Stat title={t("stats.total")} value={notifications.length}/>
@@ -124,7 +124,7 @@ export default function NotificationCenter({locale}: Props) {
                     ].map((key) => (
                         <button
                             key={key}
-                            onClick={() => setFilter(key as any)}
+                            onClick={() => setFilter(key as typeof filter)}
                             className={`rounded-xl px-4 py-2 text-sm transition ${
                                 filter === key
                                     ? "bg-cyan-400 text-black"
@@ -240,7 +240,7 @@ function NotificationCard({
                     </p>
 
                     <div className="mt-4 text-xs text-gray-500">
-                        {notification.createdAt}
+                        {new Date(notification.createdAt).toLocaleString()}
                     </div>
 
                 </div>
