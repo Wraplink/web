@@ -26,6 +26,7 @@ export default function CheckoutContent({locale}: Props) {
     const [error, setError] = useState("");
     const [method, setMethod] = useState<"card" | "isp" | "crypto">("card");
     const [receipt, setReceipt] = useState<File | null>(null);
+    const [receiptError, setReceiptError] = useState("");
     const [discountCode, setDiscountCode] = useState("");
     const [quote, setQuote] = useState<DiscountQuote | null>(null);
     const pendingId = useRef<string | null>(null);
@@ -58,6 +59,18 @@ export default function CheckoutContent({locale}: Props) {
     );
     const total = valid ? lines.reduce((sum, {item, plan}) => sum + item.quantity * plan!.priceMinor, 0) : 0;
 
+    const singlePlan = lines.length === 1 && lines[0]?.item.quantity === 1;
+    const canSubmit = !loading && method === "card" && valid && singlePlan && receipt !== null && !receiptError;
+    const onReceiptChange = (file: File | null) => {
+        setReceipt(null);
+        setReceiptError("");
+        if (!file) return;
+        const allowed = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
+        if (!allowed.includes(file.type)) {setReceiptError(locale === "fa" ? "فرمت فایل باید JPG، PNG، WebP یا PDF باشد." : "Use a JPG, PNG, WebP, or PDF receipt.");return;}
+        if (file.size === 0 || file.size > 5 * 1024 * 1024) {setReceiptError(locale === "fa" ? "حجم فایل باید بیشتر از صفر و حداکثر ۵ مگابایت باشد." : "Receipt must be nonempty and at most 5 MB.");return;}
+        setReceipt(file);
+    };
+
     const prepareSubscription = async () => {
         if (lines.length !== 1 || lines[0].item.quantity !== 1 || !valid) throw new Error("Checkout supports one valid plan at a time.");
         const plan = lines[0].plan!;
@@ -80,7 +93,7 @@ export default function CheckoutContent({locale}: Props) {
 
     const pay = async () => {
         if (submitting.current || loading) return;
-        if (!valid || method !== "card" || !receipt || lines.length !== 1 || lines[0].item.quantity !== 1) {
+        if (!valid || method !== "card" || !receipt || !!receiptError || !singlePlan) {
             setError("Select a valid plan and attach a transfer receipt.");
             return;
         }
@@ -138,16 +151,22 @@ export default function CheckoutContent({locale}: Props) {
                             </div>
                             {method === "card" && <>
                                 <p className="mt-4 text-sm text-gray-400">Upload your transfer receipt (JPEG, PNG, WebP or PDF, maximum 5 MB). Payment requires manual approval.</p>
-                                <input className="mt-3 w-full text-sm" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" onChange={event => setReceipt(event.target.files?.[0] ?? null)} />
+                                <label htmlFor="transfer-receipt" className="mt-3 block text-sm font-semibold">{locale === "fa" ? "تصویر یا فایل رسید پرداخت (الزامی)" : "Payment receipt / transfer screenshot (required)"}</label>
+                                <input id="transfer-receipt" aria-required="true" className="mt-2 w-full text-sm" type="file" accept=".jpg,.jpeg,.png,.webp,.pdf,image/jpeg,image/png,image/webp,application/pdf" onChange={event => onReceiptChange(event.target.files?.[0] ?? null)} />
+                                {receipt && <p className="mt-2 text-sm text-green-300">{locale === "fa" ? "فایل انتخاب‌شده:" : "Selected file:"} {receipt.name}</p>}
+                                {receiptError && <p role="alert" className="mt-2 text-sm text-red-300">{receiptError}</p>}
+                                {!receipt && !receiptError && <p className="mt-2 text-xs text-amber-300">{locale === "fa" ? "برای فعال شدن دکمه ثبت، رسید انتقال وجه را پیوست کنید." : "Attach your transfer receipt to enable submission."}</p>}
                                 <label className="mt-4 block text-sm">Discount code (optional)</label>
                                 <input className="mt-2 w-full rounded-lg border border-white/20 bg-black/30 p-2" value={discountCode} onChange={event => {setDiscountCode(event.target.value);setQuote(null);}} placeholder="Discount code" />
                                 <button type="button" disabled={loading || !valid} onClick={() => void applyDiscount()} className="mt-2 text-sm text-cyan-400">Apply discount</button>
                                 {quote && <p className="mt-2 text-sm text-green-300">Discount: {formatMoney(quote.discountMinor, quote.currency, locale)} — Payable: {formatMoney(quote.payableMinor, quote.currency, locale)}</p>}
                                 <p className="mt-4 text-sm text-gray-400">Amount to transfer: {valid ? formatMoney(quote?.payableMinor ?? total, currency, locale) : "—"}. Bank transfer details must be provided by an authorized payment administrator.</p>
                             </>}
-                            <button type="button" disabled={loading || method !== "card" || !valid || !receipt || lines.length !== 1 || lines[0].item.quantity !== 1}
+                            {!singlePlan && items.length > 0 && <p role="status" className="mt-4 text-sm text-amber-300">{locale === "fa" ? "در هر پرداخت فقط یک پلن با تعداد ۱ قابل خرید است. لطفاً سبد خرید را اصلاح کنید." : "Checkout supports one plan with quantity 1 per payment. Please update your basket."} <Link href="/basket" className="underline">{locale === "fa" ? "ویرایش سبد" : "Edit basket"}</Link></p>}
+                            {!valid && !checking && <p role="status" className="mt-3 text-sm text-amber-300">{locale === "fa" ? "قیمت یا پلن معتبر نیست؛ سبد خرید را بررسی کنید." : "Plan or price is invalid. Check your basket."}</p>}
+                            <button type="button" disabled={!canSubmit}
                                 onClick={() => void pay()} className="mt-6 w-full rounded-xl bg-cyan-400 px-5 py-3 font-bold text-black disabled:cursor-not-allowed disabled:opacity-40">
-                                {loading ? t("processing") : "Submit receipt for review"}
+                                {loading ? t("processing") : locale === "fa" ? "ثبت رسید برای بررسی" : "Submit receipt for review"}
                             </button>
                             <button type="button" onClick={() => void load()} disabled={loading} className="mt-4 w-full text-sm text-cyan-400">Refresh prices</button>
                         </div>
