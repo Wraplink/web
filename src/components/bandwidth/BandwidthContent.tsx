@@ -16,6 +16,7 @@ import {
     useState,
 } from "react";
 import {useTranslations} from "next-intl";
+import {isAxiosError} from "axios";
 
 import {
     getUsage,
@@ -42,6 +43,7 @@ export default function BandwidthContent() {
     const [loading, setLoading] =
         useState(true);
 
+    const [noSubscription, setNoSubscription] = useState(false);
     const [error, setError] =
         useState<string | null>(null);
 
@@ -51,6 +53,7 @@ export default function BandwidthContent() {
         const load = async () => {
             setLoading(true);
             setError(null);
+            setNoSubscription(false);
 
             try {
                 const result = await getUsage(
@@ -68,9 +71,9 @@ export default function BandwidthContent() {
 
                 if (!cancelled) {
                     setUsage(null);
-                    setError(
-                        "Usage information is not available. Make sure you have an active subscription."
-                    );
+                    const missing = isAxiosError(loadError) && loadError.response?.status === 404;
+                    setNoSubscription(missing);
+                    setError(missing ? "No active subscription is available. Purchase or activate a plan to view bandwidth usage." : "Unable to load bandwidth usage. Please try again.");
                 }
             } finally {
                 if (!cancelled) {
@@ -122,21 +125,16 @@ export default function BandwidthContent() {
         ) ?? 0
     );
 
-    const chartData = useMemo(
-        () =>
-            [...(usage?.daily ?? [])]
-                .reverse()
-                .map((item) => ({
-                    day: formatChartDate(
-                        item.date,
-                        range
-                    ),
-                    value: bytesToGiB(
-                        item.totalBytes
-                    ),
-                })),
-        [usage, range]
-    );
+    const chartData = useMemo(() => {
+        if (!usage) return [];
+        const byDate = new Map(usage.daily.map(item => [item.date, item]));
+        const today = new Date();
+        const utcMidnight = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
+        return Array.from({length: rangeDays[range]}, (_, index) => {
+            const date = new Date(utcMidnight - (rangeDays[range] - index - 1) * 86400000).toISOString().slice(0, 10);
+            return {day: formatChartDate(date, range), date, value: bytesToGiB(byDate.get(date)?.totalBytes ?? 0)};
+        });
+    }, [usage, range]);
 
     const maxValue = Math.max(
         0,
