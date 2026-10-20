@@ -101,6 +101,7 @@ export default function OrdersContent({
                     const receipt = await getCardReceipt(subscription.id);
                     if (receipt) {
                         order.receiptStatus = receipt.status;
+                        if (subscription.status === "pending_payment" && receipt.status === "approved") order.status = "confirmed";
                         order.payment = receipt.status === "pending_review" ? "Card transfer — awaiting review" :
                             receipt.status === "approved" ? "Card transfer — approved" : "Card transfer — rejected";
                         order.total = receipt.payableMinor;
@@ -213,9 +214,7 @@ export default function OrdersContent({
                             orders.filter(
                                 (o) =>
                                     o.status ===
-                                    "confirmed" ||
-                                    o.status ===
-                                    "provisioning"
+                                    "confirmed"
                             ).length
                         }
                     />
@@ -303,20 +302,8 @@ export default function OrdersContent({
                         )}
                     </FilterButton>
 
-                    <FilterButton
-                        active={
-                            filter ===
-                            "provisioning"
-                        }
-                        onClick={() =>
-                            setFilter(
-                                "provisioning"
-                            )
-                        }
-                    >
-                        {t(
-                            "filters.provisioning"
-                        )}
+                    <FilterButton active={filter === "active"} onClick={() => setFilter("active")}>
+                        {t("status.active")}
                     </FilterButton>
 
                     <FilterButton
