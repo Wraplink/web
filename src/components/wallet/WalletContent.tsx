@@ -3,9 +3,10 @@
 import {useCallback, useEffect, useRef, useState} from "react";
 import {ArrowDownCircle, ArrowUpCircle, RefreshCw, Wallet} from "lucide-react";
 import {useTranslations} from "next-intl";
+import {listPaymentCards,type PaymentCard} from "@/lib/api/paymentCards";
 
 import {
-    createWalletDeposit,
+    submitWalletCardReceipt,
     getWalletBalance,
     getWalletDeposits,
     getWalletTransactions,
@@ -30,6 +31,10 @@ export default function WalletContent({locale}: Props) {
     const [deposits, setDeposits] = useState<WalletDeposit[]>([]);
     const [filter, setFilter] = useState<Filter>("all");
     const [amount, setAmount] = useState("");
+    const [cards,setCards]=useState<PaymentCard[]>([]);
+    const [selectedCardId,setSelectedCardId]=useState("");
+    const [receipt,setReceipt]=useState<File|null>(null);
+    const [method,setMethod]=useState<"card"|"isp"|"crypto">("card");
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState("");
@@ -38,14 +43,17 @@ export default function WalletContent({locale}: Props) {
 
     const refresh = useCallback(async () => {
         try {
-            const [nextBalance, nextTransactions, nextDeposits] = await Promise.all([
+            const [nextBalance, nextTransactions, nextDeposits,availableCards] = await Promise.all([
                 getWalletBalance(),
                 getWalletTransactions(),
                 getWalletDeposits(),
+                listPaymentCards(),
             ]);
             setBalance(nextBalance);
             setTransactions(nextTransactions);
             setDeposits(nextDeposits);
+            setCards(availableCards);
+            setSelectedCardId(current=>availableCards.some(card=>card.id===current)?current:availableCards[0]?.id??"");
             setError("");
         } catch (err) {
             console.error("Could not load wallet:", err);
@@ -67,15 +75,17 @@ export default function WalletContent({locale}: Props) {
             return;
         }
 
+        if(!receipt||!selectedCardId||method!=="card"){setError(locale==="fa"?"کارت مقصد و تصویر رسید الزامی است":"Select a destination card and upload a receipt");return}
         setSubmitting(true);
         setError("");
         setMessage("");
         // Keep the same key across retries; never create duplicate deposits on a timeout.
         if (!pendingKey.current) pendingKey.current = crypto.randomUUID();
         try {
-            const request = await createWalletDeposit(value, pendingKey.current);
+            const request = await submitWalletCardReceipt(value,selectedCardId,receipt,pendingKey.current);
             setMessage(t("requestCreated", {id: request.id.slice(0, 8)}));
             setAmount("");
+            setReceipt(null);
             pendingKey.current = null;
             await refresh();
         } catch (err) {
@@ -140,8 +150,10 @@ export default function WalletContent({locale}: Props) {
                         }}
                         className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 outline-none focus:border-cyan-400"
                         placeholder="500000"/>
+                    <fieldset className="mt-5 space-y-2"><legend className="mb-2 font-semibold">{locale==="fa"?"روش پرداخت":"Payment method"}</legend>{(["card","isp","crypto"] as const).map(value=><label key={value} className="flex items-center gap-2 text-sm"><input type="radio" checked={method===value} onChange={()=>setMethod(value)}/>{value==="card"?(locale==="fa"?"کارت به کارت":"Card to card"):value==="isp"?"ISP":"Cryptocurrency"}{value!=="card"&&<span className="text-amber-300">(Coming soon)</span>}</label>)}</fieldset>
+                    {method==="card"&&<div className="mt-5 space-y-3"><p className="text-sm font-semibold">{locale==="fa"?"کارت مقصد":"Destination bank card"}</p>{cards.map(card=><button key={card.id} type="button" onClick={()=>{setSelectedCardId(card.id);pendingKey.current=null}} className={`w-full rounded-xl border p-4 text-left ${selectedCardId===card.id?"border-cyan-400 bg-cyan-400/10":"border-white/15"}`}><div className="text-sm">{card.bankName} · {card.cardholderName}</div><div dir="ltr" className="mt-2 font-mono">{card.cardNumber}</div></button>)}{cards.length===0&&<p className="text-amber-300">No destination card configured.</p>}<label className="block text-sm">{locale==="fa"?"تصویر رسید پرداخت (حداکثر ۵ مگابایت)":"Payment receipt (max 5 MB)"}<input type="file" accept="image/png,image/jpeg,image/webp,application/pdf" className="mt-2 block w-full text-sm" onChange={event=>{const file=event.target.files?.[0]??null;setReceipt(file&&file.size>0&&file.size<=5*1024*1024&&["image/png","image/jpeg","image/webp","application/pdf"].includes(file.type)?file:null);pendingKey.current=null}}/></label></div>}
                     <p className="mt-4 text-sm leading-6 text-yellow-200/80">{t("depositNotice")}</p>
-                    <button type="button" onClick={() => void submitDeposit()} disabled={submitting || loading}
+                    <button type="button" onClick={() => void submitDeposit()} disabled={submitting || loading || method!=="card" || !receipt || !selectedCardId}
                         className="mt-8 w-full rounded-xl bg-cyan-400 py-3 font-bold text-black transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-50">
                         {submitting ? t("submitting") : t("requestDeposit")}
                     </button>
