@@ -31,6 +31,7 @@ import {
 } from "@/i18n/navigation";
 
 import {apiClient} from "@/lib/api/client";
+import {getNotifications} from "@/lib/notifications";
 
 import {
     clearAuthSession,
@@ -119,6 +120,8 @@ export default function UserSidebar({
         return subscribeAuth(setUser);
     }, []);
 
+    const [unreadNotifications,setUnreadNotifications]=useState(0);
+    useEffect(()=>{if(!user)return;let active=true;const refresh=()=>{void getNotifications(1).then(data=>{if(active)setUnreadNotifications(data.unreadCount)}).catch(()=>{})};refresh();const timer=setInterval(refresh,30000);return()=>{active=false;clearInterval(timer)}},[user]);
     const [canAdmin, setCanAdmin] = useState(false);
     useEffect(() => {
         if (!user) {return;}
@@ -288,6 +291,7 @@ export default function UserSidebar({
                                             `items.${item.key}`
                                         )}
                                     </span>
+                                    {item.key==="notifications"&&unreadNotifications>0&&<span aria-label={`${unreadNotifications} unread notifications`} className="ml-auto rounded-full bg-red-500 px-2 py-0.5 text-xs font-bold text-white">{unreadNotifications>99?"99+":unreadNotifications}</span>}
                                 </Link>
                             );
                         })}
