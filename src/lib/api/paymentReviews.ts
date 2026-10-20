@@ -2,6 +2,8 @@ import {apiClient} from "@/lib/api/client";
 
 export type PendingReceipt = {
     id: string;
+    orderCount?: number;
+    paymentGroupId?: string | null;
     subscriptionId: string;
     userId: string;
     filename: string;
