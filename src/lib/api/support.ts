@@ -1,6 +1,6 @@
 import {apiClient} from "@/lib/api/client";
 export type TicketStatus="open"|"pending"|"resolved"|"closed";
-export type SupportTicket={id:string;ticketNumber:number;userId:string;email:string;fullName:string;orderNumber:number|null;subject:string;category:string;priority:"low"|"medium"|"high";status:TicketStatus;createdAt:string;updatedAt:string};
+export type SupportTicket={id:string;ticketNumber:number;userId:string;email:string;fullName:string;orderNumber:number|null;subject:string;category:string;priority:"low"|"medium"|"high";status:TicketStatus;customerUnread:boolean;staffUnread:boolean;createdAt:string;updatedAt:string};
 export type SupportMessage={id:string;senderId:string;sender:"user"|"support";message:string;date:string};
 export type TicketDetail={ticket:SupportTicket;messages:SupportMessage[]};
 export type TicketFilters={search?:string;status?:string;limit?:number;offset?:number};
