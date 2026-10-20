@@ -2,6 +2,6 @@ import LoginContent from "@/components/auth/LoginContent";
 
 export default function LoginPage() {
     return (
-        <LoginContent locale="fa"/>
+        <LoginContent locale="en"/>
     );
 }
