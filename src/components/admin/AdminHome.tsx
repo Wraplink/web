@@ -18,6 +18,7 @@ export default function AdminHome({locale}:{locale:string}){
  });return()=>{mounted=false}},[]);
  const sections=[
   {href:"/admin/users",title:"Users",description:"Search customer accounts and review status",count:counts.users},
+  {href:"/admin/support",title:"Support tickets",description:"Review customer requests, reply and update ticket status"},
   {href:"/admin/orders",title:"Orders",description:"Inspect subscriptions and payment status"},
   {href:"/admin/payment-methods",title:locale==="fa"?"روش‌های پرداخت":"Payment methods",description:locale==="fa"?"مدیریت کارت‌های مقصد کارت‌به‌کارت":"Manage card-to-card destination accounts"},
   {href:"/admin/payment-reviews",title:"Payment reviews",description:"Verify bank transfer receipts",count:counts.reviews},
