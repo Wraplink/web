@@ -31,3 +31,12 @@ export async function getCardReceipt(subscriptionId: string): Promise<CardReceip
         throw error;
     }
 }
+
+export async function submitGroupedCardReceipt(subscriptionIds:string[],file:File,paymentCardId:string):Promise<CardReceiptResult> {
+ const form=new FormData();
+ form.append("subscriptionIds",JSON.stringify(subscriptionIds));
+ form.append("receipt",file);
+ form.append("paymentCardId",paymentCardId);
+ const {data}=await apiClient.post<CardReceiptResult>("/api/v1/me/checkout/card-receipt",form);
+ return data;
+}
