@@ -6,6 +6,7 @@ import {Link, useRouter} from "@/i18n/navigation";
 import {clearBasket, getBasket, type BasketItem} from "@/lib/basket";
 import {getMarketPlans, createPendingSubscription, paySubscriptionWithWallet, type MarketPlan} from "@/lib/api/plans";
 import {quoteDiscount, submitCardReceipt, type DiscountQuote} from "@/lib/api/checkout";
+import {listPaymentCards, type PaymentCard} from "@/lib/api/paymentCards";
 
 type Props = {locale: string};
 
@@ -20,6 +21,8 @@ export default function CheckoutContent({locale}: Props) {
     const router = useRouter();
     const [items, setItems] = useState<BasketItem[]>([]);
     const [plans, setPlans] = useState<MarketPlan[]>([]);
+    const [cards, setCards] = useState<PaymentCard[]>([]);
+    const [selectedCardId, setSelectedCardId] = useState("");
     const [checking, setChecking] = useState(true);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -38,7 +41,9 @@ export default function CheckoutContent({locale}: Props) {
         setChecking(true);
         setError("");
         try {
-            const catalog = await getMarketPlans();
+            const [catalog, availableCards] = await Promise.all([getMarketPlans(),listPaymentCards()]);
+            setCards(availableCards);
+            setSelectedCardId(current => availableCards.some(card => card.id === current) ? current : (availableCards[0]?.id ?? ""));
             setItems(getBasket());
             setPlans(catalog);
         } catch {
@@ -61,7 +66,7 @@ export default function CheckoutContent({locale}: Props) {
     const total = valid ? lines.reduce((sum, {item, plan}) => sum + item.quantity * plan!.priceMinor, 0) : 0;
 
     const units = useMemo(() => lines.flatMap(({item, plan}) => Array.from({length: Math.min(item.quantity, 100)}, () => plan)), [lines]);
-    const canSubmit = !loading && method === "card" && valid && units.length > 0 && units.length <= 100 && receipts.length === units.length && !receiptError;
+    const canSubmit = !loading && method === "card" && valid && units.length > 0 && units.length <= 100 && receipts.length === units.length && !!selectedCardId && !receiptError;
     const onReceiptChange = (files: FileList | null) => {
         setReceipts([]);
         setReceiptError("");
@@ -108,7 +113,7 @@ export default function CheckoutContent({locale}: Props) {
         try {
             for (let i = submittedCount; i < units.length; i++) {
                 const id = await prepareSubscription(i);
-                const saved = await submitCardReceipt(id, receipts[i], units.length === 1 ? discountCode : "");
+                const saved = await submitCardReceipt(id, receipts[i], units.length === 1 ? discountCode : "", selectedCardId);
                 if (saved.status !== "pending_review") throw new Error("Receipt was not accepted.");
                 setSubmittedCount(i + 1);
             }
@@ -157,6 +162,20 @@ export default function CheckoutContent({locale}: Props) {
                                 ))}
                             </div>
                             {method === "card" && <>
+                                <div className="mt-5">
+                                    <h3 className="text-base font-bold">{locale === "fa" ? "انتخاب کارت مقصد" : "Choose destination card"}</h3>
+                                    <p className="mt-1 text-xs text-gray-400">{locale === "fa" ? "وجه را به کارت انتخاب‌شده انتقال دهید و سپس رسید را بارگذاری کنید." : "Transfer the amount to the selected card, then attach your receipt."}</p>
+                                    <div className="mt-3 grid gap-3">
+                                        {cards.map(card => <button key={card.id} type="button" aria-pressed={selectedCardId===card.id} onClick={()=>setSelectedCardId(card.id)}
+                                            className={`w-full rounded-2xl border-2 p-5 text-left shadow-lg transition ${selectedCardId===card.id ? "border-cyan-300 bg-gradient-to-br from-cyan-950 via-slate-800 to-indigo-950 ring-2 ring-cyan-400/30" : "border-white/20 bg-gradient-to-br from-slate-800 to-slate-950 hover:border-cyan-400/50"}`}>
+                                            <div className="flex items-center justify-between"><span className="text-xs uppercase tracking-widest text-cyan-200">{card.bankName}</span><span className="text-xl" aria-hidden="true">💳</span></div>
+                                            <div dir="ltr" className="mt-5 text-center font-mono text-lg font-bold tracking-wider text-white">{card.cardNumber.replace(/(\\d{4})(?=\\d)/g,"$1 ")}</div>
+                                            <div className="mt-4 flex items-center justify-between text-xs text-gray-300"><span>{card.cardholderName}</span><span>{selectedCardId===card.id ? (locale==="fa"?"✓ انتخاب شده":"✓ Selected") : (locale==="fa"?"انتخاب کارت":"Select card")}</span></div>
+                                        </button>)}
+                                    </div>
+                                    {cards.length===0 && <p role="alert" className="mt-3 text-sm text-amber-300">{locale==="fa"?"کارت مقصد فعالی ثبت نشده است.":"No active payment card is configured. Please contact support."}</p>}
+                                </div>
+
                                 <div className="mt-5 rounded-2xl border-2 border-dashed border-cyan-400/70 bg-cyan-400/10 p-5 text-center">
                                     <div className="text-3xl" aria-hidden="true">📎</div>
                                     <h3 className="mt-2 text-base font-bold">{locale === "fa" ? "پیوست رسید پرداخت" : "Attach your payment receipt"}</h3>
