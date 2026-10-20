@@ -61,13 +61,14 @@ const initialOrders: Order[] = [];
 
 function toOrder(subscription: UserSubscription): Order {
     const status: OrderStatus = subscription.status === "pending_payment" ? "pending" :
+        subscription.status === "confirmed" ? "confirmed" :
         subscription.status === "active" ? "active" :
         subscription.status === "cancelled" ? "cancelled" : "delivered";
     return {
         id: subscription.id,
         date: subscription.createdAt,
         status,
-        payment: subscription.status === "pending_payment" ? "Unpaid" : "Subscription",
+        payment: subscription.status === "pending_payment" ? "Unpaid" : subscription.status === "confirmed" ? "Paid — reserved for next activation" : "Subscription",
         total: subscription.priceMinor,
         currency: subscription.currency,
         items: [{id: subscription.planCode, name: subscription.planName, quantity: 1,
@@ -101,7 +102,7 @@ export default function OrdersContent({
                     const receipt = await getCardReceipt(subscription.id);
                     if (receipt) {
                         order.receiptStatus = receipt.status;
-                        if (subscription.status === "pending_payment" && receipt.status === "approved") order.status = "confirmed";
+                        if (subscription.status === "confirmed") order.status = "confirmed";
                         order.payment = receipt.status === "pending_review" ? "Card transfer — awaiting review" :
                             receipt.status === "approved" ? "Card transfer — approved" : "Card transfer — rejected";
                         order.total = receipt.payableMinor;
