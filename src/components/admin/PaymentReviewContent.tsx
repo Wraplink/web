@@ -52,7 +52,7 @@ export default function PaymentReviewContent({locale}: {locale: string}) {
             await refresh();
         } catch (e) {
             const status = (e as {response?: {status?: number}})?.response?.status;
-            setError(status === 409 ? "Receipt changed or the user already has an active subscription. Refresh and retry." :
+            setError(status === 409 ? "Receipt or group changed. Refresh and retry." :
                 "Review could not be completed.");
         } finally { setBusy(null); }
     }
@@ -77,11 +77,12 @@ export default function PaymentReviewContent({locale}: {locale: string}) {
                     <article key={item.id} className="rounded-xl border border-white/15 bg-white/5 p-5">
                         <div className="flex flex-wrap items-center justify-between gap-4">
                             <div className="min-w-0">
-                                <h2 className="break-all font-semibold">{item.filename}</h2>
-                                <p className="mt-1 text-sm text-gray-400">Subscription: {item.subscriptionId}</p>
+                                <h2 className="break-all font-semibold">{item.orderCount && item.orderCount > 1 ? (locale === "fa" ? `پرداخت گروهی — ${item.orderCount} سفارش` : `Grouped payment — ${item.orderCount} orders`) : (locale === "fa" ? "پرداخت تک‌سفارش" : "Single order payment")}</h2>
+                                <p className="mt-1 text-sm text-gray-300">{item.filename}</p>
+                                <p className="mt-1 text-sm text-gray-400">{item.paymentGroupId ? (locale === "fa" ? "شناسه پرداخت گروهی:" : "Payment group:") : "Subscription:"} {item.paymentGroupId ?? item.subscriptionId}</p>
                                 <p className="text-sm text-gray-400">Customer: {item.userId}</p>
                                 <p className="text-sm text-gray-400">Submitted: {new Date(item.createdAt).toLocaleString()}</p>
-                                <p className="mt-2 font-semibold">{money(item.payableMinor, item.currency)}</p>
+                                <p className="mt-2 font-semibold text-cyan-200">{locale === "fa" ? "مبلغ کل قابل بررسی:" : "Total payment to verify:"} {money(item.payableMinor, item.currency)}</p>
                             </div>
                             <div className="flex flex-wrap gap-2">
                                 <button type="button" disabled={busy !== null} onClick={() => void showAttachment(item)}
