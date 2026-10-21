@@ -202,3 +202,20 @@ body {
     animation-iteration-count: 1 !important;
   }
 }
+/* Wraplink cinematic hero: CSS artwork keeps the page fast and responsive. */
+.wraplink-hero {background:radial-gradient(ellipse at 78% 36%,#132e65 0%,#0a1633 36%,#070b18 75%)}
+.wraplink-hero-grid {background-image:linear-gradient(rgba(0,229,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.035) 1px,transparent 1px);background-size:52px 52px;mask-image:linear-gradient(to bottom,transparent,#000 45%,transparent)}
+.wraplink-hero-aura {background:radial-gradient(ellipse at 83% 45%,rgba(99,46,211,.23),transparent 45%),radial-gradient(ellipse at 65% 60%,rgba(0,229,255,.10),transparent 45%)}
+.wraplink-hero-art {filter:drop-shadow(0 20px 65px rgba(0,170,255,.16))}
+.wraplink-planet {position:absolute;inset:19%;border-radius:50%;border:1px solid rgba(67,215,255,.42);background:radial-gradient(circle at 30% 25%,rgba(47,148,251,.35),rgba(9,27,76,.78) 55%,rgba(3,10,30,.95) 75%);box-shadow:inset -24px -25px 70px rgba(0,0,0,.7),0 0 80px rgba(0,154,255,.22),0 0 0 12px rgba(0,229,255,.025)}
+.wraplink-planet:before,.wraplink-planet:after {content:"";position:absolute;inset:13%;border-radius:50%;border:1px solid rgba(0,229,255,.2);transform:rotate(-27deg) scaleX(.55)}
+.wraplink-planet:after {transform:rotate(32deg) scaleY(.52);inset:5%}
+.wraplink-orbit {position:absolute;inset:12% 2%;border:2px solid rgba(0,229,255,.45);border-radius:50%;transform:rotate(-27deg) scaleY(.49);box-shadow:0 0 28px rgba(0,229,255,.22)}
+.wraplink-orbit-two {inset:6% 9%;border-color:rgba(168,85,247,.65);transform:rotate(36deg) scaleY(.62)}
+.wraplink-orbit-dot {position:absolute;z-index:12;top:66%;left:10%;height:17px;width:17px;border-radius:50%;background:#e2a4ff;box-shadow:0 0 20px #b15cff,0 0 55px #b15cff}
+.wraplink-lion-halo {position:absolute;inset:26%;border-radius:50%;background:rgba(0,229,255,.13);filter:blur(46px)}
+.wraplink-spark {position:absolute;height:5px;width:5px;border-radius:50%;background:#8beeff;box-shadow:0 0 20px #00e5ff}
+.wraplink-spark-one {top:14%;left:35%}.wraplink-spark-two {bottom:19%;right:17%}
+@media(prefers-reduced-motion:no-preference){.wraplink-hero-art img {animation:wraplink-float 7s ease-in-out infinite}.wraplink-orbit-dot {animation:wraplink-glimmer 4s ease-in-out infinite}}
+@keyframes wraplink-float{50%{transform:translateY(-9px)}}
+@keyframes wraplink-glimmer{50%{opacity:.55;box-shadow:0 0 32px #b15cff}}
