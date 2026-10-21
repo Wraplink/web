@@ -12,6 +12,11 @@ export default function AdminNetworkContent(){
  const [nodes,setNodes]=useState<DNSNode[]>([]);
  const [domains,setDomains]=useState<DomainPolicy[]>([]);
  const [revision,setRevision]=useState(0);
+ const [search,setSearch]=useState("");
+ const [page,setPage]=useState(1);
+ const [pageSize,setPageSize]=useState(25);
+ const [total,setTotal]=useState(0);
+ const [policiesLoading,setPoliciesLoading]=useState(false);
  const [domain,setDomain]=useState("");
  const [mode,setMode]=useState<DomainPolicy["mode"]>("normal");
  const [ip,setIp]=useState("");
@@ -22,19 +27,27 @@ export default function AdminNetworkContent(){
  const [error,setError]=useState("");
  async function load(){
   setLoading(true);setError("");
-  try{const {data}=await apiClient.get<{nodes:DNSNode[]}>("/api/v1/admin/network/dns-controls");setNodes(data.nodes);const policies=await apiClient.get<{revision:number;domains:DomainPolicy[]}>("/api/v1/admin/network/domains");setDomains(policies.data.domains);setRevision(policies.data.revision)}
+  try{const {data}=await apiClient.get<{nodes:DNSNode[]}>("/api/v1/admin/network/dns-controls");setNodes(data.nodes);await loadPolicies(search,page,pageSize)}
   catch(e){setError((e as {response?:{status?:number}}).response?.status===403?"Access administrator permission required":"Unable to load DNS controllers")}
   finally{setLoading(false)}
  }
+ async function loadPolicies(query:string,currentPage:number,size:number){
+  setPoliciesLoading(true);
+  try{
+   const {data}=await apiClient.get<{revision:number;domains:DomainPolicy[];total?:number;page?:number;pageSize?:number}>("/api/v1/admin/network/domains",{params:{search:query,page:currentPage,pageSize:size}});
+   setDomains(data.domains);setRevision(data.revision);setTotal(data.total??data.domains.length);
+  }catch{setError("Unable to load domain policies")}finally{setPoliciesLoading(false)}
+ }
  useEffect(()=>{void load()},[]);
+ useEffect(()=>{void loadPolicies(search,page,pageSize)},[search,page,pageSize]);
  async function save(){setSaving(true);setError("");setMessage("");try{
  const policy:DomainPolicy={domain:domain.trim().toLowerCase(),mode};
  if(mode==="specific_ip")policy.specific_ip=ip.trim();
  if(mode==="route")policy.route={destination_ip:ip.trim(),protocol};
  await apiClient.put("/api/v1/admin/network/domains",policy);
- setDomain("");setIp("");setMessage("Policy saved. DNS Control will apply it after synchronization.");await load();
+ setDomain("");setIp("");setMessage("Policy saved. DNS Control will apply it after synchronization.");await loadPolicies(search,page,pageSize);
  }catch(e){setError((e as {response?:{data?:{error?:string}}}).response?.data?.error||"Unable to save policy")}finally{setSaving(false)}}
- async function remove(name:string){if(!window.confirm("Delete policy for "+name+"?"))return;setError("");try{await apiClient.delete("/api/v1/admin/network/domains/"+encodeURIComponent(name));await load()}catch{setError("Unable to delete policy")}}
+ async function remove(name:string){if(!window.confirm("Delete policy for "+name+"?"))return;setError("");try{await apiClient.delete("/api/v1/admin/network/domains/"+encodeURIComponent(name));if(domains.length===1&&page>1)setPage(page-1);else await loadPolicies(search,page,pageSize)}catch{setError("Unable to delete policy")}}
  function edit(p:DomainPolicy){setDomain(p.domain);setMode(p.mode);setIp(p.mode==="specific_ip"?p.specific_ip||"":p.route?.destination_ip||"");setProtocol(p.route?.protocol||"tcp")}
 
  return <main className="mx-auto max-w-5xl px-6 py-12">
@@ -61,7 +74,17 @@ export default function AdminNetworkContent(){
    <div className="md:col-span-2"><button disabled={saving} className="rounded-lg bg-cyan-600 px-5 py-2 text-white disabled:opacity-50">{saving?"Saving…":"Save domain policy"}</button></div>
   </form>
   {message&&<p role="status" className="mt-3 text-green-400">{message}</p>}
+  <div className="mt-5 flex flex-wrap items-end justify-between gap-3">
+   <label className="text-sm">Search domains<input type="search" value={search} onChange={e=>{setSearch(e.target.value);setPage(1)}} placeholder="Search by domain" className="mt-1 block rounded-lg border bg-transparent p-2"/></label>
+   <label className="text-sm">Per page<select value={pageSize} onChange={e=>{setPageSize(Number(e.target.value));setPage(1)}} className="mt-1 block rounded-lg border bg-gray-900 p-2">{[10,25,50,100].map(n=><option key={n} value={n}>{n}</option>)}</select></label>
+  </div>
+  {policiesLoading&&<p role="status" className="mt-3 text-sm text-gray-400">Loading policies…</p>}
+  {!policiesLoading&&domains.length===0&&<p className="mt-3 text-sm text-gray-400">No matching domains found.</p>}
   <div className="mt-5 space-y-2">{domains.map(p=><div key={p.domain} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/10 p-3"><div><strong>{p.domain}</strong><p className="text-sm text-gray-400">{p.mode}{p.specific_ip?" · "+p.specific_ip:""}{p.route?" · "+p.route.destination_ip+" / "+p.route.protocol:""}</p></div><div className="flex gap-2"><button type="button" onClick={()=>edit(p)} className="rounded border px-3 py-1">Edit</button><button type="button" onClick={()=>void remove(p.domain)} className="rounded border border-red-400/40 px-3 py-1 text-red-300">Delete</button></div></div>)}</div>
+  <nav aria-label="Domain policy pages" className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm">
+   <span>{total===0?"0 results":`${(page-1)*pageSize+1}–${Math.min(page*pageSize,total)} of ${total}`}</span>
+   <div className="flex items-center gap-3"><button type="button" disabled={page<=1||policiesLoading} onClick={()=>setPage(p=>Math.max(1,p-1))} className="rounded border px-3 py-1 disabled:opacity-40">Previous</button><span>Page {page} of {Math.max(1,Math.ceil(total/pageSize))}</span><button type="button" disabled={page>=Math.ceil(total/pageSize)||policiesLoading} onClick={()=>setPage(p=>p+1)} className="rounded border px-3 py-1 disabled:opacity-40">Next</button></div>
+  </nav>
   </section>
   <div className="mt-8 rounded-xl border border-white/15 p-5"><h2 className="font-semibold">Edge agents and routing</h2><p className="mt-2 text-sm text-gray-400">Live agent inventory, allocation policies and routing actions require a separately authenticated dns-control integration. No operational controls are exposed until that connection is secured.</p></div>
   <Link href="/admin" locale={locale} className="mt-8 inline-block text-cyan-300">Back to admin overview</Link>
