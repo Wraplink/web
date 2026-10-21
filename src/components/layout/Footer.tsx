@@ -14,7 +14,8 @@ export default function Footer() {
                 <div className="flex flex-col justify-between gap-10 md:flex-row">
 
                     <div>
-                        <h3 className="text-2xl font-bold text-white">
+                        <h3 className="flex items-center gap-3 text-2xl font-bold text-white">
+                            <img src="/wraplink-lion.svg" alt="" width={44} height={44} />
                             WrapLink
                         </h3>
 
