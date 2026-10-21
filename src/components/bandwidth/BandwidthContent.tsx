@@ -16,6 +16,7 @@ import {
     useState,
 } from "react";
 import {useTranslations} from "next-intl";
+import {Link} from "@/i18n/navigation";
 import {isAxiosError} from "axios";
 
 import {
@@ -159,7 +160,7 @@ export default function BandwidthContent() {
             <div className="rounded-3xl border border-amber-400/20 bg-white/5 p-8">
                 <h1 className="text-3xl font-bold">{t("title")}</h1>
                 <p role="status" className="mt-5 text-amber-200">{error}</p>
-                <a href="/market" className="mt-6 inline-block rounded-xl bg-cyan-400 px-5 py-3 font-semibold text-black">Browse plans</a>
+                <Link href="/market" className="mt-6 inline-block rounded-xl bg-cyan-400 px-5 py-3 font-semibold text-black">Browse plans</Link>
             </div>
         </section>;
     }
