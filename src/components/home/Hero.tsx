@@ -28,15 +28,8 @@ export default async function Hero({locale}: HeroProps) {
                         <Link href="/pricing" className="rounded-xl border border-white/25 bg-white/5 px-7 py-4 font-semibold text-white backdrop-blur transition hover:border-cyan-300/70 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-300">{t("viewPlans")}</Link>
                     </div>
                 </div>
-                <div className="wraplink-hero-art relative mx-auto flex aspect-square w-full max-w-[540px] items-center justify-center" aria-hidden="true">
-                    <div className="wraplink-orbit wraplink-orbit-one"/>
-                    <div className="wraplink-orbit wraplink-orbit-two"/>
-                    <div className="wraplink-planet"/>
-                    <div className="wraplink-orbit-dot"/>
-                    <div className="wraplink-lion-halo"/>
-                    <img src="/wraplink-lion.svg" alt="" className="relative z-10 w-[58%] drop-shadow-[0_0_48px_rgba(0,229,255,.4)]"/>
-                    <div className="wraplink-spark wraplink-spark-one"/>
-                    <div className="wraplink-spark wraplink-spark-two"/>
+                <div className="relative mx-auto flex w-full max-w-[650px] items-center justify-center" aria-hidden="true">
+                    <img src="/wraplink-roaring-hero.svg" alt="" className="w-full drop-shadow-[0_0_65px_rgba(0,180,255,.25)]" />
                 </div>
             </div>
             <div className="mx-auto grid max-w-7xl gap-3 px-6 pb-10 md:grid-cols-3">
