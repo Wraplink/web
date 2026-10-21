@@ -4,7 +4,7 @@ import {useEffect,useState} from "react";
 import {useLocale} from "next-intl";
 import {apiClient} from "@/lib/api/client";
 
-type DomainPolicy={domain:string;mode:"normal"|"hijack"|"route"|"specific_ip";specific_ip?:string;route?:{destination_ip:string;protocol:"tcp"|"udp";destination_port_start?:number;destination_port_end?:number};connection_modes?:string[]};
+type DomainPolicy={domain:string;mode:"normal"|"hijack"|"route"|"specific_ip";specific_ip?:string;route?:{destination_ip:string;protocol:"tcp"|"udp"|"tcp_udp";destination_port_start?:number;destination_port_end?:number};connection_modes?:string[]};
 type DNSNode={id:string;region:string;addresses:string[];lastSeenAt:string;online:boolean};
 
 export default function AdminNetworkContent(){
@@ -20,7 +20,7 @@ export default function AdminNetworkContent(){
  const [domain,setDomain]=useState("");
  const [mode,setMode]=useState<DomainPolicy["mode"]>("normal");
  const [ip,setIp]=useState("");
- const [protocol,setProtocol]=useState<"tcp"|"udp">("tcp");
+ const [protocol,setProtocol]=useState<"tcp"|"udp"|"tcp_udp">("tcp");
  const [saving,setSaving]=useState(false);
  const [message,setMessage]=useState("");
  const [loading,setLoading]=useState(true);
@@ -70,7 +70,7 @@ export default function AdminNetworkContent(){
    <label className="text-sm">Domain<input required value={domain} onChange={e=>setDomain(e.target.value)} placeholder="example.com" className="mt-1 w-full rounded-lg border bg-transparent p-2"/></label>
    <label className="text-sm">Resolution mode<select value={mode} onChange={e=>setMode(e.target.value as DomainPolicy["mode"])} className="mt-1 w-full rounded-lg border bg-gray-900 p-2"><option value="normal">Normal DNS</option><option value="hijack">SNI hijack</option><option value="route">Full route</option><option value="specific_ip">Specific IP</option></select></label>
    {(mode==="specific_ip"||mode==="route")&&<label className="text-sm"> {mode==="route"?"Destination IPv4":"DNS response IP"}<input required value={ip} onChange={e=>setIp(e.target.value)} placeholder="192.0.2.10" className="mt-1 w-full rounded-lg border bg-transparent p-2"/></label>}
-   {mode==="route"&&<label className="text-sm">Protocol<select value={protocol} onChange={e=>setProtocol(e.target.value as "tcp"|"udp")} className="mt-1 w-full rounded-lg border bg-gray-900 p-2"><option value="tcp">TCP</option><option value="udp">UDP</option></select></label>}
+   {mode==="route"&&<label className="text-sm">Protocol<select value={protocol} onChange={e=>setProtocol(e.target.value as "tcp"|"udp"|"tcp_udp")} className="mt-1 w-full rounded-lg border bg-gray-900 p-2"><option value="tcp">TCP</option><option value="udp">UDP</option><option value="tcp_udp">TCP/UDP</option></select></label>}
    <div className="md:col-span-2"><button disabled={saving} className="rounded-lg bg-cyan-600 px-5 py-2 text-white disabled:opacity-50">{saving?"Saving…":"Save domain policy"}</button></div>
   </form>
   {message&&<p role="status" className="mt-3 text-green-400">{message}</p>}
