@@ -5,11 +5,13 @@ import {useLocale} from "next-intl";
 import {apiClient} from "@/lib/api/client";
 
 type DomainPolicy={domain:string;mode:"normal"|"hijack"|"route"|"specific_ip";specific_ip?:string;route?:{destination_ip:string;protocol:"tcp"|"udp"|"tcp_udp";destination_port_start?:number;destination_port_end?:number};connection_modes?:string[]};
+type RouteIP={agentId:string;publicIp:string;enabled:boolean;lastSeenAt:string|null;domain:string;state:string};
 type DNSNode={id:string;region:string;addresses:string[];lastSeenAt:string;online:boolean};
 
 export default function AdminNetworkContent(){
  const locale=useLocale();
  const [nodes,setNodes]=useState<DNSNode[]>([]);
+ const [routeIPs,setRouteIPs]=useState<RouteIP[]>([]);
  const [domains,setDomains]=useState<DomainPolicy[]>([]);
  const [revision,setRevision]=useState(0);
  const [search,setSearch]=useState("");
@@ -27,9 +29,13 @@ export default function AdminNetworkContent(){
  const [error,setError]=useState("");
  async function load(){
   setLoading(true);setError("");
-  try{const {data}=await apiClient.get<{nodes:DNSNode[]}>("/api/v1/admin/network/dns-controls");setNodes(data.nodes);await loadPolicies(search,page,pageSize)}
+  try{const {data}=await apiClient.get<{nodes:DNSNode[]}>("/api/v1/admin/network/dns-controls");setNodes(data.nodes);await Promise.all([loadPolicies(search,page,pageSize),loadRouteIPs()])}
   catch(e){setError((e as {response?:{status?:number}}).response?.status===403?"Access administrator permission required":"Unable to load DNS controllers")}
   finally{setLoading(false)}
+ }
+ async function loadRouteIPs(){
+  try {const {data}=await apiClient.get<{addresses:RouteIP[]}>("/api/v1/admin/network/route-agent-ips");setRouteIPs(data.addresses)}
+  catch {setError("Unable to load route agent IP inventory")}
  }
  async function loadPolicies(query:string,currentPage:number,size:number){
   setPoliciesLoading(true);
@@ -86,7 +92,13 @@ export default function AdminNetworkContent(){
    <div className="flex items-center gap-3"><button type="button" disabled={page<=1||policiesLoading} onClick={()=>setPage(p=>Math.max(1,p-1))} className="rounded border px-3 py-1 disabled:opacity-40">Previous</button><span>Page {page} of {Math.max(1,Math.ceil(total/pageSize))}</span><button type="button" disabled={page>=Math.ceil(total/pageSize)||policiesLoading} onClick={()=>setPage(p=>p+1)} className="rounded border px-3 py-1 disabled:opacity-40">Next</button></div>
   </nav>
   </section>
-  <div className="mt-8 rounded-xl border border-white/15 p-5"><h2 className="font-semibold">Edge agents and routing</h2><p className="mt-2 text-sm text-gray-400">Live agent inventory, allocation policies and routing actions require a separately authenticated dns-control integration. No operational controls are exposed until that connection is secured.</p></div>
+  <section className="mt-8 rounded-xl border border-white/15 p-5">
+   <h2 className="font-semibold">Edge agent public IP inventory</h2>
+   <p className="mt-2 text-sm text-gray-400">Backend-registered routing IPs and their current assignments. Addresses marked free can accept a waiting Full Route domain after allocation is enabled.</p>
+   <div className="mt-4 overflow-x-auto"><table className="w-full text-left text-sm"><thead><tr><th className="p-2">Agent</th><th className="p-2">Public IP</th><th className="p-2">Domain</th><th className="p-2">Status</th></tr></thead>
+   <tbody>{routeIPs.map(item=><tr key={item.agentId+item.publicIp} className="border-t border-white/10"><td className="p-2">{item.agentId}</td><td className="p-2">{item.publicIp}</td><td className="p-2">{item.domain||"Free"}</td><td className="p-2">{!item.enabled?"Disabled":item.state||"Available"}</td></tr>)}</tbody></table></div>
+   {routeIPs.length===0&&<p className="mt-3 text-sm text-gray-400">No edge routing IPs registered yet.</p>}
+  </section>
   <Link href="/admin" locale={locale} className="mt-8 inline-block text-cyan-300">Back to admin overview</Link>
  </main>;
 }
