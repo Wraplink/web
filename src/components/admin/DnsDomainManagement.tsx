@@ -22,7 +22,7 @@ export default function DnsDomainManagement(){
   setError("");try{await dnsDomainsApi.remove(id);await load()}catch(e){setError(e instanceof Error?e.message:"Delete failed")}
  }
  return <section className="mx-auto max-w-5xl space-y-6 p-6 text-white">
-  <header><h1 className="text-2xl font-bold">DNS Domain Management</h1><p className="text-sm text-slate-400">Configure DNS resolution policies for WrapLink.</p></header>
+  <header><h1 className="text-2xl font-bold">DNS Domain Management</h1><p className="text-sm text-slate-400">Configure DNS resolution policies for WrapLink.</p><p role="note" className="mt-3 rounded border border-amber-700 bg-amber-950 p-3 text-amber-100">Rules saved here are not yet synchronized with the active DNS control policy snapshot. Do not rely on these changes for live DNS resolution until synchronization is enabled.</p></header>
   {error&&<p role="alert" className="rounded bg-red-950 p-3 text-red-200">{error}</p>}
   {notice&&<p role="status" className="rounded bg-emerald-950 p-3">{notice}</p>}
   <form onSubmit={save} className="grid gap-3 rounded-xl border border-slate-700 p-4 sm:grid-cols-2">
