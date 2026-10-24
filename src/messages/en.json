@@ -345,7 +345,7 @@
       },
       "dns": {
         "title": "DNS Test",
-        "description": "Resolve example.com using your assigned WrapLink DNS."
+        "description": "Resolve playstation.com using your assigned WrapLink DNS."
       },
       "route": {
         "title": "Route Test",
