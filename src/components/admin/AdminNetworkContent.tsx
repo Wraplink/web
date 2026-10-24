@@ -1,12 +1,14 @@
 "use client";
 import {Link} from "@/i18n/navigation";
-import {useEffect,useState} from "react";
+import {useEffect,useRef,useState} from "react";
 import {useLocale} from "next-intl";
 import {apiClient} from "@/lib/api/client";
 
 type DomainPolicy={domain:string;mode:"normal"|"hijack"|"route"|"specific_ip";specific_ip?:string;route?:{destination_ip?:string;protocol:"tcp"|"udp"|"tcp_udp";destination_port_start?:number;destination_port_end?:number};connection_modes?:string[]};
 type RouteIP={agentId:string;publicIp:string;enabled:boolean;lastSeenAt:string|null;domain:string;state:string};
 type DNSNode={id:string;region:string;addresses:string[];lastSeenAt:string;online:boolean};
+
+const REFRESH_SECONDS=15;
 
 export default function AdminNetworkContent(){
  const locale=useLocale();
@@ -29,11 +31,23 @@ export default function AdminNetworkContent(){
  const [error,setError]=useState("");
  const [deleteTarget,setDeleteTarget]=useState<string|null>(null);
  const [deleting,setDeleting]=useState(false);
+ const [refreshIn,setRefreshIn]=useState(REFRESH_SECONDS);
+ const [checkingNodes,setCheckingNodes]=useState(false);
+ const checkingRef=useRef(false);
+ async function refreshNodes(){
+  if(checkingRef.current)return;
+  checkingRef.current=true;setCheckingNodes(true);
+  try{
+   const {data}=await apiClient.get<{nodes:DNSNode[]}>("/api/v1/admin/network/dns-controls");
+   setNodes(data.nodes);setError("");
+  }catch(e){setError((e as {response?:{status?:number}}).response?.status===403?"Access administrator permission required":"Unable to refresh DNS controller status")}
+  finally{checkingRef.current=false;setCheckingNodes(false);setRefreshIn(REFRESH_SECONDS)}
+ }
  async function load(){
   setLoading(true);setError("");
   try{const {data}=await apiClient.get<{nodes:DNSNode[]}>("/api/v1/admin/network/dns-controls");setNodes(data.nodes);await Promise.all([loadPolicies(search,page,pageSize),loadRouteIPs()])}
   catch(e){setError((e as {response?:{status?:number}}).response?.status===403?"Access administrator permission required":"Unable to load DNS controllers")}
-  finally{setLoading(false)}
+  finally{setLoading(false);setRefreshIn(REFRESH_SECONDS)}
  }
  async function loadRouteIPs(){
   try {const {data}=await apiClient.get<{addresses:RouteIP[]}>("/api/v1/admin/network/route-agent-ips");setRouteIPs(data.addresses)}
@@ -47,6 +61,16 @@ export default function AdminNetworkContent(){
   }catch{setError("Unable to load domain policies")}finally{setPoliciesLoading(false)}
  }
  useEffect(()=>{void load()},[]);
+ useEffect(()=>{
+  const timer=window.setInterval(()=>{
+   if(document.visibilityState!=="visible"||checkingRef.current)return;
+   setRefreshIn(seconds=>{
+    if(seconds<=1){void refreshNodes();return REFRESH_SECONDS}
+    return seconds-1;
+   });
+  },1000);
+  return ()=>window.clearInterval(timer);
+ },[]);
  useEffect(()=>{void loadPolicies(search,page,pageSize)},[search,page,pageSize]);
  async function save(){setSaving(true);setError("");setMessage("");try{
  const policy:DomainPolicy={domain:domain.trim().toLowerCase(),mode};
@@ -59,7 +83,7 @@ export default function AdminNetworkContent(){
  function edit(p:DomainPolicy){setDomain(p.domain);setMode(p.mode);setIp(p.mode==="specific_ip"?p.specific_ip||"":p.route?.destination_ip||"");setProtocol(p.route?.protocol||"tcp")}
 
  return <main className="mx-auto max-w-5xl px-6 py-12">
-  <div className="flex flex-wrap items-center justify-between gap-4"><h1 className="text-3xl font-bold">Network operations</h1><button onClick={()=>void load()} disabled={loading} className="rounded-lg border px-4 py-2">Refresh</button></div>
+  <div className="flex flex-wrap items-center justify-between gap-4"><h1 className="text-3xl font-bold">Network operations</h1><div className="flex items-center gap-3"><span role="status" className="text-sm text-gray-400">{checkingNodes?"Checking DNS controllers…":`Auto-refresh in ${refreshIn}s`}</span><button onClick={()=>{setRefreshIn(REFRESH_SECONDS);void refreshNodes()}} disabled={loading||checkingNodes} className="rounded-lg border px-4 py-2 disabled:opacity-50">Refresh now</button></div></div>
   <p className="mt-3 text-gray-400">DNS controller registration and heartbeat status from the backend registry.</p>
   {error&&<p role="alert" className="mt-4 text-red-400">{error}</p>}
   {loading?<p className="mt-6">Loading controllers…</p>:<div className="mt-6 space-y-3">
