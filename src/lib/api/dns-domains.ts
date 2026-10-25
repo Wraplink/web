@@ -1,4 +1,4 @@
-export type DnsMode = "SNI_HIJACK" | "FULL_ROUTE" | "DIRECT";
+export type DnsMode = "SNI_HIJACK" | "FULL_ROUTE" | "DIRECT" | "BLOCK";
 export type DnsDomain = {
   id: string; domain: string; enabled: boolean; mode: DnsMode;
   agentId: string | null; overrideIp: string | null;
