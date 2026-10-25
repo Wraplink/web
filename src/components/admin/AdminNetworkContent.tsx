@@ -72,15 +72,15 @@ export default function AdminNetworkContent(){
   },1000);
   return ()=>window.clearInterval(timer);
  },[]);
- useEffect(()=>{void loadPolicies(search,page,pageSize)},[search,page,pageSize,modeFilter]);
+ useEffect(()=>{void loadPolicies(search,page,pageSize,modeFilter)},[search,page,pageSize,modeFilter]);
  async function save(){setSaving(true);setError("");setMessage("");try{
  const policy:DomainPolicy={domain:domain.trim().toLowerCase(),mode};
  if(mode==="specific_ip")policy.specific_ip=ip.trim();
  if(mode==="route")policy.route={protocol,...(ip.trim()?{destination_ip:ip.trim()}:{})};
  await apiClient.put("/api/v1/admin/network/domains",policy);
- setDomain("");setIp("");setMessage(mode==="route"?"Full Route policy saved. An agent public IP must be allocated and forwarding acknowledged before DNS can activate this domain.":"Policy saved. DNS Control will apply it after synchronization.");await Promise.all([loadPolicies(search,page,pageSize),loadRouteIPs()]);
+ setDomain("");setIp("");setMessage(mode==="route"?"Full Route policy saved. An agent public IP must be allocated and forwarding acknowledged before DNS can activate this domain.":"Policy saved. DNS Control will apply it after synchronization.");await Promise.all([loadPolicies(search,page,pageSize,modeFilter),loadRouteIPs()]);
  }catch(e){setError((e as {response?:{data?:{error?:string}}}).response?.data?.error||"Unable to save policy")}finally{setSaving(false)}}
- async function remove(name:string){setDeleting(true);setError("");try{await apiClient.delete("/api/v1/admin/network/domains/"+encodeURIComponent(name));if(domains.length===1&&page>1)setPage(page-1);else await Promise.all([loadPolicies(search,page,pageSize),loadRouteIPs()]);setDeleteTarget(null)}catch{setError("Unable to delete policy")}finally{setDeleting(false)}}
+ async function remove(name:string){setDeleting(true);setError("");try{await apiClient.delete("/api/v1/admin/network/domains/"+encodeURIComponent(name));if(domains.length===1&&page>1)setPage(page-1);else await Promise.all([loadPolicies(search,page,pageSize,modeFilter),loadRouteIPs()]);setDeleteTarget(null)}catch{setError("Unable to delete policy")}finally{setDeleting(false)}}
  function edit(p:DomainPolicy){setDomain(p.domain);setMode(p.mode);setIp(p.mode==="specific_ip"?p.specific_ip||"":p.route?.destination_ip||"");setProtocol(p.route?.protocol||"tcp")}
 
  return <main className="mx-auto max-w-5xl px-6 py-12">
