@@ -17,6 +17,7 @@ export default function AdminNetworkContent(){
  const [domains,setDomains]=useState<DomainPolicy[]>([]);
  const [revision,setRevision]=useState(0);
  const [search,setSearch]=useState("");
+ const [modeFilter,setModeFilter]=useState<DomainPolicy["mode"]|"">("");
  const [page,setPage]=useState(1);
  const [pageSize,setPageSize]=useState(25);
  const [total,setTotal]=useState(0);
@@ -45,7 +46,7 @@ export default function AdminNetworkContent(){
  }
  async function load(){
   setLoading(true);setError("");
-  try{const {data}=await apiClient.get<{nodes:DNSNode[]}>("/api/v1/admin/network/dns-controls");setNodes(data.nodes);await Promise.all([loadPolicies(search,page,pageSize),loadRouteIPs()])}
+  try{const {data}=await apiClient.get<{nodes:DNSNode[]}>("/api/v1/admin/network/dns-controls");setNodes(data.nodes);await Promise.all([loadPolicies(search,page,pageSize,modeFilter),loadRouteIPs()])}
   catch(e){setError((e as {response?:{status?:number}}).response?.status===403?"Access administrator permission required":"Unable to load DNS controllers")}
   finally{setLoading(false);setRefreshIn(REFRESH_SECONDS)}
  }
@@ -53,10 +54,10 @@ export default function AdminNetworkContent(){
   try {const {data}=await apiClient.get<{addresses:RouteIP[]}>("/api/v1/admin/network/route-agent-ips");setRouteIPs(data.addresses)}
   catch {setError("Unable to load route agent IP inventory")}
  }
- async function loadPolicies(query:string,currentPage:number,size:number){
+ async function loadPolicies(query:string,currentPage:number,size:number,selectedMode:DomainPolicy["mode"]|""){
   setPoliciesLoading(true);
   try{
-   const {data}=await apiClient.get<{revision:number;domains:DomainPolicy[];total?:number;page?:number;pageSize?:number}>("/api/v1/admin/network/domains",{params:{search:query,page:currentPage,pageSize:size}});
+   const {data}=await apiClient.get<{revision:number;domains:DomainPolicy[];total?:number;page?:number;pageSize?:number}>("/api/v1/admin/network/domains",{params:{search:query,mode:selectedMode,page:currentPage,pageSize:size}});
    setDomains(data.domains);setRevision(data.revision);setTotal(data.total??data.domains.length);
   }catch{setError("Unable to load domain policies")}finally{setPoliciesLoading(false)}
  }
@@ -71,7 +72,7 @@ export default function AdminNetworkContent(){
   },1000);
   return ()=>window.clearInterval(timer);
  },[]);
- useEffect(()=>{void loadPolicies(search,page,pageSize)},[search,page,pageSize]);
+ useEffect(()=>{void loadPolicies(search,page,pageSize)},[search,page,pageSize,modeFilter]);
  async function save(){setSaving(true);setError("");setMessage("");try{
  const policy:DomainPolicy={domain:domain.trim().toLowerCase(),mode};
  if(mode==="specific_ip")policy.specific_ip=ip.trim();
@@ -111,11 +112,12 @@ export default function AdminNetworkContent(){
   {message&&<p role="status" className="mt-3 text-green-400">{message}</p>}
   <div className="mt-5 flex flex-wrap items-end justify-between gap-3">
    <label className="text-sm">Search domains<input type="search" value={search} onChange={e=>{setSearch(e.target.value);setPage(1)}} placeholder="Search by domain" className="mt-1 block rounded-lg border bg-transparent p-2"/></label>
+   <label className="text-sm">Resolution mode filter<select aria-label="Filter by resolution mode" value={modeFilter} onChange={e=>{setModeFilter(e.target.value as DomainPolicy["mode"]|"");setPage(1)}} className="mt-1 block rounded-lg border bg-gray-900 p-2"><option value="">All modes</option><option value="normal">Normal DNS</option><option value="hijack">SNI hijack</option><option value="route">Full route</option><option value="specific_ip">Specific IP</option><option value="block">Block</option></select></label>
    <label className="text-sm">Per page<select value={pageSize} onChange={e=>{setPageSize(Number(e.target.value));setPage(1)}} className="mt-1 block rounded-lg border bg-gray-900 p-2">{[10,25,50,100].map(n=><option key={n} value={n}>{n}</option>)}</select></label>
   </div>
   {policiesLoading&&<p role="status" className="mt-3 text-sm text-gray-400">Loading policies…</p>}
   {!policiesLoading&&domains.length===0&&<p className="mt-3 text-sm text-gray-400">No matching domains found.</p>}
-  <div className="mt-5 space-y-2">{domains.map(p=><div key={p.domain} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/10 p-3"><div><strong>{p.domain}</strong><p className="text-sm text-gray-400">{p.mode}{p.specific_ip?" · "+p.specific_ip:""}{p.route?" · "+(p.route.destination_ip||"Automatic DNS")+" / "+p.route.protocol:""}</p>{p.mode==="route"&&(()=>{const assigned=routeIPs.find(i=>i.domain===p.domain&&i.enabled);return <p className={assigned?.state==="active"?"text-sm text-green-400":"text-sm text-amber-300"}>Routing: {assigned?assigned.state||"Pending": "Waiting for an available agent IP"}{assigned?" · "+assigned.publicIp+" ("+assigned.agentId+")":""}</p>})()}</div><div className="flex gap-2"><button type="button" onClick={()=>edit(p)} className="rounded border px-3 py-1">Edit</button><button type="button" onClick={()=>setDeleteTarget(p.domain)} className="rounded border border-red-400/40 px-3 py-1 text-red-300">Delete</button></div></div>)}</div>
+  <div className="mt-5 space-y-2">{domains.map(p=><div key={p.domain} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/10 p-3"><div><strong>{p.domain}</strong><p className="text-sm text-gray-400">{p.mode}{p.specific_ip?" · "+p.specific_ip:""}{p.route?" · "+(p.route.destination_ip||"Automatic DNS")+" / "+p.route.protocol:""}</p>{p.mode==="route"&&(()=>{const assigned=routeIPs.find(i=>i.domain===p.domain);return <p className={assigned?.state==="active"&&assigned.enabled?"text-sm text-green-400":"text-sm text-amber-300"}>Allocated IP: {assigned?.publicIp||"Not assigned"} · Routing: {assigned?(assigned.enabled?assigned.state||"Pending":"Disabled"):"Waiting for an available agent IP"}{assigned?" · Agent: "+assigned.agentId:""}</p>})()}</div><div className="flex gap-2"><button type="button" onClick={()=>edit(p)} className="rounded border px-3 py-1">Edit</button><button type="button" onClick={()=>setDeleteTarget(p.domain)} className="rounded border border-red-400/40 px-3 py-1 text-red-300">Delete</button></div></div>)}</div>
   <nav aria-label="Domain policy pages" className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm">
    <span>{total===0?"0 results":`${(page-1)*pageSize+1}–${Math.min(page*pageSize,total)} of ${total}`}</span>
    <div className="flex items-center gap-3"><button type="button" disabled={page<=1||policiesLoading} onClick={()=>setPage(p=>Math.max(1,p-1))} className="rounded border px-3 py-1 disabled:opacity-40">Previous</button><span>Page {page} of {Math.max(1,Math.ceil(total/pageSize))}</span><button type="button" disabled={page>=Math.ceil(total/pageSize)||policiesLoading} onClick={()=>setPage(p=>p+1)} className="rounded border px-3 py-1 disabled:opacity-40">Next</button></div>
