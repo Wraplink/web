@@ -4,7 +4,7 @@ import {useEffect,useRef,useState} from "react";
 import {useLocale} from "next-intl";
 import {apiClient} from "@/lib/api/client";
 
-type DomainPolicy={domain:string;mode:"normal"|"hijack"|"route"|"specific_ip";specific_ip?:string;route?:{destination_ip?:string;protocol:"tcp"|"udp"|"tcp_udp";destination_port_start?:number;destination_port_end?:number};connection_modes?:string[]};
+type DomainPolicy={domain:string;mode:"normal"|"hijack"|"route"|"specific_ip"|"block";specific_ip?:string;route?:{destination_ip?:string;protocol:"tcp"|"udp"|"tcp_udp";destination_port_start?:number;destination_port_end?:number};connection_modes?:string[]};
 type RouteIP={agentId:string;publicIp:string;enabled:boolean;lastSeenAt:string|null;domain:string;state:string};
 type DNSNode={id:string;region:string;addresses:string[];lastSeenAt:string;online:boolean};
 
@@ -100,7 +100,7 @@ export default function AdminNetworkContent(){
   <p className="mt-2 text-sm text-gray-400">Revision {revision}. Normal uses public DNS, SNI hijack uses a ready edge agent, full route requires a destination IPv4, and specific IP returns your configured DNS address.</p>
   <form onSubmit={e=>{e.preventDefault();void save()}} className="mt-4 grid gap-3 md:grid-cols-2">
    <label className="text-sm">Domain<input required value={domain} onChange={e=>setDomain(e.target.value)} placeholder="example.com" className="mt-1 w-full rounded-lg border bg-transparent p-2"/></label>
-   <label className="text-sm">Resolution mode<select value={mode} onChange={e=>setMode(e.target.value as DomainPolicy["mode"])} className="mt-1 w-full rounded-lg border bg-gray-900 p-2"><option value="normal">Normal DNS</option><option value="hijack">SNI hijack</option><option value="route">Full route</option><option value="specific_ip">Specific IP</option></select></label>
+   <label className="text-sm">Resolution mode<select value={mode} onChange={e=>setMode(e.target.value as DomainPolicy["mode"])} className="mt-1 w-full rounded-lg border bg-gray-900 p-2"><option value="normal">Normal DNS</option><option value="hijack">SNI hijack</option><option value="route">Full route</option><option value="specific_ip">Specific IP</option><option value="block">Block (DNS REFUSED)</option></select></label>
    {(mode==="specific_ip"||mode==="route")&&<label className="text-sm"> {mode==="route"?"Destination IPv4 (optional override)":"DNS response IP"}<input required={mode==="specific_ip"} value={ip} onChange={e=>setIp(e.target.value)} placeholder="192.0.2.10" className="mt-1 w-full rounded-lg border bg-transparent p-2"/></label>}
    {mode==="route"&&<label className="text-sm">Protocol<select value={protocol} onChange={e=>setProtocol(e.target.value as "tcp"|"udp"|"tcp_udp")} className="mt-1 w-full rounded-lg border bg-gray-900 p-2"><option value="tcp">TCP</option><option value="udp">UDP</option><option value="tcp_udp">TCP/UDP</option></select></label>}
    {mode==="route"&&<div className="md:col-span-2 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm">
