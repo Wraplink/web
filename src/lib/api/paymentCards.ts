@@ -3,8 +3,10 @@ import {apiClient} from "@/lib/api/client";
 export type PaymentCard = {id:string;cardNumber:string;cardholderName:string;bankName:string;active:boolean};
 
 export async function listPaymentCards():Promise<PaymentCard[]> {
- const {data}=await apiClient.get<{cards:PaymentCard[]}>("/api/v1/payment-cards");
- return data.cards;
+ const {data}=await apiClient.get<{cards:PaymentCard[];selectedCardId:string|null}>("/api/v1/payment-cards");
+ // The backend selects one card across both wallet and checkout using a shared sequence.
+ // Never reselect locally: that would break cross-user round-robin distribution.
+ return data.cards.filter(card=>card.id===data.selectedCardId);
 }
 export async function adminListPaymentCards():Promise<PaymentCard[]> {
  const {data}=await apiClient.get<{cards:PaymentCard[]}>("/api/v1/admin/payment-reviews/cards");
