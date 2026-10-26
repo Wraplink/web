@@ -28,7 +28,7 @@ export default function AuthenticatedLayout({
     return (
         <AuthGuard>
 
-            <div className={isAdmin?"min-h-screen":"wraplink-user-zone min-h-screen"}>
+            <div lang={locale} dir={isRtl?"rtl":"ltr"} className={isAdmin?"min-h-screen":"wraplink-user-zone min-h-screen"}>
 
                 <UserSidebar
                     mobileOpen={mobileOpen}
