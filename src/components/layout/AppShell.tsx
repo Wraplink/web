@@ -1,7 +1,6 @@
 "use client";
 
 import {useEffect} from "react";
-import {applyTheme,isTheme} from "@/lib/themes";
 import {NextIntlClientProvider} from "next-intl";
 import {usePathname} from "next/navigation";
 
@@ -55,7 +54,6 @@ export default function AppShell({
             (route !== "/" && normalizedPath.startsWith(`${route}/`))
     );
 
-    useEffect(()=>{const saved=localStorage.getItem("wraplink-theme");if(saved&&isTheme(saved))applyTheme(saved);},[]);
     useEffect(() => {
         document.documentElement.lang =
             locale;
