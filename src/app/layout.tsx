@@ -12,8 +12,8 @@ export const metadata: Metadata = {
     description:
         "Next generation gamer network and connectivity platform.",
     icons: {
-        icon: [{url: "/wraplink-icon.png", sizes: "512x512", type: "image/png"}, {url: "/favicon.ico", sizes: "any"}],
-        apple: [{url: "/wraplink-icon.png", sizes: "512x512", type: "image/png"}],
+        icon: [{url: "/wraplink-symbol.svg", type: "image/svg+xml"}],
+        shortcut: "/wraplink-symbol.svg",
     },
 };
 
