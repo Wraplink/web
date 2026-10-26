@@ -35,7 +35,7 @@ export default function AppShell({
     const pathname = usePathname();
 
     const locale =
-        pathname === "/en" || pathname.startsWith("/en/") || (pathname!=="/fa"&&!pathname.startsWith("/fa/"))
+        pathname === "/en" || pathname.startsWith("/en/")
             ? "en"
             : "fa";
 
