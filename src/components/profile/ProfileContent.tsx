@@ -1,3 +1,4 @@
+import ThemePicker from "./ThemePicker";
 "use client";
 
 import {useEffect,useState} from "react";
@@ -225,6 +226,8 @@ export default function ProfileContent({
                 </div>
 
             </div>
+
+            <ThemePicker locale={locale}/>
 
             {/* Password */}
 
