@@ -21,7 +21,7 @@ export default function AdminLayoutGate({children}:{children:ReactNode}){
  const tabs=[["","Overview"],["users","Users"],["orders","Orders"],["payment-reviews","Payments"],["discounts","Discounts"],["access","Permissions"],["network","Network"]];
  return <div>
   <div className="flex items-center gap-3 border-b border-white/10 px-6 py-4">
-   <img src="/wraplink-symbol.webp" alt="" width={68} height={44} className="h-11 w-auto" />
+   <img src="/wraplink-symbol.svg" alt="" width={68} height={44} className="h-11 w-auto" />
    <div><div className="font-bold text-white">WrapLink</div><div className="text-xs text-cyan-300">{locale==="fa"?"مدیریت":"Administration"}</div></div>
   </div>
   <nav aria-label="Administrator navigation" className="flex flex-wrap gap-2 border-b border-white/10 px-6 py-4">
