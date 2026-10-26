@@ -283,16 +283,6 @@ export default function UserSidebar({
                     </nav>
                 </div>
 
-                <div className="mx-4 mb-4 rounded-2xl border border-cyan-400/20 bg-cyan-400/5 p-4">
-                    <div className="text-xs text-gray-500">
-                        {t("wallet")}
-                    </div>
-
-                    <div className="mt-1 text-xl font-bold text-cyan-400">
-                        0 تومان
-                    </div>
-                </div>
-
                 <div className="border-t border-white/10 p-4">
                     <button
                         type="button"
