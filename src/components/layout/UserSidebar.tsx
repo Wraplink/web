@@ -14,6 +14,7 @@ import {
     Wallet,
     X,
     Shield,
+    Languages,
 } from "lucide-react";
 import {
     useEffect,
@@ -214,6 +215,13 @@ export default function UserSidebar({
                             </div>
                         </div>
                     </div>
+                    <div className="mt-4 flex items-center justify-between gap-3 border-t border-white/10 pt-3">
+                        <span className="flex items-center gap-2 text-sm text-gray-400">
+                            <Languages size={17} aria-hidden="true"/>
+                            {isRtl ? "زبان" : "Language"}
+                        </span>
+                        <LanguageSwitcher />
+                    </div>
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-4">
@@ -285,7 +293,6 @@ export default function UserSidebar({
                     </div>
                 </div>
 
-                <div className="border-t border-white/10 px-4 pt-4"><LanguageSwitcher /></div>
                 <div className="border-t border-white/10 p-4">
                     <button
                         type="button"
