@@ -219,3 +219,22 @@ body {
 @media(prefers-reduced-motion:no-preference){.wraplink-hero-art img {animation:wraplink-float 7s ease-in-out infinite}.wraplink-orbit-dot {animation:wraplink-glimmer 4s ease-in-out infinite}}
 @keyframes wraplink-float{50%{transform:translateY(-9px)}}
 @keyframes wraplink-glimmer{50%{opacity:.55;box-shadow:0 0 32px #b15cff}}
+
+/* User-selectable gaming dashboard skins. Public hero remains unchanged. */
+:root {--wl-bg:#070B18;--wl-accent:#00E5FF;--wl-surface:#0c1526}
+:root[data-wraplink-theme="cyber-blue"]{--wl-bg:#050B1A;--wl-accent:#00E5FF;--wl-surface:#0d1c36}
+:root[data-wraplink-theme="neon-purple"]{--wl-bg:#140B2D;--wl-accent:#A855F7;--wl-surface:#261441}
+:root[data-wraplink-theme="toxic-green"]{--wl-bg:#07150D;--wl-accent:#39FF14;--wl-surface:#112c1a}
+:root[data-wraplink-theme="crimson-gaming"]{--wl-bg:#1C080E;--wl-accent:#FF3355;--wl-surface:#32101b}
+:root[data-wraplink-theme="golden-elite"]{--wl-bg:#191307;--wl-accent:#FFD700;--wl-surface:#322710}
+:root[data-wraplink-theme="arctic-frost"]{--wl-bg:#EAF4FF;--wl-accent:#0077FF;--wl-surface:#d5e7fa}
+:root[data-wraplink-theme="synthwave"]{--wl-bg:#190B23;--wl-accent:#FF2BD6;--wl-surface:#30113e}
+:root[data-wraplink-theme="inferno"]{--wl-bg:#1B0D07;--wl-accent:#FF6B00;--wl-surface:#331b0e}
+:root[data-wraplink-theme="titanium"]{--wl-bg:#151B24;--wl-accent:#CBD5E1;--wl-surface:#25313e}
+body:has(aside) {background:var(--wl-bg)}
+body:has(aside) aside {background:var(--wl-surface);border-color:color-mix(in srgb,var(--wl-accent) 20%,transparent)}
+body:has(aside) main {background:linear-gradient(145deg,var(--wl-bg),var(--wl-surface))}
+body:has(aside) .text-cyan-400,body:has(aside) .text-cyan-300 {color:var(--wl-accent)}
+body:has(aside) .border-cyan-400,body:has(aside) .border-cyan-400\/20 {border-color:var(--wl-accent)}
+body:has(aside) .bg-cyan-400 {background-color:var(--wl-accent)}
+body:has(aside) .bg-white\/5 {background-color:color-mix(in srgb,var(--wl-surface) 82%,white 8%)}
