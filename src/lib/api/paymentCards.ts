@@ -19,3 +19,12 @@ export async function adminCreatePaymentCard(body:{cardNumber:string;cardholderN
 export async function adminSetPaymentCardActive(id:string,active:boolean):Promise<void> {
  await apiClient.patch(`/api/v1/admin/payment-reviews/cards/${encodeURIComponent(id)}`,{active});
 }
+
+export type PaymentMethod = "card"|"isp"|"crypto";
+export async function listPaymentMethods():Promise<Record<PaymentMethod,boolean>>{
+ const {data}=await apiClient.get<{methods:Record<PaymentMethod,boolean>}>("/api/v1/payment-methods");
+ return data.methods;
+}
+export async function adminSetPaymentMethod(method:PaymentMethod,enabled:boolean):Promise<void>{
+ await apiClient.put(`/api/v1/admin/payment-reviews/methods/${method}`,{enabled});
+}
