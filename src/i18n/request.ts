@@ -4,7 +4,7 @@ export default getRequestConfig(async ({requestLocale}) => {
     const locale = (await requestLocale) ?? "fa";
 
     const validLocale =
-        locale === "fa" ? "fa" : "en";
+        locale === "en" ? "en" : "fa";
 
     return {
         locale: validLocale,
