@@ -6,7 +6,7 @@ import {Link, useRouter} from "@/i18n/navigation";
 import {clearBasket, getBasket, type BasketItem} from "@/lib/basket";
 import {getMarketPlans, createPendingSubscription, paySubscriptionWithWallet, type MarketPlan} from "@/lib/api/plans";
 import {quoteDiscount, submitGroupedCardReceipt, type DiscountQuote} from "@/lib/api/checkout";
-import {listPaymentCards, type PaymentCard} from "@/lib/api/paymentCards";
+import {listPaymentCards,listPaymentMethods, type PaymentCard} from "@/lib/api/paymentCards";
 
 type Props = {locale: string};
 
@@ -21,6 +21,7 @@ export default function CheckoutContent({locale}: Props) {
     const router = useRouter();
     const [items, setItems] = useState<BasketItem[]>([]);
     const [plans, setPlans] = useState<MarketPlan[]>([]);
+    const [enabledMethods,setEnabledMethods]=useState({card:false,isp:false,crypto:false});
     const [cards, setCards] = useState<PaymentCard[]>([]);
     const [selectedCardId, setSelectedCardId] = useState("");
     const [checking, setChecking] = useState(true);
@@ -41,7 +42,8 @@ export default function CheckoutContent({locale}: Props) {
         setChecking(true);
         setError("");
         try {
-            const [catalog, availableCards] = await Promise.all([getMarketPlans(),listPaymentCards()]);
+            const [catalog, availableCards, availableMethods] = await Promise.all([getMarketPlans(),listPaymentCards(),listPaymentMethods()]);
+            setEnabledMethods(availableMethods);
             setCards(availableCards);
             setSelectedCardId(current => availableCards.some(card => card.id === current) ? current : (availableCards[0]?.id ?? ""));
             setItems(getBasket());
@@ -66,7 +68,7 @@ export default function CheckoutContent({locale}: Props) {
     const total = valid ? lines.reduce((sum, {item, plan}) => sum + item.quantity * plan!.priceMinor, 0) : 0;
 
     const units = useMemo(() => lines.flatMap(({item, plan}) => Array.from({length: Math.min(item.quantity, 100)}, () => plan)), [lines]);
-    const canSubmit = !loading && method === "card" && valid && units.length > 0 && units.length <= 100 && receipt !== null && !!selectedCardId && !receiptError;
+    const canSubmit = !loading && method === "card" && enabledMethods.card && valid && units.length > 0 && units.length <= 100 && receipt !== null && !!selectedCardId && !receiptError;
     const onReceiptChange = (files: FileList | null) => {
         setReceipt(null);
         setReceiptError("");
@@ -151,7 +153,7 @@ export default function CheckoutContent({locale}: Props) {
                         <div className="h-fit rounded-2xl border border-cyan-400/20 bg-white/5 p-6">
                             <h2 className="text-xl font-bold">{t("paymentMethod")}</h2>
                             <div className="mt-4 space-y-2">
-                                {(["card", "isp", "crypto"] as const).map(value => (
+                                {(["card", "isp", "crypto"] as const).filter(value => enabledMethods[value]).map(value => (
                                     <label key={value} className="flex items-center gap-2 text-sm">
                                         <input type="radio" name="paymentMethod" checked={method === value} onChange={() => setMethod(value)} />
                                         {value === "card" ? t("methods.card") : value === "isp" ? t("methods.isp") : t("methods.crypto")}
