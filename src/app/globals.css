@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -238,3 +239,18 @@ html[data-wraplink-theme="titanium"]{--wl-bg:#151B24;--wl-accent:#CBD5E1;--wl-su
 .wraplink-user-zone .border-cyan-400,.wraplink-user-zone .border-cyan-400\/20 {border-color:var(--wl-accent)}
 .wraplink-user-zone .bg-cyan-400 {background-color:var(--wl-accent)}
 .wraplink-user-zone .bg-white\/5 {background-color:color-mix(in srgb,var(--wl-surface) 82%,white 8%)}
+
+/* Persian customer area only: Vazirmatn with accessible dashboard typography. */
+.wraplink-user-zone[lang="fa"] {
+  font-family: "Vazirmatn", Tahoma, sans-serif;
+  font-size: 16px;
+  line-height: 1.8;
+}
+.wraplink-user-zone[lang="fa"] button,
+.wraplink-user-zone[lang="fa"] input,
+.wraplink-user-zone[lang="fa"] select,
+.wraplink-user-zone[lang="fa"] textarea {
+  font: inherit;
+}
+.wraplink-user-zone[lang="fa"] aside nav a {font-size: 16px; font-weight: 500;}
+.wraplink-user-zone[lang="fa"] :is(p, label, td, th) {line-height: 1.8;}
