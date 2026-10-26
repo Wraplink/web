@@ -15,7 +15,7 @@ export default function Footer() {
 
                     <div>
                         <h3 className="flex items-center gap-3 text-2xl font-bold text-white">
-                            <img src="/wraplink-lion.svg" alt="" width={44} height={44} />
+                            <img src="/wraplink-symbol.svg" alt="" width={62} height={44} className="h-11 w-auto" />
                             WrapLink
                         </h3>
 

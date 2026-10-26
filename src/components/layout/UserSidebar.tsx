@@ -170,7 +170,7 @@ export default function UserSidebar({
                             setMobileOpen(false)
                         }
                     >
-                        <div className="h-9 w-9 rounded-xl bg-cyan-400 shadow-[0_0_20px_#00E5FF]"/>
+                        <img src="/wraplink-symbol.svg" alt="" width={58} height={40} className="h-10 w-auto shrink-0" />
 
                         <div>
                             <div className="font-bold text-white">

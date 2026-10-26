@@ -52,7 +52,7 @@ export default function Navbar() {
                         href="/"
                         className="flex items-center gap-2"
                     >
-                        <img src="/wraplink-lion.svg" alt="" width={40} height={40} className="h-10 w-10" />
+                        <img src="/wraplink-symbol.svg" alt="" width={54} height={40} className="h-10 w-auto" />
 
                         <span className="text-xl font-bold text-white">
                             WrapLink

@@ -11,6 +11,10 @@ export const metadata: Metadata = {
     },
     description:
         "Next generation gamer network and connectivity platform.",
+    icons: {
+        icon: [{url: "/wraplink-symbol.svg", type: "image/svg+xml"}],
+        shortcut: "/wraplink-symbol.svg",
+    },
 };
 
 export default function RootLayout({
