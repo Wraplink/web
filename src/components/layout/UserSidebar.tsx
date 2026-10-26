@@ -31,6 +31,7 @@ import {
 } from "@/i18n/navigation";
 
 import {apiClient} from "@/lib/api/client";
+import LanguageSwitcher from "./LanguageSwitcher";
 import {getNotifications} from "@/lib/notifications";
 
 import {
@@ -284,6 +285,7 @@ export default function UserSidebar({
                     </div>
                 </div>
 
+                <div className="border-t border-white/10 px-4 pt-4"><LanguageSwitcher /></div>
                 <div className="border-t border-white/10 p-4">
                     <button
                         type="button"
