@@ -18,7 +18,7 @@ export default function AdminLayoutGate({children}:{children:ReactNode}){
  },[]);
  if(status==="loading")return <div className="p-10" role="status">Checking administrator access…</div>;
  if(status==="denied")return <main className="p-10"><h1 className="text-2xl font-bold">Administrator access unavailable</h1><p className="mt-3 text-gray-400">Your account does not have an administrator role, or the administration API cannot be reached.</p></main>;
- const tabs=[["","Overview"],["users","Users"],["orders","Orders"],["payment-reviews","Payments"],["discounts","Discounts"],["access","Permissions"],["network","Network"]];
+ const tabs=[["","Overview"],["users","Users"],["orders","Orders"],["payment-reviews","Payments"],["payment-methods",locale==="fa"?"کارت‌ها و روش‌های پرداخت":"Payment methods"],["discounts","Discounts"],["access","Permissions"],["network","Network"]];
  return <div>
   <div className="flex items-center gap-3 border-b border-white/10 px-6 py-4">
    <img src="/wraplink-symbol.svg" alt="" width={68} height={44} className="h-11 w-auto" />
