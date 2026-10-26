@@ -1,3 +1,7 @@
+"use client";
+
+import {useState,type FormEvent} from "react";
+import {apiClient} from "@/lib/api/client";
 import {
     Mail,
     MessageCircle,
@@ -6,20 +10,35 @@ import {
     Shield
 } from "lucide-react";
 
-import {getTranslations} from "next-intl/server";
+import {useTranslations} from "next-intl";
 
 type Props = {
     locale: string;
 };
 
-export default async function ContactContent({
+export default function ContactContent({
                                                  locale
                                              }: Props) {
 
-    const t = await getTranslations({
-        locale,
-        namespace: "ContactPage"
-    });
+    const t = useTranslations("ContactPage");
+    const fa=locale==="fa";
+    const [name,setName]=useState("");
+    const [email,setEmail]=useState("");
+    const [subject,setSubject]=useState("");
+    const [message,setMessage]=useState("");
+    const [website,setWebsite]=useState("");
+    const [busy,setBusy]=useState(false);
+    const [status,setStatus]=useState<"success"|"error"|null>(null);
+    const submit=async(event:FormEvent<HTMLFormElement>)=>{
+        event.preventDefault();
+        if(busy)return;
+        setBusy(true);setStatus(null);
+        try{
+            await apiClient.post("/api/v1/contact",{name,email,subject,message,website});
+            setStatus("success");setName("");setEmail("");setSubject("");setMessage("");
+        }catch{setStatus("error")}
+        finally{setBusy(false)}
+    };
 
     return (
         <section className="mx-auto max-w-7xl px-6 py-20">
@@ -50,36 +69,39 @@ export default async function ContactContent({
                         {t("form.title")}
                     </h2>
 
-                    <form className="mt-8 space-y-5">
+                    <form onSubmit={submit} className="mt-8 space-y-5">
 
                         <input
-                            placeholder={t("form.name")}
+                            required minLength={2} maxLength={120} autoComplete="name" aria-label={t("form.name")} value={name} onChange={e=>setName(e.target.value)} placeholder={t("form.name")}
                             className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 outline-none transition focus:border-cyan-400"
                         />
 
                         <input
                             type="email"
-                            placeholder={t("form.email")}
+                            required maxLength={254} autoComplete="email" aria-label={t("form.email")} value={email} onChange={e=>setEmail(e.target.value)} placeholder={t("form.email")}
                             className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 outline-none transition focus:border-cyan-400"
                         />
 
                         <input
-                            placeholder={t("form.subject")}
+                            required minLength={3} maxLength={200} aria-label={t("form.subject")} value={subject} onChange={e=>setSubject(e.target.value)} placeholder={t("form.subject")}
                             className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 outline-none transition focus:border-cyan-400"
                         />
 
                         <textarea
-                            rows={6}
+                            rows={6} required minLength={10} maxLength={10000} aria-label={t("form.message")} value={message} onChange={e=>setMessage(e.target.value)}
                             placeholder={t("form.message")}
                             className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 outline-none transition focus:border-cyan-400"
                         />
 
+                        <label className="sr-only" aria-hidden="true">Website<input tabIndex={-1} autoComplete="off" value={website} onChange={e=>setWebsite(e.target.value)}/></label>
+                        {status==="success"&&<p role="status" className="rounded-xl bg-green-500/10 p-3 text-green-300">{fa?"پیام شما با موفقیت ثبت شد.":"Your message has been received."}</p>}
+                        {status==="error"&&<p role="alert" className="rounded-xl bg-red-500/10 p-3 text-red-300">{fa?"ارسال پیام ناموفق بود. دوباره تلاش کنید.":"Unable to send your message. Please try again."}</p>}
                         <button
-                            type="button"
-                            className="inline-flex items-center gap-3 rounded-xl bg-cyan-400 px-6 py-3 font-bold text-black transition hover:scale-105"
+                            type="submit" disabled={busy}
+                            className="inline-flex items-center gap-3 rounded-xl bg-cyan-400 px-6 py-3 font-bold text-black transition hover:scale-105 disabled:opacity-50"
                         >
                             <Send size={20}/>
-                            {t("form.send")}
+                            {busy?(fa?"در حال ارسال…":"Sending…"):t("form.send")}
                         </button>
 
                     </form>
