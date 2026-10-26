@@ -1,4 +1,5 @@
 "use client";
+import ThemePicker from "./ThemePicker";
 
 import {useEffect,useState} from "react";
 import {getProfile,updateProfile,changeProfilePassword,getProfileSessions,revokeProfileSession,revokeOtherProfileSessions,type Profile,type ManagedSession} from "@/lib/api/profile";
@@ -225,6 +226,8 @@ export default function ProfileContent({
                 </div>
 
             </div>
+
+            <ThemePicker locale={locale}/>
 
             {/* Password */}
 
