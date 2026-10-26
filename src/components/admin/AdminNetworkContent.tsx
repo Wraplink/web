@@ -9,6 +9,7 @@ type RouteIP={agentId:string;publicIp:string;enabled:boolean;lastSeenAt:string|n
 type DNSNode={id:string;region:string;addresses:string[];lastSeenAt:string;online:boolean};
 
 const REFRESH_SECONDS=15;
+const PENDING_REFRESH_SECONDS=3;
 
 export default function AdminNetworkContent(){
  const locale=useLocale();
@@ -35,14 +36,17 @@ export default function AdminNetworkContent(){
  const [refreshIn,setRefreshIn]=useState(REFRESH_SECONDS);
  const [checkingNodes,setCheckingNodes]=useState(false);
  const checkingRef=useRef(false);
+ const pendingRoutes=routeIPs.some(ip=>ip.enabled&&ip.domain&&ip.state!=="active");
+ const pendingRoutesRef=useRef(false);
+ pendingRoutesRef.current=pendingRoutes;
  async function refreshNodes(){
   if(checkingRef.current)return;
   checkingRef.current=true;setCheckingNodes(true);
   try{
    const {data}=await apiClient.get<{nodes:DNSNode[]}>("/api/v1/admin/network/dns-controls");
-   setNodes(data.nodes);setError("");
+   setNodes(data.nodes);await loadRouteIPs();setError("");
   }catch(e){setError((e as {response?:{status?:number}}).response?.status===403?"Access administrator permission required":"Unable to refresh DNS controller status")}
-  finally{checkingRef.current=false;setCheckingNodes(false);setRefreshIn(REFRESH_SECONDS)}
+  finally{checkingRef.current=false;setCheckingNodes(false);setRefreshIn(pendingRoutesRef.current?PENDING_REFRESH_SECONDS:REFRESH_SECONDS)}
  }
  async function load(){
   setLoading(true);setError("");
@@ -66,12 +70,13 @@ export default function AdminNetworkContent(){
   const timer=window.setInterval(()=>{
    if(document.visibilityState!=="visible"||checkingRef.current)return;
    setRefreshIn(seconds=>{
-    if(seconds<=1){void refreshNodes();return REFRESH_SECONDS}
-    return seconds-1;
+    if(seconds<=1){void refreshNodes();return pendingRoutesRef.current?PENDING_REFRESH_SECONDS:REFRESH_SECONDS}
+    return Math.min(seconds-1,pendingRoutesRef.current?PENDING_REFRESH_SECONDS:REFRESH_SECONDS);
    });
   },1000);
   return ()=>window.clearInterval(timer);
  },[]);
+ useEffect(()=>{if(pendingRoutes)setRefreshIn(seconds=>Math.min(seconds,PENDING_REFRESH_SECONDS))},[pendingRoutes]);
  useEffect(()=>{void loadPolicies(search,page,pageSize,modeFilter)},[search,page,pageSize,modeFilter]);
  async function save(){setSaving(true);setError("");setMessage("");try{
  const policy:DomainPolicy={domain:domain.trim().toLowerCase(),mode};
