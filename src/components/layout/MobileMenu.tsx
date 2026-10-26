@@ -43,7 +43,8 @@ export default function MobileMenu({
             >
 
                 <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-bold text-white">
+                    <h2 className="flex items-center gap-2 text-xl font-bold text-white">
+                        <img src="/wraplink-symbol.webp" alt="" width={45} height={30} className="h-8 w-auto" />
                         WrapLink
                     </h2>
 
