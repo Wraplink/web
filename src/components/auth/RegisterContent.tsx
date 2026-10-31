@@ -2,6 +2,7 @@
 
 import {useMemo, useState} from "react";
 import {useRouter} from "next/navigation";
+import {apiClient} from "@/lib/api/client";
 
 import {
     Check,
@@ -68,6 +69,9 @@ export default function RegisterContent({
         useState(false);
 
     const router = useRouter();
+    const returnUrl = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("returnUrl") : null;
+    const checkoutReturn = returnUrl && returnUrl.startsWith("/") && !returnUrl.startsWith("//") ? returnUrl : null;
+    const loginTarget = (locale === "fa" ? "/fa/auth/login" : "/auth/login") + (checkoutReturn ? `?returnUrl=${encodeURIComponent(checkoutReturn)}` : "");
 
     const passwordStrength = useMemo(() => {
         if (!password) {
@@ -187,53 +191,6 @@ export default function RegisterContent({
 
         setIsSubmitting(true);
 
-        /*
-         * ========================================================
-         * BACKEND TODO
-         * ========================================================
-         *
-         * POST /api/v1/auth/register
-         *
-         * Payload should eventually contain:
-         *
-         * {
-         *   name,
-         *   email,
-         *   password,
-         *
-         *   legal: {
-         *     termsVersion: "2026-09-26",
-         *     privacyVersion: "2026-09-26",
-         *     acceptedAt: "...",
-         *     marketingConsent: false
-         *   }
-         * }
-         *
-         * Backend MUST:
-         *
-         * 1. Validate the account data.
-         * 2. Hash the password using a strong password hashing
-         *    algorithm such as Argon2id.
-         * 3. Create the user.
-         * 4. Persist the exact accepted Terms version.
-         * 5. Persist the exact accepted Privacy Policy version.
-         * 6. Persist acceptedAt on the server.
-         * 7. Persist marketingConsent separately from mandatory
-         *    legal acceptance.
-         * 8. Create email verification request.
-         * 9. Return the appropriate verification state.
-         *
-         * IMPORTANT:
-         *
-         * Do NOT trust the client-provided acceptedAt.
-         * The backend must generate the authoritative timestamp.
-         *
-         * Do NOT store passwords or authentication secrets
-         * in localStorage.
-         *
-         * ========================================================
-         */
-
         const registrationPayload = {
             name: name.trim(),
             email: email.trim().toLowerCase(),
@@ -248,29 +205,17 @@ export default function RegisterContent({
             locale,
         };
 
-        console.log(
-            "Registration form is valid",
-            registrationPayload,
-        );
-
-        /*
-         * Temporary frontend implementation.
-         *
-         * Remove this when the backend API is connected.
-         */
-        setTimeout(() => {
+        try {
+            await apiClient.post("/api/v1/auth/register", registrationPayload);
+            router.push(loginTarget);
+        } catch (error) {
+            setErrors(previous => ({...previous, email: "Registration failed. Please try again."}));
+        } finally {
             setIsSubmitting(false);
-            router.push(
-                locale === "fa"
-                    ? "/fa/auth/login"
-                    : "/auth/login"
-            );
-        }, 500);
+        }
     }
 
-    const loginHref = isFa
-        ? "/fa/auth/login"
-        : "/auth/login";
+    const loginHref = loginTarget;
 
     const legalHref = isFa
         ? "/fa/legal"
