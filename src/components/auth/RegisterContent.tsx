@@ -1,7 +1,7 @@
 "use client";
 
 import {useMemo, useState} from "react";
-import {useRouter, useSearchParams} from "next/navigation";
+import {useRouter} from "next/navigation";
 import {apiClient} from "@/lib/api/client";
 
 import {
@@ -69,8 +69,7 @@ export default function RegisterContent({
         useState(false);
 
     const router = useRouter();
-    const params = useSearchParams();
-    const returnUrl = params.get("returnUrl");
+    const returnUrl = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("returnUrl") : null;
     const checkoutReturn = returnUrl && returnUrl.startsWith("/") && !returnUrl.startsWith("//") ? returnUrl : null;
     const loginTarget = (locale === "fa" ? "/fa/auth/login" : "/auth/login") + (checkoutReturn ? `?returnUrl=${encodeURIComponent(checkoutReturn)}` : "");
 
