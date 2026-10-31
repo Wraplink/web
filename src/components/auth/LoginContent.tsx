@@ -23,6 +23,7 @@ type Props = {
 export default function LoginContent({locale}: Props) {
     const t = useTranslations("LoginPage");
     const router = useRouter();
+    const registrationHref = `/auth/register${typeof window !== "undefined" ? window.location.search : ""}`;
 
     const [showPassword, setShowPassword] =
         useState(false);
@@ -265,7 +266,7 @@ export default function LoginContent({locale}: Props) {
                         {t("noAccount")}{" "}
 
                         <Link
-                            href="/auth/register"
+                            href={registrationHref}
                             className="font-semibold text-cyan-400 hover:underline"
                         >
                             {t("register")}
