@@ -7,7 +7,7 @@ import {apiClient} from "@/lib/api/client";
 type Plan={id:string;code:string;name:string;description:string;priceMinor:number;currency:string;durationDays:number;dataLimitBytes:number;active:boolean;publishAt:string|null;sortOrder:number;createdAt:string};
 type Draft=Omit<Plan,"id"|"createdAt">;
 const blank:Draft={code:"",name:"",description:"",priceMinor:0,currency:"IRR",durationDays:30,dataLimitBytes:0,active:false,publishAt:null,sortOrder:0};
-const toLocal=(v:string|null)=>v?new Date(v).toISOString().slice(0,16):"";
+const toLocal=(v:string|null)=>{if(!v)return "";const d=new Date(v);return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16)};
 export default function AdminPlansContent(){
  const locale=useLocale(),fa=locale==="fa";
  const [items,setItems]=useState<Plan[]>([]),[draft,setDraft]=useState<Draft>(blank),[search,setSearch]=useState(""),[page,setPage]=useState(1),[loading,setLoading]=useState(true),[saving,setSaving]=useState(false),[error,setError]=useState(""),[message,setMessage]=useState("");
@@ -22,7 +22,7 @@ export default function AdminPlansContent(){
  async function save(){setSaving(true);setError("");setMessage("");try{
  if(!/^[a-z0-9][a-z0-9_-]{1,63}$/.test(draft.code)||!draft.name.trim()||!Number.isSafeInteger(draft.priceMinor)||draft.priceMinor<0||!Number.isSafeInteger(draft.dataLimitBytes)||draft.dataLimitBytes<0||!Number.isInteger(draft.durationDays)||draft.durationDays<1){throw new Error(fa?"مقادیر پلن معتبر نیست.":"Invalid plan fields.")}
  const publishAt=dateInput?new Date(dateInput).toISOString():null;
- await apiClient.put("/api/v1/admin/plans/",{...draft,publishAt});setMessage(fa?"پلن ذخیره شد.":"Plan saved.");await load();reset()
+ await apiClient.put("/api/v1/admin/plans/",{...draft,publishAt});setMessage(fa?"پلن ذخیره شد.":"Plan saved.");await load();reset();setMessage(fa?"پلن ذخیره شد.":"Plan saved.")
  }catch(e){setError((e as {response?:{data?:{error?:string}}}).response?.data?.error||(e instanceof Error?e.message:"Unable to save plan"))}finally{setSaving(false)}}
  const status=(p:Plan)=>!p.active?(fa?"غیرفعال":"Disabled"):p.publishAt&&new Date(p.publishAt)>new Date()?(fa?"زمان‌بندی‌شده":"Scheduled"):(fa?"منتشرشده":"Published");
  return <main className="mx-auto max-w-5xl px-6 py-10">
