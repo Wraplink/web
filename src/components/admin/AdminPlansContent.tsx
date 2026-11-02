@@ -12,17 +12,18 @@ export default function AdminPlansContent(){
  const locale=useLocale(),fa=locale==="fa";
  const [items,setItems]=useState<Plan[]>([]),[draft,setDraft]=useState<Draft>(blank),[search,setSearch]=useState(""),[page,setPage]=useState(1),[loading,setLoading]=useState(true),[saving,setSaving]=useState(false),[error,setError]=useState(""),[message,setMessage]=useState("");
  const [dateInput,setDateInput]=useState("");
+ const [editingCode,setEditingCode]=useState<string|null>(null);
  async function load(){setLoading(true);setError("");try{const {data}=await apiClient.get<{plans:Plan[]}>("/api/v1/admin/plans/");setItems(data.plans??[])}catch(e){setError((e as {response?:{status?:number}}).response?.status===403?(fa?"دسترسی مدیر لازم است.":"Administrator permission required."):(fa?"دریافت پلن‌ها ناموفق بود.":"Unable to load plans."))}finally{setLoading(false)}}
  useEffect(()=>{void load()},[]);
  const filtered=useMemo(()=>items.filter(p=>(p.code+" "+p.name).toLowerCase().includes(search.toLowerCase())),[items,search]);
  const visible=filtered.slice((page-1)*10,page*10);
  const update=<K extends keyof Draft>(key:K,value:Draft[K])=>setDraft(p=>({...p,[key]:value}));
- function edit(p:Plan){setDraft({code:p.code,name:p.name,description:p.description,priceMinor:p.priceMinor,currency:p.currency,durationDays:p.durationDays,dataLimitBytes:p.dataLimitBytes,active:p.active,publishAt:p.publishAt,sortOrder:p.sortOrder});setDateInput(toLocal(p.publishAt));setMessage("");window.scrollTo({top:0,behavior:"smooth"})}
- function reset(){setDraft(blank);setDateInput("");setMessage("")}
+ function edit(p:Plan){setEditingCode(p.code);setDraft({code:p.code,name:p.name,description:p.description,priceMinor:p.priceMinor,currency:p.currency,durationDays:p.durationDays,dataLimitBytes:p.dataLimitBytes,active:p.active,publishAt:p.publishAt,sortOrder:p.sortOrder});setDateInput(toLocal(p.publishAt));setMessage("");window.scrollTo({top:0,behavior:"smooth"})}
+ function reset(){setEditingCode(null);setDraft(blank);setDateInput("");setMessage("")}
  async function save(){setSaving(true);setError("");setMessage("");try{
  if(!/^[a-z0-9][a-z0-9_-]{1,63}$/.test(draft.code)||!draft.name.trim()||!Number.isSafeInteger(draft.priceMinor)||draft.priceMinor<0||!Number.isSafeInteger(draft.dataLimitBytes)||draft.dataLimitBytes<0||!Number.isInteger(draft.durationDays)||draft.durationDays<1){throw new Error(fa?"مقادیر پلن معتبر نیست.":"Invalid plan fields.")}
  const publishAt=dateInput?new Date(dateInput).toISOString():null;
- await apiClient.put("/api/v1/admin/plans/",{...draft,publishAt});setMessage(fa?"پلن ذخیره شد.":"Plan saved.");await load();reset();setMessage(fa?"پلن ذخیره شد.":"Plan saved.")
+ await apiClient.put("/api/v1/admin/plans/",{...draft,publishAt});await load();reset();setMessage(fa?"پلن ذخیره شد.":"Plan saved.")
  }catch(e){setError((e as {response?:{data?:{error?:string}}}).response?.data?.error||(e instanceof Error?e.message:"Unable to save plan"))}finally{setSaving(false)}}
  const status=(p:Plan)=>!p.active?(fa?"غیرفعال":"Disabled"):p.publishAt&&new Date(p.publishAt)>new Date()?(fa?"زمان‌بندی‌شده":"Scheduled"):(fa?"منتشرشده":"Published");
  return <main className="mx-auto max-w-5xl px-6 py-10">
@@ -30,7 +31,7 @@ export default function AdminPlansContent(){
  <p className="mt-3 text-sm text-gray-400">{fa?"پلن فقط در صورت فعال بودن و رسیدن زمان انتشار برای کاربران نمایش داده می‌شود.":"Plans become purchasable only when enabled and their publication date has arrived."}</p>
  {error&&<p role="alert" className="mt-4 text-red-300">{error}</p>}{message&&<p role="status" className="mt-4 text-green-300">{message}</p>}
  <form onSubmit={e=>{e.preventDefault();void save()}} className="mt-6 grid gap-4 rounded-2xl border border-white/15 bg-white/5 p-5 sm:grid-cols-2">
- <label className="text-sm">{fa?"کد پلن":"Code"}<input required value={draft.code} onChange={e=>update("code",e.target.value.toLowerCase())} className="mt-1 w-full rounded border bg-transparent p-2" /></label>
+ <label className="text-sm">{fa?"کد پلن":"Code"}<input required disabled={editingCode!==null} value={draft.code} onChange={e=>update("code",e.target.value.toLowerCase())} className="mt-1 w-full rounded border bg-transparent p-2" /></label>
  <label className="text-sm">{fa?"نام":"Name"}<input required value={draft.name} onChange={e=>update("name",e.target.value)} className="mt-1 w-full rounded border bg-transparent p-2" /></label>
  <label className="text-sm sm:col-span-2">{fa?"توضیحات":"Description"}<textarea value={draft.description} onChange={e=>update("description",e.target.value)} className="mt-1 w-full rounded border bg-transparent p-2" /></label>
  {([["priceMinor",fa?"قیمت (واحد خرد)":"Price (minor units)"],["durationDays",fa?"مدت (روز)":"Duration (days)"],["dataLimitBytes",fa?"حجم ترافیک (بایت)":"Data limit (bytes)"],["sortOrder",fa?"ترتیب نمایش":"Sort order"]] as const).map(([key,label])=><label key={key} className="text-sm">{label}<input type="number" min="0" required value={draft[key]} onChange={e=>update(key,Number(e.target.value))} className="mt-1 w-full rounded border bg-transparent p-2" /></label>)}
