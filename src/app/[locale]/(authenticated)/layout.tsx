@@ -17,7 +17,6 @@ export default function AuthenticatedLayout({
                                             }: Props) {
     const locale = useLocale();
     const pathname=usePathname();
-    const isGuestShop=/^\/(?:fa\/|en\/)?market(?:\/|$)/.test(pathname);
     const isAdmin=/^\/(?:fa\/|en\/)?admin(?:\/|$)/.test(pathname);
     useEffect(()=>{const saved=localStorage.getItem("wraplink-theme");if(!isAdmin&&saved&&isTheme(saved))applyTheme(saved);return ()=>{delete document.documentElement.dataset.wraplinkTheme}},[isAdmin]);
 
@@ -26,14 +25,6 @@ export default function AuthenticatedLayout({
 
     const isRtl = locale === "fa";
 
-    if (isGuestShop) {
-        return <div lang={locale} dir={isRtl ? "rtl" : "ltr"} className="wraplink-user-zone min-h-screen">
-            <div className="mx-auto max-w-7xl px-6 pt-6">
-                <a href={locale === "fa" ? "/fa" : "/"} className="text-cyan-400 hover:underline">{locale === "fa" ? "خانه" : "Home"}</a>
-            </div>
-            {children}
-        </div>;
-    }
 
     return (
         <AuthGuard>
