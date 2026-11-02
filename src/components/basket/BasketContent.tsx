@@ -13,7 +13,7 @@ import {
 
 import {useTranslations} from "next-intl";
 
-import {Link} from "@/i18n/navigation";
+import {Link, usePathname} from "@/i18n/navigation";
 import {getMarketPlans, type MarketPlan} from "@/lib/api/plans";
 
 import {
@@ -32,6 +32,7 @@ export default function BasketContent({
                                           locale,
                                       }: Props) {
     const t = useTranslations("BasketPage");
+    const inUserZone = usePathname().startsWith("/user/");
 
     const [items, setItems] =
         useState<BasketItem[]>([]);
@@ -143,7 +144,7 @@ export default function BasketContent({
                         </p>
 
                         <Link
-                            href="/market"
+                            href={inUserZone ? "/user/market" : "/market"}
                             className="mt-8 inline-flex items-center gap-2 rounded-xl bg-cyan-400 px-6 py-3 font-bold text-black transition hover:scale-105"
                         >
                             {t("empty.button")}
@@ -340,7 +341,7 @@ export default function BasketContent({
                             </Link>
 
                             <Link
-                                href="/market"
+                                href={inUserZone ? "/user/market" : "/market"}
                                 className="mt-3 flex w-full justify-center rounded-xl border border-white/10 py-3 text-sm text-gray-300 transition hover:border-cyan-400 hover:text-cyan-400"
                             >
                                 {t("continueShopping")}
