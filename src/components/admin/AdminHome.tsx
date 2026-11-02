@@ -26,6 +26,7 @@ export default function AdminHome({locale}:{locale:string}){
   {href:"/admin/payment-methods",title:locale==="fa"?"روش‌های پرداخت":"Payment methods",description:locale==="fa"?"مدیریت کارت‌های مقصد کارت‌به‌کارت":"Manage card-to-card destination accounts"},
   {href:"/admin/payment-reviews",title:"Payment reviews",description:locale==="fa"?"بررسی رسید سفارش‌ها و شارژ کیف پول":"Review order payments and wallet top-ups",count:counts.reviews},
   {href:"/admin/discounts",title:"Discounts",description:"Create and disable promotional codes"},
+  {href:"/admin/plans",title:locale==="fa"?"مدیریت پلن‌ها":"Plans",description:locale==="fa"?"ساخت و ویرایش پلن‌ها، فعال‌سازی و زمان‌بندی انتشار":"Create, edit, enable and schedule subscription plans"},
   {href:"/admin/access",title:"Staff permissions",description:"Grant and revoke administrative permissions",count:counts.staff},
   {href:"/admin/network",title:"Network operations",description:"DNS control, edge agents and network health"},
  ];
