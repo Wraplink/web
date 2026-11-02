@@ -17,7 +17,7 @@ export default function AuthenticatedLayout({
                                             }: Props) {
     const locale = useLocale();
     const pathname=usePathname();
-    const isGuestShop=/^\/(?:fa\/|en\/)?(?:market|basket)(?:\/|$)/.test(pathname);
+    const isGuestShop=/^\/(?:fa\/|en\/)?market(?:\/|$)/.test(pathname);
     const isAdmin=/^\/(?:fa\/|en\/)?admin(?:\/|$)/.test(pathname);
     useEffect(()=>{const saved=localStorage.getItem("wraplink-theme");if(!isAdmin&&saved&&isTheme(saved))applyTheme(saved);return ()=>{delete document.documentElement.dataset.wraplinkTheme}},[isAdmin]);
 
