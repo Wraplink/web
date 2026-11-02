@@ -6,6 +6,7 @@ import {Link, useRouter} from "@/i18n/navigation";
 import {clearBasket, getBasket, type BasketItem} from "@/lib/basket";
 import {getMarketPlans, createPendingSubscription, paySubscriptionWithWallet, type MarketPlan} from "@/lib/api/plans";
 import {quoteDiscount, submitGroupedCardReceipt, type DiscountQuote} from "@/lib/api/checkout";
+import {getWalletBalance, type WalletBalance} from "@/lib/api/wallet";
 import {listPaymentCards,listPaymentMethods, type PaymentCard} from "@/lib/api/paymentCards";
 
 type Props = {locale: string};
@@ -22,12 +23,13 @@ export default function CheckoutContent({locale}: Props) {
     const [items, setItems] = useState<BasketItem[]>([]);
     const [plans, setPlans] = useState<MarketPlan[]>([]);
     const [enabledMethods,setEnabledMethods]=useState({card:false,isp:false,crypto:false});
+    const [wallet, setWallet] = useState<WalletBalance | null>(null);
     const [cards, setCards] = useState<PaymentCard[]>([]);
     const [selectedCardId, setSelectedCardId] = useState("");
     const [checking, setChecking] = useState(true);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const [method, setMethod] = useState<"card" | "isp" | "crypto">("card");
+    const [method, setMethod] = useState<"wallet" | "card" | "isp" | "crypto">("wallet");
     const [receipt, setReceipt] = useState<File | null>(null);
     const [receiptError, setReceiptError] = useState("");
     const receiptInputRef = useRef<HTMLInputElement>(null);
@@ -36,13 +38,15 @@ export default function CheckoutContent({locale}: Props) {
     const pendingIds = useRef<string[]>([]);
 
     const submitting = useRef(false);
-    const paymentKey = useRef<string | null>(null);
+    const walletKeys = useRef<Record<string, string>>({});
+    const walletPaid = useRef<Set<string>>(new Set());
 
     const load = async () => {
         setChecking(true);
         setError("");
         try {
-            const [catalog, availableCards, availableMethods] = await Promise.all([getMarketPlans(),listPaymentCards(),listPaymentMethods()]);
+            const [catalog, availableCards, availableMethods, balance] = await Promise.all([getMarketPlans(),listPaymentCards(),listPaymentMethods(),getWalletBalance()]);
+            setWallet(balance);
             setEnabledMethods(availableMethods);
             setCards(availableCards);
             setSelectedCardId(current => availableCards.some(card => card.id === current) ? current : (availableCards[0]?.id ?? ""));
@@ -68,7 +72,7 @@ export default function CheckoutContent({locale}: Props) {
     const total = valid ? lines.reduce((sum, {item, plan}) => sum + item.quantity * plan!.priceMinor, 0) : 0;
 
     const units = useMemo(() => lines.flatMap(({item, plan}) => Array.from({length: Math.min(item.quantity, 100)}, () => plan)), [lines]);
-    const canSubmit = !loading && method === "card" && enabledMethods.card && valid && units.length > 0 && units.length <= 100 && receipt !== null && !!selectedCardId && !receiptError;
+    const canSubmit = !loading && valid && units.length > 0 && units.length <= 100 && (method === "wallet" ? wallet !== null && wallet.currency === currency && wallet.balanceMinor >= total && !quote : method === "card" && enabledMethods.card && receipt !== null && !!selectedCardId && !receiptError);
     const onReceiptChange = (files: FileList | null) => {
         setReceipt(null);
         setReceiptError("");
@@ -106,7 +110,7 @@ export default function CheckoutContent({locale}: Props) {
     const pay = async () => {
         if (submitting.current || loading) return;
         if (!canSubmit) {
-            setError(locale === "fa" ? "برای هر سفارش یک رسید پرداخت معتبر انتخاب کنید." : "Attach a separate valid transfer receipt for each order.");
+            setError(locale === "fa" ? "روش پرداخت یا موجودی کیف پول را بررسی کنید." : "Check your payment method or wallet balance.");
             return;
         }
         submitting.current = true;
@@ -115,12 +119,23 @@ export default function CheckoutContent({locale}: Props) {
         try {
             const ids: string[] = [];
             for (let i = 0; i < units.length; i++) ids.push(await prepareSubscription(i));
-            const saved = await submitGroupedCardReceipt(ids, receipt!, selectedCardId);
-            if (saved.status !== "pending_review") throw new Error("Receipt was not accepted.");
+            if (method === "wallet") {
+                for (const id of ids) {
+                    if (walletPaid.current.has(id)) continue;
+                    const key = walletKeys.current[id] ?? (walletKeys.current[id] = crypto.randomUUID());
+                    await paySubscriptionWithWallet(id, key);
+                    walletPaid.current.add(id);
+                }
+                setWallet(await getWalletBalance());
+            } else {
+                const saved = await submitGroupedCardReceipt(ids, receipt!, selectedCardId);
+                if (saved.status !== "pending_review") throw new Error("Receipt was not accepted.");
+            }
             clearBasket();
             router.push("/orders");
         } catch (e) {
-            setError((e instanceof Error ? e.message : "Payment failed.") + (locale === "fa" ? " سفارش‌های ثبت‌شده حفظ شده‌اند. پس از بررسی مجدداً تلاش کنید." : " Already submitted orders are preserved. Check Orders before retrying."));
+            setError((e instanceof Error ? e.message : "Payment failed.") + (locale === "fa" ? " برخی سفارش‌ها ممکن است پرداخت شده باشند؛ سفارش‌ها را بررسی کنید." : " Some orders may already be paid. Check Orders before retrying."));
+            if (method === "wallet") { try {setWallet(await getWalletBalance());} catch { /* preserve error */ } }
         } finally {
             submitting.current = false;
             setLoading(false);
@@ -153,14 +168,20 @@ export default function CheckoutContent({locale}: Props) {
                         <div className="h-fit rounded-2xl border border-cyan-400/20 bg-white/5 p-6">
                             <h2 className="text-xl font-bold">{t("paymentMethod")}</h2>
                             <div className="mt-4 space-y-2">
-                                {(["card", "isp", "crypto"] as const).filter(value => enabledMethods[value]).map(value => (
+                                {(["wallet", "card", "isp", "crypto"] as const).filter(value => value === "wallet" || enabledMethods[value]).map(value => (
                                     <label key={value} className="flex items-center gap-2 text-sm">
                                         <input type="radio" name="paymentMethod" checked={method === value} onChange={() => setMethod(value)} />
-                                        {value === "card" ? t("methods.card") : value === "isp" ? t("methods.isp") : t("methods.crypto")}
-                                        {value !== "card" && <span className="text-amber-300">(Coming soon)</span>}
+                                        {value === "wallet" ? (locale === "fa" ? "کیف پول" : "Wallet") : value === "card" ? t("methods.card") : value === "isp" ? t("methods.isp") : t("methods.crypto")}
+                                        {value !== "card" && value !== "wallet" && <span className="text-amber-300">(Coming soon)</span>}
                                     </label>
                                 ))}
                             </div>
+                            {method === "wallet" && <div className="mt-5 rounded-xl border border-white/10 p-4 text-sm">
+                                <p>{locale === "fa" ? "موجودی کیف پول:" : "Wallet balance:"} {wallet && wallet.currency === currency ? formatMoney(wallet.balanceMinor, currency, locale) : "—"}</p>
+                                {wallet && wallet.currency === currency && wallet.balanceMinor < total && <p role="alert" className="mt-2 text-amber-300">{locale === "fa" ? "موجودی کافی نیست." : "Insufficient balance."} <Link href="/wallet" className="underline">{locale === "fa" ? "شارژ کیف پول" : "Add funds"}</Link></p>}
+                                {quote && <p className="mt-2 text-amber-300">{locale === "fa" ? "پرداخت کیف پول با کد تخفیف پشتیبانی نمی‌شود." : "Discount quotes are not supported with wallet payment."}</p>}
+                                {units.length > 1 && <p className="mt-2 text-amber-300">{locale === "fa" ? "پرداخت هر پلن جداگانه انجام می‌شود." : "Each plan is charged separately."}</p>}
+                            </div>}
                             {method === "card" && <>
                                 <div className="mt-5">
                                     <h3 className="text-base font-bold">{locale === "fa" ? "انتخاب کارت مقصد" : "Choose destination card"}</h3>
@@ -195,11 +216,11 @@ export default function CheckoutContent({locale}: Props) {
                                 {quote && <p className="mt-2 text-sm text-green-300">{locale === "fa" ? "تخفیف:" : "Discount:"} {formatMoney(quote.discountMinor, quote.currency, locale)} — {locale === "fa" ? "مبلغ قابل پرداخت:" : "Payable:"} {formatMoney(quote.payableMinor, quote.currency, locale)}</p>}
                                 <p className="mt-4 text-sm text-gray-400">{locale === "fa" ? "مبلغ انتقال:" : "Amount to transfer:"} {valid ? formatMoney(quote?.payableMinor ?? total, currency, locale) : "—"}. {locale === "fa" ? "اطلاعات حساب مقصد باید توسط مدیر پرداخت اعلام شود." : "Bank transfer details must be provided by an authorized payment administrator."}</p>
                             </>}
-                            {valid && units.length > 1 && <p role="status" className="mt-4 text-sm text-amber-300">{locale === "fa" ? `یک رسید برای هر ${units.length} پلن کافی است. مدیر مبلغ کل پرداخت را بررسی می‌کند.` : `One receipt covers all ${units.length} plans. The administrator will review the combined payment.`}</p>}
+                            {method === "card" && valid && units.length > 1 && <p role="status" className="mt-4 text-sm text-amber-300">{locale === "fa" ? `یک رسید برای هر ${units.length} پلن کافی است. مدیر مبلغ کل پرداخت را بررسی می‌کند.` : `One receipt covers all ${units.length} plans. The administrator will review the combined payment.`}</p>}
                             {!valid && !checking && <p role="status" className="mt-3 text-sm text-amber-300">{locale === "fa" ? "قیمت یا پلن معتبر نیست؛ سبد خرید را بررسی کنید." : "Plan or price is invalid. Check your basket."}</p>}
                             <button type="button" disabled={!canSubmit}
                                 onClick={() => void pay()} className="mt-6 w-full rounded-xl bg-cyan-400 px-5 py-3 font-bold text-black disabled:cursor-not-allowed disabled:opacity-40">
-                                {loading ? t("processing") : locale === "fa" ? "ثبت رسیدها برای بررسی" : "Submit receipts for review"}
+                                {loading ? t("processing") : method === "wallet" ? (locale === "fa" ? "پرداخت از کیف پول" : "Pay with wallet") : locale === "fa" ? "ثبت رسیدها برای بررسی" : "Submit receipts for review"}
                             </button>
                             <button type="button" onClick={() => void load()} disabled={loading} className="mt-4 w-full text-sm text-cyan-400">{locale === "fa" ? "به‌روزرسانی قیمت‌ها" : "Refresh prices"}</button>
                         </div>
