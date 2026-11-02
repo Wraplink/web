@@ -3,7 +3,7 @@
 import {useEffect, useMemo, useState} from "react";
 import {Search, ShoppingBag, RefreshCw} from "lucide-react";
 import {useTranslations} from "next-intl";
-import {Link} from "@/i18n/navigation";
+import {Link, usePathname} from "@/i18n/navigation";
 import {addBasketItem, getBasket} from "@/lib/basket";
 import {getMarketPlans, type MarketPlan} from "@/lib/api/plans";
 
@@ -21,6 +21,7 @@ function formatPrice(plan: MarketPlan, locale: string) {
 
 export default function MarketContent({locale}: Props) {
     const t = useTranslations("MarketPage");
+    const inUserZone = usePathname().startsWith("/user/");
     const [plans, setPlans] = useState<MarketPlan[]>([]);
     const [search, setSearch] = useState("");
     const [loading, setLoading] = useState(true);
@@ -81,7 +82,7 @@ export default function MarketContent({locale}: Props) {
                         <h1 className="mt-6 text-4xl font-black lg:text-5xl">{t("title")}</h1>
                         <p className="mt-4 max-w-2xl text-gray-400">{t("subtitle")}</p>
                     </div>
-                    <Link href="/basket" className="inline-flex items-center gap-2 rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-5 py-3 font-semibold text-cyan-400">
+                    <Link href={inUserZone ? "/user/basket" : "/basket"} className="inline-flex items-center gap-2 rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-5 py-3 font-semibold text-cyan-400">
                         <ShoppingBag size={19}/>{t("basket")}
                         {basketCount > 0 && <span className="rounded-full bg-cyan-400 px-2 text-xs text-black">{basketCount}</span>}
                     </Link>
