@@ -34,7 +34,8 @@ export async function createPendingSubscription(planCode: string) {
 
 export async function paySubscriptionWithWallet(subscriptionId: string, idempotencyKey: string) {
     const {data} = await apiClient.post(
-        `/api/v1/me/subscriptions/${encodeURIComponent(subscriptionId)}/pay-with-wallet`
+        `/api/v1/me/subscriptions/${encodeURIComponent(subscriptionId)}/pay-with-wallet`, {},
+        {headers: {"Idempotency-Key": idempotencyKey}}
     );
     return data;
 }
