@@ -1,11 +1,7 @@
-import type {Metadata} from "next";
+import {redirect} from "next/navigation";
 
-import BasketContent from "@/components/basket/BasketContent";
-
-export const metadata: Metadata = {
-    title: "Basket",
-};
-
-export default function BasketPage() {
-    return <BasketContent locale="fa"/>;
+// Legacy unprefixed route: send visitors to the public Persian storefront.
+// User-zone navigation uses /fa/user/basket and retains the sidebar.
+export default function LegacyBasketPage() {
+    redirect("/fa/basket");
 }

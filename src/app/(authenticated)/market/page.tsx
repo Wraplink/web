@@ -1,5 +1,7 @@
-import MarketContent from "@/components/market/MarketContent";
+import {redirect} from "next/navigation";
 
-export default function MarketPage() {
-    return <MarketContent locale="fa"/>;
+// Legacy unprefixed route: send visitors to the public Persian storefront.
+// User-zone navigation uses /fa/user/market and retains the sidebar.
+export default function LegacyMarketPage() {
+    redirect("/fa/market");
 }
