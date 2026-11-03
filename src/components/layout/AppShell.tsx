@@ -16,11 +16,11 @@ type Props = {
 };
 
 const authenticatedRoutes = [
+    "/user/market",
+    "/user/basket",
     "/dashboard",
     "/connection",
     "/wallet",
-    "/market",
-    "/basket",
     "/orders",
     "/support",
     "/bandwidth",
