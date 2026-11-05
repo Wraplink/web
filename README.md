@@ -34,3 +34,7 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+### Cloudflare Turnstile CAPTCHA
+
+Create a Managed widget in [Cloudflare Turnstile](https://dash.cloudflare.com/) and configure `NEXT_PUBLIC_TURNSTILE_SITE_KEY` in your web build environment (`.env.local` for local development, or the Docker build argument in deployment). This is a **public** site key embedded at `next build` time; rebuild after changing it. The Go backend separately requires the **private** `TURNSTILE_SECRET_KEY` at runtime. Never put the secret in the Next.js environment or frontend Docker build arguments. Both keys must be configured together for production enforcement. See the [platform deployment guide](https://github.com/Wraplink/platform#cloudflare-turnstile-captcha).
