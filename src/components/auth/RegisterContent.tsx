@@ -80,7 +80,7 @@ export default function RegisterContent({
 
         let score = 0;
 
-        if (password.length >= 8) {
+        if (password.length >= 12) {
             score++;
         }
 
@@ -137,10 +137,12 @@ export default function RegisterContent({
                 "validation.passwordRequired",
             );
         } else if (
-            password.length < 8 ||
+            new TextEncoder().encode(password).length < 12 ||
+            new TextEncoder().encode(password).length > 128 ||
             !/[a-z]/.test(password) ||
             !/[A-Z]/.test(password) ||
-            !/[0-9]/.test(password)
+            !/[0-9]/.test(password) ||
+            !/[^\p{L}\p{N}]/u.test(password)
         ) {
             nextErrors.password = t(
                 "validation.passwordWeak",
@@ -207,9 +209,9 @@ export default function RegisterContent({
 
         try {
             await apiClient.post("/api/v1/auth/register", registrationPayload);
-            router.push(loginTarget);
+            router.push((locale === "en" ? "/en" : "") + "/auth/verify-email?email=" + encodeURIComponent(email.trim().toLowerCase()));
         } catch (error) {
-            setErrors(previous => ({...previous, email: "Registration failed. Please try again."}));
+            setErrors(previous => ({...previous, email: t("validation.registrationFailed")}));
         } finally {
             setIsSubmitting(false);
         }
