@@ -44,7 +44,7 @@ export default function VerifyEmailContent({locale}: Props) {
         setSending(true);
         setNotice("");
         try {
-            await apiClient.post("/api/v1/auth/verify-email/resend", {email});
+            await apiClient.post("/api/v1/auth/resend-verification", {email});
             setNotice(t("success"));
             setSeconds(30);
         } catch {
