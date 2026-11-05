@@ -189,7 +189,7 @@
     "email": "Email Address",
     "password": "Password",
     "confirmPassword": "Confirm Password",
-    "passwordHint": "Use at least 8 characters with uppercase, lowercase and numbers.",
+    "passwordHint": "Use at least 12 characters with uppercase, lowercase, numbers and a symbol.",
     "strength": "Password Strength",
     "weak": "Weak",
     "medium": "Medium",
@@ -214,11 +214,12 @@
       "emailRequired": "Email address is required.",
       "emailInvalid": "Please enter a valid email address.",
       "passwordRequired": "Password is required.",
-      "passwordWeak": "Password must contain at least 8 characters, uppercase, lowercase and a number.",
+      "passwordWeak": "Password must be 12–128 bytes and include uppercase, lowercase, numbers and a symbol.",
       "confirmRequired": "Please confirm your password.",
       "passwordMismatch": "Passwords do not match.",
       "termsRequired": "You must accept the terms.",
-      "privacyRequired": "You must acknowledge the Privacy Policy."
+      "privacyRequired": "You must acknowledge the Privacy Policy.",
+      "registrationFailed": "Registration failed. Check your details and try again."
     }
   },
   "ForgotPasswordPage": {
@@ -246,7 +247,20 @@
     "resend": "Resend Email",
     "resendIn": "Resend in {seconds}s",
     "backToLogin": "Back to Login",
-    "success": "Verification email sent successfully."
+    "success": "Verification email sent successfully.",
+    "checkTitle": "Check your email",
+    "checkingTitle": "Verifying your email",
+    "checkingDescription": "Please wait a moment.",
+    "verifiedTitle": "Email verified!",
+    "verifiedDescription": "Your account is active. You can now sign in.",
+    "invalidTitle": "Invalid or expired verification link",
+    "invalidDescription": "Request another verification email.",
+    "errorTitle": "Unable to verify email",
+    "errorDescription": "We couldn't contact the server. Please try again.",
+    "resendError": "Unable to resend the email. Please try later.",
+    "resendRequiresEmail": "Return to registration or sign in to request a new email.",
+    "retry": "Try again",
+    "goLogin": "Sign in"
   },
   "ResetPasswordPage": {
     "badge": "Secure Password Reset",
