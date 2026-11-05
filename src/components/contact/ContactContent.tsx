@@ -1,6 +1,7 @@
 "use client";
 
-import {useState,type FormEvent} from "react";
+import {useCallback,useState,type FormEvent} from "react";
+import {Turnstile,captchaEnabled} from "@/components/security/Turnstile";
 import {apiClient} from "@/lib/api/client";
 import {
     Mail,
@@ -27,14 +28,16 @@ export default function ContactContent({
     const [subject,setSubject]=useState("");
     const [message,setMessage]=useState("");
     const [website,setWebsite]=useState("");
+    const [captchaToken,setCaptchaToken]=useState("");
+    const onCaptchaToken=useCallback((token:string)=>setCaptchaToken(token),[]);
     const [busy,setBusy]=useState(false);
     const [status,setStatus]=useState<"success"|"error"|null>(null);
     const submit=async(event:FormEvent<HTMLFormElement>)=>{
         event.preventDefault();
-        if(busy)return;
+        if(busy||(captchaEnabled&&!captchaToken))return;
         setBusy(true);setStatus(null);
         try{
-            await apiClient.post("/api/v1/contact",{name,email,subject,message,website});
+            await apiClient.post("/api/v1/contact",{name,email,subject,message,website},{headers:{"X-Turnstile-Token":captchaToken}});
             setStatus("success");setName("");setEmail("");setSubject("");setMessage("");
         }catch{setStatus("error")}
         finally{setBusy(false)}
@@ -96,8 +99,9 @@ export default function ContactContent({
                         <label className="sr-only" aria-hidden="true">Website<input tabIndex={-1} autoComplete="off" value={website} onChange={e=>setWebsite(e.target.value)}/></label>
                         {status==="success"&&<p role="status" className="rounded-xl bg-green-500/10 p-3 text-green-300">{fa?"پیام شما با موفقیت ثبت شد.":"Your message has been received."}</p>}
                         {status==="error"&&<p role="alert" className="rounded-xl bg-red-500/10 p-3 text-red-300">{fa?"ارسال پیام ناموفق بود. دوباره تلاش کنید.":"Unable to send your message. Please try again."}</p>}
+                        <Turnstile onToken={onCaptchaToken}/>
                         <button
-                            type="submit" disabled={busy}
+                            type="submit" disabled={busy||(captchaEnabled&&!captchaToken)}
                             className="inline-flex items-center gap-3 rounded-xl bg-cyan-400 px-6 py-3 font-bold text-black transition hover:scale-105 disabled:opacity-50"
                         >
                             <Send size={20}/>
