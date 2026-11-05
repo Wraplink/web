@@ -137,10 +137,12 @@ export default function RegisterContent({
                 "validation.passwordRequired",
             );
         } else if (
-            new TextEncoder().encode(password).length < 12 ||\n            new TextEncoder().encode(password).length > 128 ||
+            new TextEncoder().encode(password).length < 12 ||
+            new TextEncoder().encode(password).length > 128 ||
             !/[a-z]/.test(password) ||
             !/[A-Z]/.test(password) ||
-            !/[0-9]/.test(password)
+            !/[0-9]/.test(password) ||
+            !/[^\p{L}\p{N}]/u.test(password)
         ) {
             nextErrors.password = t(
                 "validation.passwordWeak",
