@@ -1,9 +1,11 @@
 "use client";
 
 import {ArrowLeft, CheckCircle2, Mail, ShieldCheck} from "lucide-react";
-import {FormEvent, useState} from "react";
+import {FormEvent, useCallback, useState} from "react";
 import {useTranslations} from "next-intl";
 
+import {Turnstile,captchaEnabled} from "@/components/security/Turnstile";
+import {apiClient} from "@/lib/api/client";
 import {Link} from "@/i18n/navigation";
 
 type Props = {
@@ -16,56 +18,24 @@ export default function ForgotPasswordContent({locale}: Props) {
     const [email, setEmail] = useState("");
     const [error, setError] = useState("");
     const [submitted, setSubmitted] = useState(false);
+    const [captchaToken,setCaptchaToken]=useState("");
+    const onCaptchaToken=useCallback((token:string)=>setCaptchaToken(token),[]);
+    const [busy,setBusy]=useState(false);
 
-    const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-
         setError("");
-
-        if (!email.trim()) {
-            setError(t("errors.emailRequired"));
-            return;
-        }
-
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            setError(t("errors.emailInvalid"));
-            return;
-        }
-
-        /*
-         * ========================================================
-         * BACKEND TODO
-         * ========================================================
-         *
-         * When the Go backend is ready:
-         *
-         * POST /api/v1/auth/forgot-password
-         *
-         * Payload:
-         *
-         * {
-         *   email
-         * }
-         *
-         * Backend should:
-         *
-         * 1. Find the account by email.
-         * 2. Generate a secure, short-lived reset token.
-         * 3. Store only the hashed token.
-         * 4. Send the password reset email.
-         * 5. Return a generic response so account existence
-         *    cannot be discovered.
-         *
-         * The frontend should NOT receive or store the reset token.
-         * ========================================================
-         */
-
-        console.log("Forgot password request", {
-            email,
-            locale,
-        });
-
-        setSubmitted(true);
+        if (!email.trim()) {setError(t("errors.emailRequired"));return;}
+        if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {setError(t("errors.emailInvalid"));return;}
+        if (busy || (captchaEnabled && !captchaToken)) return;
+        setBusy(true);
+        try {
+            await apiClient.post("/api/v1/auth/password-reset/request", {email,locale},
+                {headers:{"X-Turnstile-Token":captchaToken}});
+            setSubmitted(true);
+        } catch {
+            setError(locale==="fa"?"ارسال درخواست ناموفق بود. دوباره تلاش کنید.":"Unable to send request. Please try again.");
+        } finally {setBusy(false);}
     };
 
     return (
@@ -160,8 +130,9 @@ export default function ForgotPasswordContent({locale}: Props) {
                                 </p>
                             )}
 
+                            <Turnstile onToken={onCaptchaToken}/>
                             <button
-                                type="submit"
+                                type="submit" disabled={busy||(captchaEnabled&&!captchaToken)}
                                 className="mt-6 w-full rounded-xl bg-cyan-400 py-3.5 font-semibold text-black shadow-[0_0_25px_rgba(0,229,255,0.2)] transition hover:scale-[1.01] hover:bg-cyan-300"
                             >
                                 {t("submit")}
