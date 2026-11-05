@@ -1,7 +1,8 @@
 "use client";
 
-import {useMemo, useState} from "react";
+import {useCallback, useMemo, useState} from "react";
 import {useRouter} from "next/navigation";
+import {Turnstile, captchaEnabled} from "@/components/security/Turnstile";
 import {apiClient} from "@/lib/api/client";
 
 import {
@@ -64,6 +65,9 @@ export default function RegisterContent({
 
     const [errors, setErrors] =
         useState<FormErrors>({});
+
+    const [captchaToken, setCaptchaToken] = useState("");
+    const onCaptchaToken = useCallback((token: string) => setCaptchaToken(token), []);
 
     const [isSubmitting, setIsSubmitting] =
         useState(false);
@@ -187,7 +191,7 @@ export default function RegisterContent({
             return;
         }
 
-        if (isSubmitting) {
+        if (isSubmitting || (captchaEnabled && !captchaToken)) {
             return;
         }
 
@@ -208,7 +212,7 @@ export default function RegisterContent({
         };
 
         try {
-            await apiClient.post("/api/v1/auth/register", registrationPayload);
+            await apiClient.post("/api/v1/auth/register", registrationPayload, {headers: {"X-Turnstile-Token": captchaToken}});
             router.push((locale === "en" ? "/en" : "") + "/auth/verify-email?email=" + encodeURIComponent(email.trim().toLowerCase()));
         } catch (error) {
             setErrors(previous => ({...previous, email: t("validation.registrationFailed")}));
@@ -623,12 +627,15 @@ export default function RegisterContent({
 
                         </div>
 
+                        <Turnstile onToken={onCaptchaToken}/>
+
                         {/* Submit */}
 
                         <button
                             type="submit"
                             disabled={
                                 isSubmitting ||
+                                (captchaEnabled && !captchaToken) ||
                                 !acceptedTerms ||
                                 !acceptedPrivacy
                             }

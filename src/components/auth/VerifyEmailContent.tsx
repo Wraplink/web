@@ -1,10 +1,11 @@
 "use client";
 
-import {useEffect, useRef, useState} from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
 import {useSearchParams} from "next/navigation";
 import {useTranslations} from "next-intl";
 import {MailCheck, RotateCw, CheckCircle2, AlertCircle} from "lucide-react";
 import {Link} from "@/i18n/navigation";
+import {Turnstile,captchaEnabled} from "@/components/security/Turnstile";
 import {apiClient} from "@/lib/api/client";
 
 type Props = {locale: string};
@@ -17,6 +18,8 @@ export default function VerifyEmailContent({locale}: Props) {
     const email = search.get("email") ?? "";
     const [status, setStatus] = useState<Status>(token ? "checking" : "pending");
     const [seconds, setSeconds] = useState(30);
+    const [captchaToken,setCaptchaToken]=useState("");
+    const onCaptchaToken=useCallback((token:string)=>setCaptchaToken(token),[]);
     const [sending, setSending] = useState(false);
     const [notice, setNotice] = useState("");
     const attempted = useRef<string | null>(null);
@@ -54,11 +57,11 @@ export default function VerifyEmailContent({locale}: Props) {
     }
 
     async function resend() {
-        if (!email || seconds > 0 || sending) return;
+        if (!email || seconds > 0 || sending || (captchaEnabled && !captchaToken)) return;
         setSending(true);
         setNotice("");
         try {
-            await apiClient.post("/api/v1/auth/resend-verification", {email});
+            await apiClient.post("/api/v1/auth/resend-verification", {email}, {headers:{"X-Turnstile-Token":captchaToken}});
             setNotice(t("success"));
             setSeconds(30);
         } catch {
@@ -92,8 +95,9 @@ export default function VerifyEmailContent({locale}: Props) {
                 {status === "pending" && email && <p dir="ltr" className="mt-3 text-cyan-300">{email.replace(/^(.{2}).*(@.*)$/, "$1***$2")}</p>}
                 {(status === "pending" || status === "invalid") && (
                     <div className="mt-8">
+                        {email && <Turnstile onToken={onCaptchaToken}/>}
                         {email ? (
-                            <button type="button" disabled={seconds > 0 || sending} onClick={resend}
+                            <button type="button" disabled={seconds > 0 || sending || (captchaEnabled && !captchaToken)} onClick={resend}
                                 className="rounded-xl bg-cyan-400 px-6 py-3 font-bold text-black disabled:cursor-not-allowed disabled:opacity-50">
                                 <RotateCw className="me-2 inline" size={18}/>
                                 {seconds > 0 ? t("resendIn", {seconds}) : t("resend")}
