@@ -20,11 +20,13 @@ export default function VerifyEmailContent({locale}: Props) {
     const [sending, setSending] = useState(false);
     const [notice, setNotice] = useState("");
     const attempted = useRef<string | null>(null);
+    const savedToken = useRef<string | null>(null);
 
     useEffect(() => {
         if (!token) {setStatus("pending"); return;}
         if (attempted.current === token) return;
         attempted.current = token;
+        savedToken.current = token;
         setStatus("checking");
         // Remove the secret from browser history as soon as it has been captured.
         window.history.replaceState(window.history.state, "", window.location.pathname);
@@ -38,6 +40,18 @@ export default function VerifyEmailContent({locale}: Props) {
         const id = window.setTimeout(() => setSeconds(value => Math.max(0, value - 1)), 1000);
         return () => window.clearTimeout(id);
     }, [seconds]);
+
+    async function retryVerification() {
+        if (!savedToken.current) return;
+        setStatus("checking");
+        try {
+            await apiClient.post("/api/v1/auth/verify-email", {token: savedToken.current});
+            setStatus("verified");
+        } catch (error: unknown) {
+            const status = (error as {response?: {status?: number}})?.response?.status;
+            setStatus(status === 400 ? "invalid" : "error");
+        }
+    }
 
     async function resend() {
         if (!email || seconds > 0 || sending) return;
@@ -88,7 +102,7 @@ export default function VerifyEmailContent({locale}: Props) {
                     </div>
                 )}
                 {notice && <p role="status" className="mt-4 text-sm text-cyan-300">{notice}</p>}
-                {status === "error" && <button className="mt-6 text-cyan-400 underline" onClick={() => window.location.reload()}>{t("retry")}</button>}
+                {status === "error" && <button className="mt-6 text-cyan-400 underline" onClick={retryVerification}>{t("retry")}</button>}
                 {(status === "verified" || status === "pending" || status === "invalid") && (
                     <Link href={loginHref} className="mt-8 block rounded-xl border border-cyan-400/40 px-6 py-3 text-cyan-300">
                         {status === "verified" ? t("goLogin") : t("backToLogin")}
