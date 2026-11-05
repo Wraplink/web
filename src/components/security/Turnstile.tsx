@@ -24,20 +24,22 @@ export function Turnstile({onToken}: {onToken: (token: string) => void}) {
     const container = useRef<HTMLDivElement>(null);
     const widgetId = useRef<string | null>(null);
     const [ready, setReady] = useState(false);
+    const onTokenRef = useRef(onToken);
+    useEffect(() => {onTokenRef.current = onToken;}, [onToken]);
     useEffect(() => {
         if (!siteKey || !ready || !container.current || !window.turnstile) return;
         const id = window.turnstile.render(container.current, {
             sitekey: siteKey,
-            callback: onToken,
-            "expired-callback": () => onToken(""),
-            "error-callback": () => onToken(""),
+            callback: (token: string) => onTokenRef.current(token),
+            "expired-callback": () => onTokenRef.current(""),
+            "error-callback": () => onTokenRef.current(""),
         });
         widgetId.current = id;
         return () => {
             if (widgetId.current && window.turnstile) window.turnstile.remove(widgetId.current);
             widgetId.current = null;
         };
-    }, [ready, onToken]);
+    }, [ready]);
     if (!siteKey) return null;
     return <>
         <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
