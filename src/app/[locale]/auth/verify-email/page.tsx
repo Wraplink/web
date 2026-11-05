@@ -1,3 +1,4 @@
+import {Suspense} from "react";
 import VerifyEmailContent from "@/components/auth/VerifyEmailContent";
 
 type Props = {
@@ -12,5 +13,5 @@ export default async function VerifyEmailPage({
 
     const {locale} = await params;
 
-    return <VerifyEmailContent locale={locale}/>;
+    return <Suspense fallback={null}><VerifyEmailContent locale={locale}/></Suspense>;
 }
