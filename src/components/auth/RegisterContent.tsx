@@ -625,12 +625,15 @@ export default function RegisterContent({
 
                         </div>
 
+                        <Turnstile onToken={onCaptchaToken}/>
+
                         {/* Submit */}
 
                         <button
                             type="submit"
                             disabled={
                                 isSubmitting ||
+                                (captchaEnabled && !captchaToken) ||
                                 !acceptedTerms ||
                                 !acceptedPrivacy
                             }
