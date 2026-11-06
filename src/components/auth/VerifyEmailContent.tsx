@@ -74,7 +74,7 @@ export default function VerifyEmailContent({locale}: Props) {
     const isFa = locale === "fa";
     const loginHref = "/auth/login";
     return (
-        <section dir={isFa ? "rtl" : "ltr"} className="relative min-h-[calc(100vh-4rem)] px-6 py-20">
+        <section dir={isFa ? "rtl" : "ltr"} className={`relative min-h-[calc(100vh-4rem)] px-6 py-20 ${isFa ? "font-[family-name:var(--font-persian)]" : "font-sans"}`}>
             <div className="mx-auto max-w-lg rounded-3xl border border-white/10 bg-white/[0.04] p-8 text-center shadow-2xl">
                 {status === "verified" ? <CheckCircle2 className="mx-auto text-green-400" size={60}/> :
                  status === "invalid" || status === "error" ? <AlertCircle className="mx-auto text-amber-400" size={60}/> :
