@@ -31,13 +31,15 @@ type MeResponse = {
 
 export async function login(
     email: string,
-    password: string
+    password: string,
+    rememberDevice = false
 ): Promise<AuthUser> {
     const response = await axios.post<LoginResponse>(
         `${API_BASE_URL}/api/v1/auth/login`,
         {
             email: email.trim(),
             password,
+            rememberDevice,
         },
         {
             withCredentials: true,

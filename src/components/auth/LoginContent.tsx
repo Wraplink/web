@@ -25,6 +25,8 @@ export default function LoginContent({locale}: Props) {
     const router = useRouter();
     const registrationHref = `/auth/register${typeof window !== "undefined" ? window.location.search : ""}`;
 
+    const [rememberDevice, setRememberDevice] = useState(false);
+
     const [showPassword, setShowPassword] =
         useState(false);
 
@@ -57,7 +59,8 @@ export default function LoginContent({locale}: Props) {
         try {
             const user = await login(
                 email,
-                password
+                password,
+                rememberDevice
             );
 
             setAuthUser(user);
@@ -216,6 +219,8 @@ export default function LoginContent({locale}: Props) {
 
                                 <input
                                     type="checkbox"
+                                    checked={rememberDevice}
+                                    onChange={event => setRememberDevice(event.target.checked)}
                                     disabled={loading}
                                 />
 
