@@ -28,16 +28,17 @@ export default function MarketContent({locale}: Props) {
     const [error, setError] = useState<string | null>(null);
     const [retry, setRetry] = useState(0);
     const [basketCount, setBasketCount] = useState(0);
-    const [favorites, setFavorites] = useState<string[]>([]);
+    const [favorites, setFavorites] = useState<string[]>(() => {
+        if (typeof window === "undefined") return [];
+        try {
+            const saved: unknown = JSON.parse(window.localStorage.getItem("wraplink:favorite-plans:v1") || "[]");
+            return Array.isArray(saved) ? saved.filter((item): item is string => typeof item === "string") : [];
+        } catch { return []; }
+    });
     const [favoritesOnly, setFavoritesOnly] = useState(false);
     const fa = locale === "fa";
 
-    useEffect(() => {
-        try {
-            const saved: unknown = JSON.parse(localStorage.getItem("wraplink:favorite-plans:v1") || "[]");
-            if (Array.isArray(saved)) setFavorites(saved.filter((item): item is string => typeof item === "string"));
-        } catch { /* storage may be unavailable */ }
-    }, []);
+
 
     const toggleFavorite = (code: string) => {
         setFavorites(previous => {
@@ -80,7 +81,8 @@ export default function MarketContent({locale}: Props) {
         return plans.filter(plan =>
             (!favoritesOnly || favorites.includes(plan.code)) && (!q || [plan.code, plan.name, plan.description].some(value =>
                 value.toLowerCase().includes(q)
-            ));
+            ))
+        );
     }, [plans, search, favorites, favoritesOnly]);
 
     const addToBasket = (plan: MarketPlan) => {
