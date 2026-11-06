@@ -3,6 +3,8 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+:root { --font-persian: "Vazirmatn", Tahoma, sans-serif; }
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -254,3 +256,6 @@ html[data-wraplink-theme="titanium"]{--wl-bg:#151B24;--wl-accent:#CBD5E1;--wl-su
 }
 .wraplink-user-zone[lang="fa"] aside nav a {font-size: 16px; font-weight: 500;}
 .wraplink-user-zone[lang="fa"] :is(p, label, td, th) {line-height: 1.8;}
+
+/* Use the same Persian typography on public authentication pages as the user zone. */
+html[lang="fa"] :is(input, button, select, textarea) { font-family: inherit; }
