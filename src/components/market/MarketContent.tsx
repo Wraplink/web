@@ -1,7 +1,7 @@
 "use client";
 
 import {useEffect, useMemo, useState} from "react";
-import {Search, ShoppingBag, RefreshCw, Heart, Database, CalendarDays, Star} from "lucide-react";
+import {Search, ShoppingBag, RefreshCw, Heart, Database, CalendarDays, Star, CheckCircle2, X} from "lucide-react";
 import {useTranslations} from "next-intl";
 import {Link, usePathname} from "@/i18n/navigation";
 import {addBasketItem, getBasket} from "@/lib/basket";
@@ -28,6 +28,8 @@ export default function MarketContent({locale}: Props) {
     const [error, setError] = useState<string | null>(null);
     const [retry, setRetry] = useState(0);
     const [basketCount, setBasketCount] = useState(0);
+    const [basketIds, setBasketIds] = useState<string[]>([]);
+    const [basketNotice, setBasketNotice] = useState<{name: string; alreadyAdded: boolean} | null>(null);
     const [favorites, setFavorites] = useState<string[]>(() => {
         if (typeof window === "undefined") return [];
         try {
@@ -54,7 +56,9 @@ export default function MarketContent({locale}: Props) {
 
 
     useEffect(() => {
-        setBasketCount(getBasket().reduce((sum, item) => sum + item.quantity, 0));
+        const basket = getBasket();
+        setBasketCount(basket.reduce((sum, item) => sum + item.quantity, 0));
+        setBasketIds(basket.map(item => item.id));
     }, []);
 
     useEffect(() => {
@@ -86,13 +90,22 @@ export default function MarketContent({locale}: Props) {
     }, [plans, search, favorites, favoritesOnly]);
 
     const addToBasket = (plan: MarketPlan) => {
+        // A plan is a subscription choice: repeated clicks must not add extra quantities.
+        if (getBasket().some(item => item.id === plan.code)) {
+            setBasketIds(getBasket().map(item => item.id));
+            setBasketNotice({name: plan.name, alreadyAdded: true});
+            return;
+        }
         addBasketItem({
             id: plan.code,
             name: plan.name,
             category: t("categories.plans"),
             price: plan.priceMinor,
         });
-        setBasketCount(getBasket().reduce((sum, item) => sum + item.quantity, 0));
+        const basket = getBasket();
+        setBasketCount(basket.reduce((sum, item) => sum + item.quantity, 0));
+        setBasketIds(basket.map(item => item.id));
+        setBasketNotice({name: plan.name, alreadyAdded: false});
     };
 
     return (
@@ -111,6 +124,14 @@ export default function MarketContent({locale}: Props) {
                         {basketCount > 0 && <span className="rounded-full bg-cyan-400 px-2 text-xs text-black">{basketCount}</span>}
                     </Link>
                 </div>
+                {basketNotice && <div role="status" aria-live="polite" className="mt-6 flex flex-wrap items-center gap-3 rounded-2xl border border-emerald-400/40 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-100">
+                    <CheckCircle2 size={22} className="shrink-0 text-emerald-300"/>
+                    <span className="min-w-0 flex-1 font-medium">{basketNotice.alreadyAdded
+                        ? (fa ? `«${basketNotice.name}» از قبل در سبد خرید شماست.` : `${basketNotice.name} is already in your basket.`)
+                        : (fa ? `«${basketNotice.name}» به سبد خرید اضافه شد.` : `${basketNotice.name} added to your basket.`)}</span>
+                    <Link href={inUserZone ? "/user/basket" : "/basket"} className="rounded-lg bg-emerald-400 px-4 py-2 font-bold text-slate-950 hover:bg-emerald-300">{fa ? "مشاهده سبد خرید" : "View basket"}</Link>
+                    <button type="button" onClick={() => setBasketNotice(null)} aria-label={fa ? "بستن پیام" : "Dismiss notification"} className="rounded-lg p-2 hover:bg-white/10"><X size={18}/></button>
+                </div>}
                 <div className="mt-10 flex max-w-md items-center rounded-xl border border-white/10 bg-white/5 px-4">
                     <Search size={19} className="text-gray-500"/>
                     <input value={search} onChange={event => setSearch(event.target.value)}
@@ -174,10 +195,17 @@ export default function MarketContent({locale}: Props) {
                                         <p className="text-xs text-slate-400">{fa ? "قیمت پلن" : "Plan price"}</p>
                                         <p className="mt-2 break-words text-2xl font-black text-cyan-300">{formatPrice(plan, locale)}</p>
                                     </div>
-                                    <button type="button" onClick={() => addToBasket(plan)}
-                                        className="mt-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-cyan-400 px-4 py-3 font-bold text-slate-950 transition hover:bg-cyan-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300">
-                                        <ShoppingBag size={19}/>{t("addToBasket")}
-                                    </button>
+                                    {basketIds.includes(plan.code) ? (
+                                        <Link href={inUserZone ? "/user/basket" : "/basket"}
+                                            className="mt-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-emerald-400/50 bg-emerald-400/15 px-4 py-3 font-bold text-emerald-200 transition hover:bg-emerald-400/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300">
+                                            <CheckCircle2 size={19}/>{fa ? "در سبد خرید · مشاهده سبد" : "In basket · View basket"}
+                                        </Link>
+                                    ) : (
+                                        <button type="button" onClick={() => addToBasket(plan)}
+                                            className="mt-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-cyan-400 px-4 py-3 font-bold text-slate-950 transition hover:bg-cyan-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300">
+                                            <ShoppingBag size={19}/>{t("addToBasket")}
+                                        </button>
+                                    )}
                                 </div>
                             </article>
                         ))}
