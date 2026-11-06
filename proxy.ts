@@ -1,29 +1,22 @@
 import createMiddleware from "next-intl/middleware";
-import {NextRequest} from "next/server";
+import {NextRequest, NextResponse} from "next/server";
 
 import {routing} from "./src/i18n/routing";
 
 const intlMiddleware = createMiddleware(routing);
-// Keep an explicit /fa prefix for authenticated shop routes. With the default
-// "as-needed" policy, /fa/user/market is canonicalized back to /user/market,
-// which can select the wrong (public) layout and lose the sidebar and theme.
-const userShopMiddleware = createMiddleware({
-    ...routing,
-    localePrefix: "always",
-});
 
 export default function proxy(request: NextRequest) {
-    const pathname = request.nextUrl.pathname;
-
-    if (/^\/(?:fa\/)?user\/(?:market|basket)(?:\/|$)/.test(pathname)) {
-        return userShopMiddleware(request);
+    // These Persian default-locale user-zone routes have explicit pages under
+    // the authenticated root route group. Do not rewrite or redirect them
+    // through [locale], where default-locale canonicalization can select the
+    // wrong layout and lose the sidebar and saved theme.
+    if (/^\/user\/(?:market|basket)(?:\/|$)/.test(request.nextUrl.pathname)) {
+        return NextResponse.next();
     }
 
     return intlMiddleware(request);
 }
 
 export const config = {
-    matcher: [
-        "/((?!api|trpc|_next|_vercel|.*\\..*).*)",
-    ],
+    matcher: ["/((?!api|trpc|_next|_vercel|.*\\..*).*)"],
 };
