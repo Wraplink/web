@@ -26,11 +26,11 @@ export default function ForgotPasswordContent({locale}: Props) {
         event.preventDefault();
         setError("");
         if (!email.trim()) {setError(t("errors.emailRequired"));return;}
-        if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {setError(t("errors.emailInvalid"));return;}
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {setError(t("errors.emailInvalid"));return;}
         if (busy || (captchaEnabled && !captchaToken)) return;
         setBusy(true);
         try {
-            await apiClient.post("/api/v1/auth/password-reset/request", {email,locale},
+            await apiClient.post("/api/v1/auth/password-reset/request", {email:email.trim(),locale},
                 {headers:{"X-Turnstile-Token":captchaToken}});
             setSubmitted(true);
         } catch {
