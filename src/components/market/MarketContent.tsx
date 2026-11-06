@@ -1,7 +1,7 @@
 "use client";
 
 import {useEffect, useMemo, useState} from "react";
-import {Search, ShoppingBag, RefreshCw, Heart, Database, CalendarDays} from "lucide-react";
+import {Search, ShoppingBag, RefreshCw, Heart, Database, CalendarDays, Star} from "lucide-react";
 import {useTranslations} from "next-intl";
 import {Link, usePathname} from "@/i18n/navigation";
 import {addBasketItem, getBasket} from "@/lib/basket";
@@ -142,7 +142,8 @@ export default function MarketContent({locale}: Props) {
                     <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
                         {filteredPlans.map(plan => (
                             <article key={plan.id} dir={fa ? "rtl" : "ltr"}
-                                className="group flex h-full flex-col rounded-3xl border border-white/15 bg-gradient-to-b from-slate-800/95 to-slate-950/95 p-6 shadow-xl shadow-black/20 transition hover:-translate-y-1 hover:border-cyan-400/50 focus-within:border-cyan-400/60">
+                                className={`group relative flex h-full flex-col rounded-3xl border ${plan.isPopular ? "border-amber-400/70 ring-1 ring-amber-400/30" : "border-white/15"} bg-gradient-to-b from-slate-800/95 to-slate-950/95 p-6 shadow-xl shadow-black/20 transition hover:-translate-y-1 hover:border-cyan-400/50 focus-within:border-cyan-400/60`}>
+                                {plan.isPopular && <div className="mb-4 inline-flex w-fit items-center gap-1.5 rounded-full bg-amber-400 px-3 py-1 text-xs font-bold text-slate-950"><Star size={14} fill="currentColor"/>{fa ? "محبوب‌ترین" : "Most popular"}</div>}
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="min-w-0">
                                         <span className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs text-cyan-200">{fa ? "پلن اینترنت" : "Internet plan"}</span>
