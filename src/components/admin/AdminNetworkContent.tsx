@@ -4,7 +4,6 @@ import {useEffect,useMemo,useRef,useState} from "react";
 import {useLocale} from "next-intl";
 import {apiClient} from "@/lib/api/client";
 
-type DomainPolicy={domain:string;mode:"normal"|"hijack"|"route"|"specific_ip"|"block";specific_ip?:string;route?:{destination_ip?:string;protocol:"tcp"|"udp"|"tcp_udp";destination_port_start?:number;destination_port_end?:number};connection_modes?:string[]};
 type RouteIP={agentId:string;publicIp:string;enabled:boolean;lastSeenAt:string|null;domain:string;state:string};
 type DNSNode={id:string;region:string;addresses:string[];lastSeenAt:string;online:boolean};
 
@@ -15,31 +14,15 @@ export default function AdminNetworkContent(){
  const locale=useLocale();
  const [nodes,setNodes]=useState<DNSNode[]>([]);
  const [routeIPs,setRouteIPs]=useState<RouteIP[]>([]);
- const [domains,setDomains]=useState<DomainPolicy[]>([]);
- const [revision,setRevision]=useState(0);
- const [search,setSearch]=useState("");
  const [networkSearch,setNetworkSearch]=useState("");
- const normalizedNetworkSearch=networkSearch.trim().toLowerCase();
- const visibleNodes=useMemo(()=>nodes.filter(node=>[node.id,node.region,...node.addresses,node.online?"online":"offline"].some(value=>value.toLowerCase().includes(normalizedNetworkSearch))),[nodes,normalizedNetworkSearch]);
- const visibleRouteIPs=useMemo(()=>routeIPs.filter(item=>[item.agentId,item.publicIp,item.domain,item.state,item.enabled?"enabled":"disabled"].some(value=>value.toLowerCase().includes(normalizedNetworkSearch))),[routeIPs,normalizedNetworkSearch]);
- const [modeFilter,setModeFilter]=useState<DomainPolicy["mode"]|"">("");
- const [page,setPage]=useState(1);
- const [pageSize,setPageSize]=useState(25);
- const [total,setTotal]=useState(0);
- const [policiesLoading,setPoliciesLoading]=useState(false);
- const [domain,setDomain]=useState("");
- const [mode,setMode]=useState<DomainPolicy["mode"]>("normal");
- const [ip,setIp]=useState("");
- const [protocol,setProtocol]=useState<"tcp"|"udp"|"tcp_udp">("tcp");
- const [saving,setSaving]=useState(false);
- const [message,setMessage]=useState("");
  const [loading,setLoading]=useState(true);
  const [error,setError]=useState("");
- const [deleteTarget,setDeleteTarget]=useState<string|null>(null);
- const [deleting,setDeleting]=useState(false);
  const [refreshIn,setRefreshIn]=useState(REFRESH_SECONDS);
  const [checkingNodes,setCheckingNodes]=useState(false);
  const checkingRef=useRef(false);
+ const normalizedNetworkSearch=networkSearch.trim().toLowerCase();
+ const visibleNodes=useMemo(()=>nodes.filter(node=>[node.id,node.region,...node.addresses,node.online?"online":"offline"].some(value=>value.toLowerCase().includes(normalizedNetworkSearch))),[nodes,normalizedNetworkSearch]);
+ const visibleRouteIPs=useMemo(()=>routeIPs.filter(item=>[item.agentId,item.publicIp,item.domain,item.state,item.enabled?"enabled":"disabled"].some(value=>value.toLowerCase().includes(normalizedNetworkSearch))),[routeIPs,normalizedNetworkSearch]);
  const pendingRoutes=routeIPs.some(ip=>ip.enabled&&ip.domain&&ip.state!=="active");
  const pendingRoutesRef=useRef(false);
  pendingRoutesRef.current=pendingRoutes;
@@ -54,20 +37,13 @@ export default function AdminNetworkContent(){
  }
  async function load(){
   setLoading(true);setError("");
-  try{const {data}=await apiClient.get<{nodes:DNSNode[]}>("/api/v1/admin/network/dns-controls");setNodes(data.nodes);await Promise.all([loadPolicies(search,page,pageSize,modeFilter),loadRouteIPs()])}
+  try{const {data}=await apiClient.get<{nodes:DNSNode[]}>("/api/v1/admin/network/dns-controls");setNodes(data.nodes);await loadRouteIPs()}
   catch(e){setError((e as {response?:{status?:number}}).response?.status===403?"Access administrator permission required":"Unable to load DNS controllers")}
   finally{setLoading(false);setRefreshIn(REFRESH_SECONDS)}
  }
  async function loadRouteIPs(){
   try {const {data}=await apiClient.get<{addresses:RouteIP[]}>("/api/v1/admin/network/route-agent-ips");setRouteIPs(data.addresses)}
   catch {setError("Unable to load route agent IP inventory")}
- }
- async function loadPolicies(query:string,currentPage:number,size:number,selectedMode:DomainPolicy["mode"]|""){
-  setPoliciesLoading(true);
-  try{
-   const {data}=await apiClient.get<{revision:number;domains:DomainPolicy[];total?:number;page?:number;pageSize?:number}>("/api/v1/admin/network/domains",{params:{search:query,mode:selectedMode,page:currentPage,pageSize:size}});
-   setDomains(data.domains);setRevision(data.revision);setTotal(data.total??data.domains.length);
-  }catch{setError("Unable to load domain policies")}finally{setPoliciesLoading(false)}
  }
  useEffect(()=>{void load()},[]);
  useEffect(()=>{
@@ -81,16 +57,6 @@ export default function AdminNetworkContent(){
   return ()=>window.clearInterval(timer);
  },[]);
  useEffect(()=>{if(pendingRoutes)setRefreshIn(seconds=>Math.min(seconds,PENDING_REFRESH_SECONDS))},[pendingRoutes]);
- useEffect(()=>{void loadPolicies(search,page,pageSize,modeFilter)},[search,page,pageSize,modeFilter]);
- async function save(){setSaving(true);setError("");setMessage("");try{
- const policy:DomainPolicy={domain:domain.trim().toLowerCase(),mode};
- if(mode==="specific_ip")policy.specific_ip=ip.trim();
- if(mode==="route")policy.route={protocol,...(ip.trim()?{destination_ip:ip.trim()}:{})};
- await apiClient.put("/api/v1/admin/network/domains",policy);
- setDomain("");setIp("");setMessage(mode==="route"?"Full Route policy saved. An agent public IP must be allocated and forwarding acknowledged before DNS can activate this domain.":"Policy saved. DNS Control will apply it after synchronization.");await Promise.all([loadPolicies(search,page,pageSize,modeFilter),loadRouteIPs()]);
- }catch(e){setError((e as {response?:{data?:{error?:string}}}).response?.data?.error||"Unable to save policy")}finally{setSaving(false)}}
- async function remove(name:string){setDeleting(true);setError("");try{await apiClient.delete("/api/v1/admin/network/domains/"+encodeURIComponent(name));if(domains.length===1&&page>1)setPage(page-1);else await Promise.all([loadPolicies(search,page,pageSize,modeFilter),loadRouteIPs()]);setDeleteTarget(null)}catch{setError("Unable to delete policy")}finally{setDeleting(false)}}
- function edit(p:DomainPolicy){setDomain(p.domain);setMode(p.mode);setIp(p.mode==="specific_ip"?p.specific_ip||"":p.route?.destination_ip||"");setProtocol(p.route?.protocol||"tcp")}
 
  return <main className="mx-auto max-w-5xl px-6 py-12">
   <div className="flex flex-wrap items-center justify-between gap-4"><h1 className="text-3xl font-bold">Network operations</h1><div className="flex items-center gap-3"><span role="status" className="text-sm text-gray-400">{checkingNodes?"Checking DNS controllers…":`Auto-refresh in ${refreshIn}s`}</span><button onClick={()=>{setRefreshIn(REFRESH_SECONDS);void refreshNodes()}} disabled={loading||checkingNodes} className="rounded-lg border px-4 py-2 disabled:opacity-50">Refresh now</button></div></div>
