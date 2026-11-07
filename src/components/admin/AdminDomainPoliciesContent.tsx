@@ -1,19 +1,15 @@
 "use client";
 import {Link} from "@/i18n/navigation";
-import {useEffect,useRef,useState} from "react";
+import {useEffect,useState} from "react";
 import {useLocale} from "next-intl";
 import {apiClient} from "@/lib/api/client";
 
 type DomainPolicy={domain:string;mode:"normal"|"hijack"|"route"|"specific_ip"|"block";specific_ip?:string;route?:{destination_ip?:string;protocol:"tcp"|"udp"|"tcp_udp";destination_port_start?:number;destination_port_end?:number};connection_modes?:string[]};
 type RouteIP={agentId:string;publicIp:string;enabled:boolean;lastSeenAt:string|null;domain:string;state:string};
-type DNSNode={id:string;region:string;addresses:string[];lastSeenAt:string;online:boolean};
 
-const REFRESH_SECONDS=15;
-const PENDING_REFRESH_SECONDS=3;
 
 export default function AdminDomainPoliciesContent(){
  const locale=useLocale();
- const [nodes,setNodes]=useState<DNSNode[]>([]);
  const [routeIPs,setRouteIPs]=useState<RouteIP[]>([]);
  const [domains,setDomains]=useState<DomainPolicy[]>([]);
  const [revision,setRevision]=useState(0);
@@ -29,31 +25,9 @@ export default function AdminDomainPoliciesContent(){
  const [protocol,setProtocol]=useState<"tcp"|"udp"|"tcp_udp">("tcp");
  const [saving,setSaving]=useState(false);
  const [message,setMessage]=useState("");
- const [loading,setLoading]=useState(true);
  const [error,setError]=useState("");
  const [deleteTarget,setDeleteTarget]=useState<string|null>(null);
  const [deleting,setDeleting]=useState(false);
- const [refreshIn,setRefreshIn]=useState(REFRESH_SECONDS);
- const [checkingNodes,setCheckingNodes]=useState(false);
- const checkingRef=useRef(false);
- const pendingRoutes=routeIPs.some(ip=>ip.enabled&&ip.domain&&ip.state!=="active");
- const pendingRoutesRef=useRef(false);
- pendingRoutesRef.current=pendingRoutes;
- async function refreshNodes(){
-  if(checkingRef.current)return;
-  checkingRef.current=true;setCheckingNodes(true);
-  try{
-   const {data}=await apiClient.get<{nodes:DNSNode[]}>("/api/v1/admin/network/dns-controls");
-   setNodes(data.nodes);await loadRouteIPs();setError("");
-  }catch(e){setError((e as {response?:{status?:number}}).response?.status===403?"Access administrator permission required":"Unable to refresh DNS controller status")}
-  finally{checkingRef.current=false;setCheckingNodes(false);setRefreshIn(pendingRoutesRef.current?PENDING_REFRESH_SECONDS:REFRESH_SECONDS)}
- }
- async function load(){
-  setLoading(true);setError("");
-  try{const {data}=await apiClient.get<{nodes:DNSNode[]}>("/api/v1/admin/network/dns-controls");setNodes(data.nodes);await Promise.all([loadPolicies(search,page,pageSize,modeFilter),loadRouteIPs()])}
-  catch(e){setError((e as {response?:{status?:number}}).response?.status===403?"Access administrator permission required":"Unable to load DNS controllers")}
-  finally{setLoading(false);setRefreshIn(REFRESH_SECONDS)}
- }
  async function loadRouteIPs(){
   try {const {data}=await apiClient.get<{addresses:RouteIP[]}>("/api/v1/admin/network/route-agent-ips");setRouteIPs(data.addresses)}
   catch {setError("Unable to load route agent IP inventory")}
@@ -65,18 +39,7 @@ export default function AdminDomainPoliciesContent(){
    setDomains(data.domains);setRevision(data.revision);setTotal(data.total??data.domains.length);
   }catch{setError("Unable to load domain policies")}finally{setPoliciesLoading(false)}
  }
- useEffect(()=>{void load()},[]);
- useEffect(()=>{
-  const timer=window.setInterval(()=>{
-   if(document.visibilityState!=="visible"||checkingRef.current)return;
-   setRefreshIn(seconds=>{
-    if(seconds<=1){void refreshNodes();return pendingRoutesRef.current?PENDING_REFRESH_SECONDS:REFRESH_SECONDS}
-    return Math.min(seconds-1,pendingRoutesRef.current?PENDING_REFRESH_SECONDS:REFRESH_SECONDS);
-   });
-  },1000);
-  return ()=>window.clearInterval(timer);
- },[]);
- useEffect(()=>{if(pendingRoutes)setRefreshIn(seconds=>Math.min(seconds,PENDING_REFRESH_SECONDS))},[pendingRoutes]);
+ useEffect(()=>{void loadRouteIPs()},[]);
  useEffect(()=>{void loadPolicies(search,page,pageSize,modeFilter)},[search,page,pageSize,modeFilter]);
  async function save(){setSaving(true);setError("");setMessage("");try{
  const policy:DomainPolicy={domain:domain.trim().toLowerCase(),mode};
