@@ -28,6 +28,7 @@ export default function AdminHome({locale}:{locale:string}){
   {href:"/admin/discounts",title:locale==="fa"?"کدهای تخفیف":"Discounts",description:locale==="fa"?"ایجاد و غیرفعال‌سازی کدهای تخفیف":"Create and disable promotional codes"},
   {href:"/admin/plans",title:locale==="fa"?"مدیریت پلن‌ها":"Plans",description:locale==="fa"?"ساخت و ویرایش پلن‌ها، فعال‌سازی و زمان‌بندی انتشار":"Create, edit, enable and schedule subscription plans"},
   {href:"/admin/access",title:locale==="fa"?"مجوزهای کارکنان":"Staff permissions",description:locale==="fa"?"اعطا و لغو مجوزهای مدیریتی":"Grant and revoke administrative permissions",count:counts.staff},
+  {href:"/admin/domain-policies",title:locale==="fa"?"سیاست‌های تفکیک دامنه":"Domain resolution policies",description:locale==="fa"?"ثبت و مدیریت قوانین پاسخ DNS و مسیریابی دامنه‌ها":"Manage DNS resolution and domain routing policies"},
   {href:"/admin/network",title:locale==="fa"?"مدیریت شبکه":"Network operations",description:locale==="fa"?"کنترل DNS، عامل‌های لبه و سلامت شبکه":"DNS control, edge agents and network health"},
  ];
  return <main className="mx-auto max-w-6xl px-6 py-12">
