@@ -36,7 +36,7 @@ export default function LoginContent({locale}: Props) {
                 if (user) setAuthUser(user);
                 const params = new URLSearchParams(window.location.search);
                 const returnUrl = params.get("returnUrl");
-                const destination = returnUrl && returnUrl.startsWith("/") && !returnUrl.startsWith("//") && !returnUrl.startsWith("/\\\\") && !returnUrl.includes("\\\\")
+                const destination = returnUrl && returnUrl.startsWith("/") && !returnUrl.startsWith("//")
                     ? returnUrl : "/dashboard";
                 router.replace(destination);
             } catch {
