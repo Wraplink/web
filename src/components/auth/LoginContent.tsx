@@ -25,6 +25,8 @@ export default function LoginContent({locale}: Props) {
     const router = useRouter();
     const registrationHref = `/auth/register${typeof window !== "undefined" ? window.location.search : ""}`;
 
+    const [checkingSession, setCheckingSession] = useState(true);
+
     // A persistent refresh cookie is HttpOnly, so restore it via the API.
     // Without this check, returning users always see the password form.
     useEffect(() => {
@@ -41,6 +43,7 @@ export default function LoginContent({locale}: Props) {
                 router.replace(destination);
             } catch {
                 // Missing/expired refresh cookie: allow manual login.
+                if (!cancelled) setCheckingSession(false);
             }
         };
         void restore();
@@ -110,6 +113,16 @@ export default function LoginContent({locale}: Props) {
             setLoading(false);
         }
     };
+
+    // Do not flash the password form while checking a remembered session.
+    if (checkingSession) {
+        return (
+            <div role="status" className="flex min-h-[calc(100vh-120px)] items-center justify-center gap-3 text-gray-300">
+                <Loader2 className="h-6 w-6 animate-spin" aria-hidden="true" />
+                <span>Checking your session...</span>
+            </div>
+        );
+    }
 
     return (
         <section className="mx-auto flex min-h-[calc(100vh-120px)] max-w-7xl items-center px-6 py-20">
