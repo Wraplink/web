@@ -1,7 +1,7 @@
 "use client";
 
 import axios from "axios";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {
     Eye,
     EyeOff,
@@ -13,8 +13,8 @@ import {
 import {useTranslations} from "next-intl";
 
 import {Link, useRouter} from "@/i18n/navigation";
-import {login} from "@/lib/api/auth";
-import {setAuthUser} from "@/lib/auth";
+import {login, restoreSession} from "@/lib/api/auth";
+import {setAuthUser, isAuthenticated} from "@/lib/auth";
 
 type Props = {
     locale: string;
@@ -24,6 +24,28 @@ export default function LoginContent({locale}: Props) {
     const t = useTranslations("LoginPage");
     const router = useRouter();
     const registrationHref = `/auth/register${typeof window !== "undefined" ? window.location.search : ""}`;
+
+    // A persistent refresh cookie is HttpOnly, so restore it via the API.
+    // Without this check, returning users always see the password form.
+    useEffect(() => {
+        let cancelled = false;
+        const restore = async () => {
+            try {
+                const user = isAuthenticated() ? null : await restoreSession();
+                if (cancelled) return;
+                if (user) setAuthUser(user);
+                const params = new URLSearchParams(window.location.search);
+                const returnUrl = params.get("returnUrl");
+                const destination = returnUrl && returnUrl.startsWith("/") && !returnUrl.startsWith("//")
+                    ? returnUrl : "/dashboard";
+                router.replace(destination);
+            } catch {
+                // Missing/expired refresh cookie: allow manual login.
+            }
+        };
+        void restore();
+        return () => { cancelled = true; };
+    }, [router]);
 
     const [rememberDevice, setRememberDevice] = useState(false);
 
