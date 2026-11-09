@@ -12,6 +12,7 @@ export default function AdminPlansContent(){
  const locale=useLocale(),fa=locale==="fa";
  const [items,setItems]=useState<Plan[]>([]),[draft,setDraft]=useState<Draft>(blank),[search,setSearch]=useState(""),[page,setPage]=useState(1),[loading,setLoading]=useState(true),[saving,setSaving]=useState(false),[error,setError]=useState(""),[message,setMessage]=useState("");
  const [dateInput,setDateInput]=useState("");
+ const [allowanceGB,setAllowanceGB]=useState("");
  const [retiringCode,setRetiringCode]=useState<string|null>(null);
  const [editingCode,setEditingCode]=useState<string|null>(null);
  async function load(){setLoading(true);setError("");try{const {data}=await apiClient.get<{plans:Plan[]}>("/api/v1/admin/plans/");setItems(data.plans??[])}catch(e){setError((e as {response?:{status?:number}}).response?.status===403?(fa?"دسترسی مدیر لازم است.":"Administrator permission required."):(fa?"دریافت پلن‌ها ناموفق بود.":"Unable to load plans."))}finally{setLoading(false)}}
@@ -19,8 +20,8 @@ export default function AdminPlansContent(){
  const filtered=useMemo(()=>items.filter(p=>(p.code+" "+p.name).toLowerCase().includes(search.toLowerCase())),[items,search]);
  const visible=filtered.slice((page-1)*10,page*10);
  const update=<K extends keyof Draft>(key:K,value:Draft[K])=>setDraft(p=>({...p,[key]:value}));
- function edit(p:Plan){setEditingCode(p.code);setDraft({code:p.code,name:p.name,description:p.description,priceMinor:p.priceMinor,currency:p.currency,durationDays:p.durationDays,dataLimitBytes:p.dataLimitBytes,active:p.active,isPopular:p.isPopular??false,publishAt:p.publishAt,sortOrder:p.sortOrder});setDateInput(toLocal(p.publishAt));setMessage("");window.scrollTo({top:0,behavior:"smooth"})}
- function reset(){setEditingCode(null);setDraft(blank);setDateInput("");setMessage("")}
+ function edit(p:Plan){setAllowanceGB(p.dataLimitBytes===0?"":String(p.dataLimitBytes/(1024**3)));setEditingCode(p.code);setDraft({code:p.code,name:p.name,description:p.description,priceMinor:p.priceMinor,currency:p.currency,durationDays:p.durationDays,dataLimitBytes:p.dataLimitBytes,active:p.active,isPopular:p.isPopular??false,publishAt:p.publishAt,sortOrder:p.sortOrder});setDateInput(toLocal(p.publishAt));setMessage("");window.scrollTo({top:0,behavior:"smooth"})}
+ function reset(){setAllowanceGB("");setEditingCode(null);setDraft(blank);setDateInput("");setMessage("")}
  async function retire(p:Plan){
   const confirmation=fa?`پلن «${p.name}» حذف شود؟ اگر سابقه خرید داشته باشد بایگانی می‌شود و تاریخچه کاربران حفظ خواهد شد.`:`Remove "${p.name}"? Plans with purchase history will be archived; customer records are preserved.`;
   if(!window.confirm(confirmation))return;
@@ -45,6 +46,7 @@ export default function AdminPlansContent(){
  <label className="text-sm">{fa?"نام":"Name"}<input required value={draft.name} onChange={e=>update("name",e.target.value)} className="mt-1 w-full rounded border bg-transparent p-2" /></label>
  <label className="text-sm sm:col-span-2">{fa?"توضیحات":"Description"}<textarea value={draft.description} onChange={e=>update("description",e.target.value)} className="mt-1 w-full rounded border bg-transparent p-2" /></label>
  {([["priceMinor",fa?"قیمت (واحد خرد)":"Price (minor units)"],["durationDays",fa?"مدت (روز)":"Duration (days)"],["dataLimitBytes",fa?"حجم ترافیک (بایت)":"Data limit (bytes)"],["sortOrder",fa?"ترتیب نمایش":"Sort order"]] as const).map(([key,label])=><label key={key} className="text-sm">{label}<input type="number" min="0" required value={draft[key]} onChange={e=>update(key,Number(e.target.value))} className="mt-1 w-full rounded border bg-transparent p-2" /></label>)}
+ <label className="text-sm">{fa?"حجم ترافیک (گیگابایت) — ۰ یعنی نامحدود":"Data allowance (GB) — 0 means unlimited"}<input type="number" min="0" step="any" value={allowanceGB} placeholder={fa?"مثلاً ۱۰":"e.g. 10"} onChange={e=>{const value=e.target.value;setAllowanceGB(value);const gb=Number(value);if(value!==""&&Number.isFinite(gb)&&gb>=0&&Number.isSafeInteger(Math.round(gb*1024**3)))update("dataLimitBytes",Math.round(gb*1024**3));}} className="mt-1 w-full rounded border bg-transparent p-2" /><span className="mt-1 block text-xs text-gray-400">{fa?"مقدار بالا به بایت تبدیل می‌شود؛ صفر به معنای نامحدود است.":"Converted to bytes automatically; zero means unlimited."}</span></label>
  <label className="text-sm">{fa?"ارز":"Currency"}<input maxLength={3} required value={draft.currency} onChange={e=>update("currency",e.target.value.toUpperCase())} className="mt-1 w-full rounded border bg-transparent p-2" /></label>
  <label className="text-sm">{fa?"تاریخ انتشار (اختیاری)":"Publish date (optional)"}<input type="datetime-local" value={dateInput} onChange={e=>setDateInput(e.target.value)} className="mt-1 w-full rounded border bg-slate-900 p-2" /></label>
  <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={draft.isPopular} onChange={e=>update("isPopular",e.target.checked)} />{fa?"محبوب‌ترین / پیشنهاد ویژه":"Most popular / Featured"}</label>
