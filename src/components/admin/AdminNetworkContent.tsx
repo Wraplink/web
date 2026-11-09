@@ -17,14 +17,18 @@ export default function AdminNetworkContent(){
  const [agents,setAgents]=useState<EdgeAgent[]>([]);
  const [routeIPs,setRouteIPs]=useState<RouteIP[]>([]);
  const [networkSearch,setNetworkSearch]=useState("");
+ const [nodeType,setNodeType]=useState<"all"|"dns"|"edge">("all");
  const [loading,setLoading]=useState(true);
  const [error,setError]=useState("");
  const [refreshIn,setRefreshIn]=useState(REFRESH_SECONDS);
  const [checkingNodes,setCheckingNodes]=useState(false);
  const checkingRef=useRef(false);
  const normalizedNetworkSearch=networkSearch.trim().toLowerCase();
- const visibleAgents=useMemo(()=>agents.filter(a=>[a.id,a.region,a.status,a.online?"online":"offline"].some(v=>v.toLowerCase().includes(normalizedNetworkSearch))),[agents,normalizedNetworkSearch]);
- const visibleNodes=useMemo(()=>nodes.filter(node=>[node.id,node.region,...node.addresses,node.online?"online":"offline"].some(value=>value.toLowerCase().includes(normalizedNetworkSearch))),[nodes,normalizedNetworkSearch]);
+ const unifiedNodes=useMemo(()=>[
+  ...nodes.map(node=>({key:"dns:"+node.id,id:node.id,type:"dns" as const,region:node.region,online:node.online,addresses:node.addresses.join(", "),capacity:"—",lastSeenAt:node.lastSeenAt})),
+  ...agents.map(agent=>({key:"edge:"+agent.id,id:agent.id,type:"edge" as const,region:agent.region,online:agent.online,addresses:"—",capacity:agent.sniCapacity+" / "+agent.routeCapacity,lastSeenAt:agent.lastSeenAt}))
+ ],[nodes,agents]);
+ const visibleNodes=useMemo(()=>unifiedNodes.filter(node=>(nodeType==="all"||node.type===nodeType)&&[node.id,node.type,node.type==="dns"?"dns control":"edge agent",node.region,node.addresses,node.capacity,node.online?"online":"offline"].some(value=>value.toLowerCase().includes(normalizedNetworkSearch))),[unifiedNodes,nodeType,normalizedNetworkSearch]);
  const visibleRouteIPs=useMemo(()=>routeIPs.filter(item=>[item.agentId,item.publicIp,item.domain,item.state,item.enabled?"enabled":"disabled"].some(value=>value.toLowerCase().includes(normalizedNetworkSearch))),[routeIPs,normalizedNetworkSearch]);
  const pendingRoutes=routeIPs.some(ip=>ip.enabled&&ip.domain&&ip.state!=="active");
  const pendingRoutesRef=useRef(false);
@@ -69,23 +73,15 @@ export default function AdminNetworkContent(){
   <div className="flex flex-wrap items-center justify-between gap-4"><h1 className="text-3xl font-bold">Network operations</h1><div className="flex items-center gap-3"><span role="status" className="text-sm text-gray-400">{checkingNodes?"Checking DNS controllers…":`Auto-refresh in ${refreshIn}s`}</span><button onClick={()=>{setRefreshIn(REFRESH_SECONDS);void refreshNodes()}} disabled={loading||checkingNodes} className="rounded-lg border px-4 py-2 disabled:opacity-50">Refresh now</button></div></div>
   <p className="mt-3 text-gray-400">DNS controller registration and heartbeat status from the backend registry.</p>
   {error&&<p role="alert" className="mt-4 text-red-400">{error}</p>}
-  <label className="mt-6 block text-sm">{locale==="fa"?"جست‌وجوی شبکه":"Search network"}<input type="search" value={networkSearch} onChange={e=>setNetworkSearch(e.target.value)} placeholder={locale==="fa"?"شناسه کنترلر، منطقه، IP، دامنه یا وضعیت":"Controller, region, IP, domain or status"} className="mt-2 block w-full max-w-lg rounded-lg border border-white/20 bg-transparent p-3" /></label>
-  {loading?<p className="mt-6">Loading controllers…</p>:<div className="mt-6 space-y-3">
-   {visibleNodes.length===0&&<p>{networkSearch?"No matching DNS controllers.":"No registered DNS controllers."}</p>}
-   {visibleNodes.map(node=><article key={node.id} className="rounded-xl border border-white/15 bg-white/5 p-5">
-    <div className="flex justify-between gap-3"><h2 className="break-all font-semibold">{node.id}</h2><span className={node.online?"text-green-400":"text-amber-300"}>{node.online?"Online":"Offline"}</span></div>
-    <p className="mt-2 text-sm text-gray-400">Region: {node.region||"Unspecified"}</p>
-    <p className="text-sm text-gray-400">Addresses: {node.addresses.join(", ")||"None"}</p>
-    <p className="text-sm text-gray-400">Last registration: {new Date(node.lastSeenAt).toLocaleString()}</p>
-   </article>)}
-  </div>}
   <section className="mt-8 rounded-xl border border-white/15 p-5">
-   <h2 className="font-semibold">{locale==="fa"?"سلامت عامل‌های شبکه":"Edge Agent health"}</h2>
-   <p className="mt-2 text-sm text-gray-400">{locale==="fa"?"وضعیت و آخرین ضربان قلب ثبت‌شده در بک‌اند":"Backend-authoritative status, heartbeat freshness and advertised capacity"}</p>
-   <div className="mt-4 flex flex-wrap gap-3 text-sm"><span>Online: {agents.filter(a=>a.online).length}</span><span>Offline/stale: {agents.filter(a=>!a.online).length}</span><span>Total: {agents.length}</span></div>
-   <div className="mt-4 overflow-x-auto"><table className="w-full text-left text-sm"><thead><tr><th className="p-2">Agent</th><th className="p-2">Region</th><th className="p-2">Health</th><th className="p-2">SNI / Route capacity</th><th className="p-2">Last heartbeat</th></tr></thead>
-   <tbody>{visibleAgents.map(a=><tr key={a.id} className="border-t border-white/10"><td className="p-2">{a.id}</td><td className="p-2">{a.region||"—"}</td><td className={a.online?"p-2 text-green-400":"p-2 text-amber-300"}>{a.online?"Online":"Offline / stale"}</td><td className="p-2">{a.sniCapacity} / {a.routeCapacity}</td><td className="p-2">{new Date(a.lastSeenAt).toLocaleString(locale)}</td></tr>)}</tbody></table></div>
-   {visibleAgents.length===0&&<p className="mt-3 text-sm text-gray-400">{networkSearch?"No matching Edge Agents.":"No registered Edge Agents."}</p>}
+   <h2 className="font-semibold">{locale==="fa"?"وضعیت کنترلرهای DNS و عامل‌های شبکه":"DNS controllers and Edge Agents"}</h2>
+   <p className="mt-2 text-sm text-gray-400">{locale==="fa"?"نمای یکپارچه وضعیت و آخرین فعالیت ثبت‌شده در بک‌اند":"Unified Backend-reported status and last activity"}</p>
+   <div className="mt-4 flex flex-wrap gap-3 text-sm"><span>{locale==="fa"?"آنلاین":"Online"}: {unifiedNodes.filter(n=>n.online).length}</span><span>{locale==="fa"?"آفلاین":"Offline/stale"}: {unifiedNodes.filter(n=>!n.online).length}</span><span>{locale==="fa"?"مجموع":"Total"}: {unifiedNodes.length}</span></div>
+   <div className="mt-5 flex flex-wrap items-end gap-4">
+    <label className="block min-w-0 flex-1 text-sm">{locale==="fa"?"جست‌وجوی شبکه":"Search network"}<input type="search" value={networkSearch} onChange={e=>setNetworkSearch(e.target.value)} placeholder={locale==="fa"?"شناسه، نوع، منطقه، IP یا وضعیت":"ID, type, region, IP or status"} className="mt-2 block w-full rounded-lg border border-white/20 bg-transparent p-3" /></label>
+    <label className="block text-sm">{locale==="fa"?"نوع":"Type"}<select value={nodeType} onChange={e=>setNodeType(e.target.value as "all"|"dns"|"edge")} className="mt-2 block w-full rounded-lg border border-white/20 bg-slate-950 p-3"><option value="all">{locale==="fa"?"همه":"All types"}</option><option value="dns">DNS Control</option><option value="edge">Edge Agent</option></select></label>
+   </div>
+   {loading?<p className="mt-5">{locale==="fa"?"در حال بارگذاری…":"Loading network nodes…"}</p>:<div className="mt-5 overflow-x-auto"><table className="w-full text-left text-sm" dir={locale==="fa"?"rtl":"ltr"}><thead><tr><th scope="col" className="p-2">{locale==="fa"?"شناسه":"Node"}</th><th scope="col" className="p-2">{locale==="fa"?"نوع":"Type"}</th><th scope="col" className="p-2">{locale==="fa"?"منطقه":"Region"}</th><th scope="col" className="p-2">{locale==="fa"?"وضعیت":"Health"}</th><th scope="col" className="p-2">{locale==="fa"?"آدرس‌های DNS":"DNS addresses"}</th><th scope="col" className="p-2">{locale==="fa"?"ظرفیت SNI / Route":"SNI / Route capacity"}</th><th scope="col" className="p-2">{locale==="fa"?"آخرین فعالیت":"Last activity"}</th></tr></thead><tbody>{visibleNodes.map(node=><tr key={node.key} className="border-t border-white/10"><td className="p-2 font-medium">{node.id}</td><td className="p-2">{node.type==="dns"?"DNS Control":"Edge Agent"}</td><td className="p-2">{node.region||"—"}</td><td className={node.online?"p-2 text-green-400":"p-2 text-amber-300"}>{node.online?(locale==="fa"?"آنلاین":"Online"):(locale==="fa"?"آفلاین / قدیمی":"Offline / stale")}</td><td className="p-2">{node.addresses||"—"}</td><td className="p-2">{node.capacity}</td><td className="p-2">{node.lastSeenAt?new Date(node.lastSeenAt).toLocaleString(locale):"—"}</td></tr>)}</tbody></table>{visibleNodes.length===0&&<p className="mt-4 text-sm text-gray-400">{locale==="fa"?"موردی مطابق فیلترها یافت نشد.":"No network nodes match your filters."}</p>}</div>}
   </section>
   <div className="mt-5"><Link href="/admin/domain-policies" className="text-cyan-300 underline">{locale==="fa"?"مدیریت سیاست‌های تفکیک دامنه":"Manage domain resolution policies"}</Link></div>
   <section className="mt-8 rounded-xl border border-white/15 p-5">
