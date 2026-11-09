@@ -5,7 +5,7 @@ import {useLocale} from "next-intl";
 import {apiClient} from "@/lib/api/client";
 
 type Plan={id:string;code:string;name:string;description:string;priceMinor:number;currency:string;durationDays:number;dataLimitBytes:number;active:boolean;isPopular:boolean;publishAt:string|null;sortOrder:number;createdAt:string;archivedAt:string|null};
-type Draft=Omit<Plan,"id"|"createdAt">;
+type Draft=Omit<Plan,"id"|"createdAt"|"archivedAt">;
 const blank:Draft={code:"",name:"",description:"",priceMinor:0,currency:"IRR",durationDays:30,dataLimitBytes:0,active:false,isPopular:false,publishAt:null,sortOrder:0};
 const toLocal=(v:string|null)=>{if(!v)return "";const d=new Date(v);return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16)};
 export default function AdminPlansContent(){
