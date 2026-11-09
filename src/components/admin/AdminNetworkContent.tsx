@@ -5,6 +5,7 @@ import {useLocale} from "next-intl";
 import {apiClient} from "@/lib/api/client";
 
 type RouteIP={agentId:string;publicIp:string;enabled:boolean;lastSeenAt:string|null;domain:string;state:string};
+type EdgeAgent={id:string;region:string;status:string;sniCapacity:number;routeCapacity:number;registeredAt:string;lastSeenAt:string;online:boolean};
 type DNSNode={id:string;region:string;addresses:string[];lastSeenAt:string;online:boolean};
 
 const REFRESH_SECONDS=15;
@@ -13,6 +14,7 @@ const PENDING_REFRESH_SECONDS=3;
 export default function AdminNetworkContent(){
  const locale=useLocale();
  const [nodes,setNodes]=useState<DNSNode[]>([]);
+ const [agents,setAgents]=useState<EdgeAgent[]>([]);
  const [routeIPs,setRouteIPs]=useState<RouteIP[]>([]);
  const [networkSearch,setNetworkSearch]=useState("");
  const [loading,setLoading]=useState(true);
@@ -21,6 +23,7 @@ export default function AdminNetworkContent(){
  const [checkingNodes,setCheckingNodes]=useState(false);
  const checkingRef=useRef(false);
  const normalizedNetworkSearch=networkSearch.trim().toLowerCase();
+ const visibleAgents=useMemo(()=>agents.filter(a=>[a.id,a.region,a.status,a.online?"online":"offline"].some(v=>v.toLowerCase().includes(normalizedNetworkSearch))),[agents,normalizedNetworkSearch]);
  const visibleNodes=useMemo(()=>nodes.filter(node=>[node.id,node.region,...node.addresses,node.online?"online":"offline"].some(value=>value.toLowerCase().includes(normalizedNetworkSearch))),[nodes,normalizedNetworkSearch]);
  const visibleRouteIPs=useMemo(()=>routeIPs.filter(item=>[item.agentId,item.publicIp,item.domain,item.state,item.enabled?"enabled":"disabled"].some(value=>value.toLowerCase().includes(normalizedNetworkSearch))),[routeIPs,normalizedNetworkSearch]);
  const pendingRoutes=routeIPs.some(ip=>ip.enabled&&ip.domain&&ip.state!=="active");
@@ -31,15 +34,19 @@ export default function AdminNetworkContent(){
   checkingRef.current=true;setCheckingNodes(true);
   try{
    const {data}=await apiClient.get<{nodes:DNSNode[]}>("/api/v1/admin/network/dns-controls");
-   setNodes(data.nodes);await loadRouteIPs();setError("");
+   setNodes(data.nodes);await Promise.all([loadRouteIPs(),loadAgents()]);setError("");
   }catch(e){setError((e as {response?:{status?:number}}).response?.status===403?"Access administrator permission required":"Unable to refresh DNS controller status")}
   finally{checkingRef.current=false;setCheckingNodes(false);setRefreshIn(pendingRoutesRef.current?PENDING_REFRESH_SECONDS:REFRESH_SECONDS)}
  }
  async function load(){
   setLoading(true);setError("");
-  try{const {data}=await apiClient.get<{nodes:DNSNode[]}>("/api/v1/admin/network/dns-controls");setNodes(data.nodes);await loadRouteIPs()}
+  try{const {data}=await apiClient.get<{nodes:DNSNode[]}>("/api/v1/admin/network/dns-controls");setNodes(data.nodes);await Promise.all([loadRouteIPs(),loadAgents()])}
   catch(e){setError((e as {response?:{status?:number}}).response?.status===403?"Access administrator permission required":"Unable to load DNS controllers")}
   finally{setLoading(false);setRefreshIn(REFRESH_SECONDS)}
+ }
+ async function loadAgents(){
+  try{const {data}=await apiClient.get<{agents:EdgeAgent[]}>("/api/v1/admin/network/agents");setAgents(data.agents)}
+  catch{setError("Unable to load authoritative Edge Agent health")}
  }
  async function loadRouteIPs(){
   try {const {data}=await apiClient.get<{addresses:RouteIP[]}>("/api/v1/admin/network/route-agent-ips");setRouteIPs(data.addresses)}
@@ -72,6 +79,14 @@ export default function AdminNetworkContent(){
     <p className="text-sm text-gray-400">Last registration: {new Date(node.lastSeenAt).toLocaleString()}</p>
    </article>)}
   </div>}
+  <section className="mt-8 rounded-xl border border-white/15 p-5">
+   <h2 className="font-semibold">{locale==="fa"?"سلامت عامل‌های شبکه":"Edge Agent health"}</h2>
+   <p className="mt-2 text-sm text-gray-400">{locale==="fa"?"وضعیت و آخرین ضربان قلب ثبت‌شده در بک‌اند":"Backend-authoritative status, heartbeat freshness and advertised capacity"}</p>
+   <div className="mt-4 flex flex-wrap gap-3 text-sm"><span>Online: {agents.filter(a=>a.online).length}</span><span>Offline/stale: {agents.filter(a=>!a.online).length}</span><span>Total: {agents.length}</span></div>
+   <div className="mt-4 overflow-x-auto"><table className="w-full text-left text-sm"><thead><tr><th className="p-2">Agent</th><th className="p-2">Region</th><th className="p-2">Health</th><th className="p-2">SNI / Route capacity</th><th className="p-2">Last heartbeat</th></tr></thead>
+   <tbody>{visibleAgents.map(a=><tr key={a.id} className="border-t border-white/10"><td className="p-2">{a.id}</td><td className="p-2">{a.region||"—"}</td><td className={a.online?"p-2 text-green-400":"p-2 text-amber-300"}>{a.online?"Online":"Offline / stale"}</td><td className="p-2">{a.sniCapacity} / {a.routeCapacity}</td><td className="p-2">{new Date(a.lastSeenAt).toLocaleString(locale)}</td></tr>)}</tbody></table></div>
+   {visibleAgents.length===0&&<p className="mt-3 text-sm text-gray-400">{networkSearch?"No matching Edge Agents.":"No registered Edge Agents."}</p>}
+  </section>
   <div className="mt-5"><Link href="/admin/domain-policies" className="text-cyan-300 underline">{locale==="fa"?"مدیریت سیاست‌های تفکیک دامنه":"Manage domain resolution policies"}</Link></div>
   <section className="mt-8 rounded-xl border border-white/15 p-5">
    <h2 className="font-semibold">Edge agent public IP inventory</h2>
