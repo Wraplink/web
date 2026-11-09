@@ -2,6 +2,7 @@
 import {Link} from "@/i18n/navigation";
 import {useEffect,useState} from "react";
 import {useLocale} from "next-intl";
+import {useSearchParams} from "next/navigation";
 import {apiClient} from "@/lib/api/client";
 
 type DomainPolicy={domain:string;mode:"normal"|"hijack"|"route"|"specific_ip"|"block";specific_ip?:string;route?:{destination_ip?:string;protocol:"tcp"|"udp"|"tcp_udp";destination_port_start?:number;destination_port_end?:number};connection_modes?:string[]};
@@ -10,6 +11,8 @@ type RouteIP={agentId:string;publicIp:string;enabled:boolean;lastSeenAt:string|n
 
 export default function AdminDomainPoliciesContent(){
  const locale=useLocale();
+ const searchParams=useSearchParams();
+ const suggestedDomain=searchParams.get("domain")?.trim().toLowerCase()??"";
  const [routeIPs,setRouteIPs]=useState<RouteIP[]>([]);
  const [domains,setDomains]=useState<DomainPolicy[]>([]);
  const [revision,setRevision]=useState(0);
@@ -19,7 +22,7 @@ export default function AdminDomainPoliciesContent(){
  const [pageSize,setPageSize]=useState(25);
  const [total,setTotal]=useState(0);
  const [policiesLoading,setPoliciesLoading]=useState(false);
- const [domain,setDomain]=useState("");
+ const [domain,setDomain]=useState(suggestedDomain);
  const [mode,setMode]=useState<DomainPolicy["mode"]>("normal");
  const [ip,setIp]=useState("");
  const [protocol,setProtocol]=useState<"tcp"|"udp"|"tcp_udp">("tcp");
