@@ -50,9 +50,16 @@ export default function MarketContent({locale}: Props) {
         });
     };
 
-    const formatData = (bytes: number) => bytes === 0
-        ? (fa ? "نامحدود" : "Unlimited")
-        : `${new Intl.NumberFormat(fa ? "fa-IR" : "en-US", {maximumFractionDigits: 1}).format(bytes / (1024 ** 3))} GB`;
+    const formatData = (bytes: number) => {
+        if (bytes === 0) return fa ? "نامحدود" : "Unlimited";
+        if (!Number.isFinite(bytes) || bytes < 0) return fa ? "نامشخص" : "Unknown";
+        const localeTag = fa ? "fa-IR" : "en-US";
+        const units = ["B", "KB", "MB", "GB", "TB"];
+        let amount = bytes;
+        let unit = 0;
+        while (amount >= 1024 && unit < units.length - 1) { amount /= 1024; unit++; }
+        return `${new Intl.NumberFormat(localeTag, {maximumFractionDigits: amount < 10 ? 2 : 1}).format(amount)} ${units[unit]}`;
+    };
 
 
     useEffect(() => {
