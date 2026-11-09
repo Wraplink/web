@@ -5,7 +5,7 @@ import {useLocale} from "next-intl";
 import {Link} from "@/i18n/navigation";
 import {apiClient} from "@/lib/api/client";
 
-type Query = {eventId:string;controllerId:string;observedAt:string;domain:string;qtype:string;rcode:string;resolutionMode:string;durationMs:number;managed?:boolean;managedMode?:string};
+type Query = {eventId:string;controllerId:string;observedAt:string;domain:string;qtype:string;rcode:string;resolutionMode:string;durationMs:number;managed?:boolean;managedMode?:string;managedDomain?:string};
 type Response = {queries:Query[];total:number;page:number;pageSize:number};
 const PAGE_SIZE = 25;
 
@@ -72,7 +72,7 @@ export default function AdminDNSQueriesContent() {
                     <td className="p-3">{q.managed===undefined?"—":q.managed?(fa?"بله":"Yes"):(fa?"خیر":"No")}</td>
                     <td className="p-3">{q.managedMode||"—"}</td>
                     <td className="p-3">{q.durationMs} ms</td>
-                    <td className="p-3"><Link href={`/admin/domain-policies?domain=${encodeURIComponent(q.domain)}`} className="whitespace-nowrap text-cyan-300 underline">{q.managed?(fa?"مشاهده / ویرایش":"View / Edit"):(fa?"ثبت دامنه":"Register domain")}</Link></td>
+                    <td className="p-3"><Link href={`/admin/domain-policies?domain=${encodeURIComponent(q.managed&&q.managedDomain?q.managedDomain:q.domain)}`} className="whitespace-nowrap text-cyan-300 underline">{q.managed?(fa?"مشاهده / ویرایش":"View / Edit"):(fa?"ثبت دامنه":"Register domain")}</Link></td>
                 </tr>)}
             </tbody></table>
             {!loading&&data.queries.length===0&&<p className="p-6 text-center text-gray-400">{fa?"درخواستی یافت نشد.":"No queries found."}</p>}
