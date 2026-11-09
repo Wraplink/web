@@ -6,6 +6,7 @@ import {useTranslations} from "next-intl";
 import {Link, usePathname} from "@/i18n/navigation";
 import {addBasketItem, getBasket} from "@/lib/basket";
 import {getMarketPlans, type MarketPlan} from "@/lib/api/plans";
+import {apiClient} from "@/lib/api/client";
 
 type Props = {locale: string};
 
@@ -37,6 +38,10 @@ export default function MarketContent({locale}: Props) {
             return Array.isArray(saved) ? saved.filter((item): item is string => typeof item === "string") : [];
         } catch { return []; }
     });
+    const [freeBusy,setFreeBusy]=useState<string|null>(null);
+    const [freeClaimed,setFreeClaimed]=useState<string[]>([]);
+    const [freeError,setFreeError]=useState<string|null>(null);
+    const [freeNotice,setFreeNotice]=useState<string|null>(null);
     const [favoritesOnly, setFavoritesOnly] = useState(false);
     const fa = locale === "fa";
 
@@ -96,6 +101,19 @@ export default function MarketContent({locale}: Props) {
         );
     }, [plans, search, favorites, favoritesOnly]);
 
+    const claimFree = async (plan:MarketPlan) => {
+        if(freeBusy||freeClaimed.includes(plan.code))return;
+        setFreeBusy(plan.code);setFreeError(null);setFreeNotice(null);
+        try{
+            await apiClient.post("/api/v1/me/free-plans/claim",{planCode:plan.code});
+            setFreeClaimed(previous=>[...previous,plan.code]);
+            setFreeNotice(fa?`پلن رایگان «${plan.name}» فعال شد.`:`Free plan "${plan.name}" activated.`);
+        }catch(e){
+            const status=(e as {response?:{status?:number}}).response?.status;
+            setFreeError(status===409?(fa?"این پلن قبلاً استفاده شده یا اشتراک فعال دیگری دارید.":"Already claimed or another subscription is active."):status===401?(fa?"ابتدا وارد حساب شوید.":"Sign in to activate a free plan."):(fa?"فعال‌سازی پلن رایگان ناموفق بود.":"Unable to activate free plan."));
+        }finally{setFreeBusy(null)}
+    };
+
     const addToBasket = (plan: MarketPlan) => {
         // A plan is a subscription choice: repeated clicks must not add extra quantities.
         if (getBasket().some(item => item.id === plan.code)) {
@@ -131,6 +149,8 @@ export default function MarketContent({locale}: Props) {
                         {basketCount > 0 && <span className="rounded-full bg-cyan-400 px-2 text-xs text-black">{basketCount}</span>}
                     </Link>
                 </div>
+                {freeError&&<p role="alert" className="mt-5 text-red-300">{freeError}</p>}
+                {freeNotice&&<p role="status" className="mt-5 text-green-300">{freeNotice}</p>}
                 {basketNotice && <div role="status" aria-live="polite" className="mt-6 flex flex-wrap items-center gap-3 rounded-2xl border border-emerald-400/40 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-100">
                     <CheckCircle2 size={22} className="shrink-0 text-emerald-300"/>
                     <span className="min-w-0 flex-1 font-medium">{basketNotice.alreadyAdded
@@ -200,9 +220,11 @@ export default function MarketContent({locale}: Props) {
                                 <div className="mt-auto pt-6">
                                     <div className="border-t border-white/10 pt-5">
                                         <p className="text-xs text-slate-400">{fa ? "قیمت پلن" : "Plan price"}</p>
-                                        <p className="mt-2 break-words text-2xl font-black text-cyan-300">{formatPrice(plan, locale)}</p>
+                                        <p className="mt-2 break-words text-2xl font-black text-cyan-300">{plan.priceMinor===0?(fa?"رایگان":"Free"):formatPrice(plan, locale)}</p>
                                     </div>
-                                    {basketIds.includes(plan.code) ? (
+                                    {plan.priceMinor===0 ? (
+                                        <button type="button" disabled={freeBusy!==null||freeClaimed.includes(plan.code)} onClick={()=>void claimFree(plan)} className="mt-5 flex min-h-12 w-full items-center justify-center rounded-xl bg-emerald-400 px-4 py-3 font-bold text-slate-950 disabled:opacity-50">{freeBusy===plan.code?"…":freeClaimed.includes(plan.code)?(fa?"فعال شد":"Activated"):(fa?"فعال‌سازی رایگان":"Activate Free")}</button>
+                                    ) : basketIds.includes(plan.code) ? (
                                         <Link href={inUserZone ? "/user/basket" : "/basket"}
                                             className="mt-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-emerald-400/50 bg-emerald-400/15 px-4 py-3 font-bold text-emerald-200 transition hover:bg-emerald-400/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300">
                                             <CheckCircle2 size={19}/>{fa ? "در سبد خرید · مشاهده سبد" : "In basket · View basket"}
