@@ -65,6 +65,7 @@ export default function AdminDNSQueriesContent() {
             <label className="text-sm">{fa?"حالت پاسخ":"Resolution mode"}<select className="mt-2 block rounded-lg border border-white/20 bg-slate-950 p-3" value={mode} onChange={e=>{setMode(e.target.value);setPage(1)}}><option value="">{fa?"همه":"All"}</option><option value="normal">normal</option><option value="hijack">hijack</option><option value="route">route</option><option value="specific_ip">specific_ip</option><option value="block">block</option><option value="refused">refused</option><option value="servfail">servfail</option></select></label>
             <label className="text-sm">{fa?"مدیریت‌شده":"Managed"}<select className="mt-2 block rounded-lg border border-white/20 bg-slate-950 p-3" value={managed} onChange={e=>{setManaged(e.target.value);setPage(1)}}><option value="">{fa?"همه":"All"}</option><option value="true">{fa?"بله":"Yes"}</option><option value="false">{fa?"خیر":"No"}</option></select></label>
             <button type="submit" className="rounded-lg bg-cyan-600 px-5 py-3 text-white">{fa?"جست‌وجو":"Search"}</button>
+            <button type="button" onClick={()=>{setSearch("");setSubmitted("");setController("");setRcode("");setQtype("");setMode("");setManaged("");setPage(1);setRefresh(n=>n+1)}} className="rounded-lg border border-white/20 px-5 py-3">{fa?"پاک کردن فیلترها":"Clear filters"}</button>
         </form>
         {error&&<p role="alert" className="mt-5 text-red-400">{error}</p>}
         <div className="mt-6 overflow-x-auto rounded-xl border border-white/15">
