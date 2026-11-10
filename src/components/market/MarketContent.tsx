@@ -99,7 +99,7 @@ export default function MarketContent({locale}: Props) {
         let active=true;
         setClaimsLoading(true);
         apiClient.get<{claims:{planId:string;planCode:string;source:string;state:string}[]}>("/api/v1/me/free-plans/claims")
-            .then(({data})=>{if(active){setFreeClaimed((data.claims??[]).map(c=>c.planCode).filter(Boolean));setClaimsError(false);setClaimsUnauthorized(false)}})
+            .then(({data})=>{if(active){setFreeClaimed((data.claims??[]).map(c=>c.planCode?.toLowerCase()).filter((code):code is string=>Boolean(code)));setClaimsError(false);setClaimsUnauthorized(false)}})
             .catch((e)=>{if(active){const status=(e as {response?:{status?:number}}).response?.status;setClaimsUnauthorized(status===401);setClaimsError(status!==401)}})
             .finally(()=>{if(active)setClaimsLoading(false)});
         return ()=>{active=false};
@@ -115,11 +115,11 @@ export default function MarketContent({locale}: Props) {
     }, [plans, search, favorites, favoritesOnly]);
 
     const claimFree = async (plan:MarketPlan) => {
-        if(freeBusy||freeClaimed.includes(plan.code))return;
+        if(freeBusy||freeClaimed.includes(plan.code.toLowerCase()))return;
         setFreeBusy(plan.code);setFreeError(null);setFreeNotice(null);
         try{
             await apiClient.post("/api/v1/me/free-plans/claim",{planCode:plan.code});
-            setFreeClaimed(previous=>[...previous,plan.code]);
+            setFreeClaimed(previous=>[...previous,plan.code.toLowerCase()]);
             setFreeNotice(fa?`پلن رایگان «${plan.name}» فعال شد.`:`Free plan "${plan.name}" activated.`);
         }catch(e){
             const status=(e as {response?:{status?:number}}).response?.status;
