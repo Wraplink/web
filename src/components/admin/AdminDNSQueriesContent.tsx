@@ -63,7 +63,7 @@ export default function AdminDNSQueriesContent() {
         {error&&<p role="alert" className="mt-5 text-red-400">{error}</p>}
         <div className="mt-6 overflow-x-auto rounded-xl border border-white/15">
             <table className="w-full text-sm"><thead className="bg-white/5"><tr>
-                {[fa?"زمان":"Time",fa?"دامنه":"Domain",fa?"کنترلر":"Controller","Type","RCODE",fa?"حالت گزارش‌شده":"Reported mode",fa?"مدیریت‌شده":"Managed",fa?"سیاست":"Policy",fa?"مدت":"Latency",fa?"عملیات":"Action"].map(label=><th key={label} className="p-3 text-start">{label}</th>)}
+                {[fa?"زمان":"Time",fa?"دامنه":"Domain",fa?"کنترلر":"Controller","Type","RCODE",fa?"حالت گزارش‌شده":"Reported mode",fa?"مدیریت‌شده":"Managed",fa?"سیاست":"Policy",fa?"دامنه سیاست":"Policy domain",fa?"مدت":"Latency",fa?"عملیات":"Action"].map(label=><th key={label} className="p-3 text-start">{label}</th>)}
             </tr></thead><tbody>
                 {data.queries.map(q=><tr key={q.controllerId+q.eventId} className="border-t border-white/10">
                     <td className="whitespace-nowrap p-3">{new Date(q.observedAt).toLocaleString(fa?"fa-IR":"en-US")}</td>
@@ -71,6 +71,7 @@ export default function AdminDNSQueriesContent() {
                     <td className="p-3">{q.qtype}</td><td className="p-3">{q.rcode}</td><td className="p-3">{q.resolutionMode}</td>
                     <td className="p-3">{q.managed===undefined?"—":q.managed?(fa?"بله":"Yes"):(fa?"خیر":"No")}</td>
                     <td className="p-3">{q.managedMode||"—"}</td>
+                    <td className="p-3" dir="ltr">{q.managedDomain||"—"}</td>
                     <td className="p-3">{q.durationMs} ms</td>
                     <td className="p-3"><Link href={`/admin/domain-policies?domain=${encodeURIComponent(q.managed&&q.managedDomain?q.managedDomain:q.domain)}`} className="whitespace-nowrap text-cyan-300 underline">{q.managed?(fa?"مشاهده / ویرایش":"View / Edit"):(fa?"ثبت دامنه":"Register domain")}</Link></td>
                 </tr>)}
