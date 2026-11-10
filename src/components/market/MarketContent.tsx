@@ -123,7 +123,7 @@ export default function MarketContent({locale}: Props) {
             setFreeNotice(fa?`پلن رایگان «${plan.name}» فعال شد.`:`Free plan "${plan.name}" activated.`);
         }catch(e){
             const status=(e as {response?:{status?:number}}).response?.status;
-            setFreeError(status===409?(fa?"این پلن قبلاً استفاده شده یا اشتراک فعال دیگری دارید.":"Already claimed or another subscription is active."):status===401?(fa?"ابتدا وارد حساب شوید.":"Sign in to activate a free plan."):(fa?"فعال‌سازی پلن رایگان ناموفق بود.":"Unable to activate free plan."));
+            setFreeError(status===409?(fa?"این پلن قبلاً استفاده شده یا اشتراک فعال دیگری دارید.":"Already claimed or another subscription is active."):status===401?(fa?"ابتدا وارد حساب شوید.":"Sign in to activate a free plan."):status===403?(fa?"برای دریافت پلن رایگان ابتدا ایمیل حساب خود را تأیید کنید.":"Verify your account email before activating a free plan."):(fa?"فعال‌سازی پلن رایگان ناموفق بود.":"Unable to activate free plan."));
         }finally{setFreeBusy(null)}
     };
 
