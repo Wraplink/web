@@ -4,7 +4,7 @@ import {useLocale} from "next-intl";
 import {Link} from "@/i18n/navigation";
 import {apiClient} from "@/lib/api/client";
 
-type Plan={id:string;name:string;code:string;priceMinor:number;active:boolean;archivedAt:string|null};
+type Plan={id:string;name:string;code:string;priceMinor:number;active:boolean;archivedAt:string|null;publishAt?:string|null};
 type Policy={id:string;planId:string;enabled:boolean;priority:number;region:string;assignmentTrigger:string;activationTrigger:string;reservationTtlSeconds:number;trialDurationSeconds:number};
 export default function AdminStarterPlansContent(){
  const fa=useLocale()==="fa";
@@ -57,7 +57,7 @@ export default function AdminStarterPlansContent(){
   }catch(e){setError((e as {response?:{data?:{error?:string}}}).response?.data?.error||(fa?"به‌روزرسانی ناموفق بود.":"Could not update policy."))}
   finally{setBusy(null)}
  }
- const eligible=plans.filter(p=>p.active&&!p.archivedAt&&p.priceMinor===0);
+ const eligible=plans.filter(p=>p.active&&!p.archivedAt&&p.priceMinor===0&&(!p.publishAt||new Date(p.publishAt).getTime()<=Date.now()));
  return <main className="mx-auto max-w-5xl px-6 py-10" dir={fa?"rtl":"ltr"}>
   <div className="flex flex-wrap items-center justify-between gap-3"><h1 className="text-3xl font-bold">{fa?"پلن‌های شروع رایگان":"Starter Plans"}</h1><Link href="/admin/plans" className="text-cyan-300">{fa?"مدیریت پلن‌ها":"Manage plans"}</Link></div>
   <p className="mt-3 text-sm text-slate-400">{fa?"پس از تأیید ایمیل، یک پلن رایگان برای کاربر جدید رزرو می‌شود. زمان استفاده با فعال‌سازی دستی شروع می‌شود.":"Reserve one free trial after email verification. The trial countdown starts only when the user activates it."}</p>
