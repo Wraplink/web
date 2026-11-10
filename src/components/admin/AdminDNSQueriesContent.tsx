@@ -16,6 +16,8 @@ export default function AdminDNSQueriesContent() {
     const [submitted, setSubmitted] = useState("");
     const [controller, setController] = useState("");
     const [rcode, setRcode] = useState("");
+    const [qtype, setQtype] = useState("");
+    const [mode, setMode] = useState("");
     const [managed, setManaged] = useState("");
     const [page, setPage] = useState(1);
     const [refresh, setRefresh] = useState(0);
@@ -33,6 +35,8 @@ export default function AdminDNSQueriesContent() {
                 if (submitted) params.set("search",submitted);
                 if (controller) params.set("controller",controller);
                 if (rcode) params.set("rcode",rcode);
+                if (qtype) params.set("qtype",qtype);
+                if (mode) params.set("mode",mode);
                 if (managed) params.set("managed",managed);
                 const response = await apiClient.get<Response>(`/api/v1/admin/network/dns-queries?${params.toString()}`,{signal:abort.signal});
                 if (!abort.signal.aborted) setData(response.data);
@@ -44,7 +48,7 @@ export default function AdminDNSQueriesContent() {
         }
         void load();
         return () => abort.abort();
-    },[page,submitted,controller,rcode,managed,refresh,fa]);
+    },[page,submitted,controller,rcode,qtype,mode,managed,refresh,fa]);
 
     return <main className="mx-auto max-w-7xl px-6 py-10" dir={fa?"rtl":"ltr"}>
         <div className="flex flex-wrap items-center justify-between gap-4">
@@ -57,6 +61,8 @@ export default function AdminDNSQueriesContent() {
             <label className="min-w-48 flex-1 text-sm">{fa?"جست‌وجوی دامنه":"Domain search"}<input className="mt-2 w-full rounded-lg border border-white/20 bg-transparent p-3" value={search} onChange={e=>setSearch(e.target.value)} maxLength={253} /></label>
             <label className="min-w-40 text-sm">{fa?"کنترلر":"Controller"}<input className="mt-2 w-full rounded-lg border border-white/20 bg-transparent p-3" value={controller} onChange={e=>{setController(e.target.value);setPage(1)}} maxLength={128}/></label>
             <label className="text-sm">{fa?"نتیجه":"Response"}<select className="mt-2 block rounded-lg border border-white/20 bg-slate-950 p-3" value={rcode} onChange={e=>{setRcode(e.target.value);setPage(1)}}><option value="">{fa?"همه":"All"}</option><option>NOERROR</option><option>NXDOMAIN</option><option>REFUSED</option><option>SERVFAIL</option></select></label>
+            <label className="text-sm">{fa?"نوع درخواست":"Query type"}<select className="mt-2 block rounded-lg border border-white/20 bg-slate-950 p-3" value={qtype} onChange={e=>{setQtype(e.target.value);setPage(1)}}><option value="">{fa?"همه":"All"}</option><option>A</option><option>AAAA</option><option>CNAME</option><option>MX</option><option>TXT</option><option>NS</option><option>SOA</option><option>PTR</option><option>SRV</option><option>CAA</option></select></label>
+            <label className="text-sm">{fa?"حالت پاسخ":"Resolution mode"}<select className="mt-2 block rounded-lg border border-white/20 bg-slate-950 p-3" value={mode} onChange={e=>{setMode(e.target.value);setPage(1)}}><option value="">{fa?"همه":"All"}</option><option value="normal">normal</option><option value="hijack">hijack</option><option value="route">route</option><option value="specific_ip">specific_ip</option><option value="block">block</option><option value="refused">refused</option><option value="servfail">servfail</option></select></label>
             <label className="text-sm">{fa?"مدیریت‌شده":"Managed"}<select className="mt-2 block rounded-lg border border-white/20 bg-slate-950 p-3" value={managed} onChange={e=>{setManaged(e.target.value);setPage(1)}}><option value="">{fa?"همه":"All"}</option><option value="true">{fa?"بله":"Yes"}</option><option value="false">{fa?"خیر":"No"}</option></select></label>
             <button type="submit" className="rounded-lg bg-cyan-600 px-5 py-3 text-white">{fa?"جست‌وجو":"Search"}</button>
         </form>
