@@ -34,7 +34,8 @@ export default function StarterTrialCard({locale}:{locale:string}){
  const active=claim?.state==="active"&&!!activeExpiry&&Number.isFinite(new Date(activeExpiry).getTime())&&new Date(activeExpiry).getTime()>now;
  const missingExpiry=claim?.state==="active"&&!activeExpiry;
  const expiredTrial=!!activeExpiry&&new Date(activeExpiry).getTime()<=now;
- const expired=claim?.state==="expired"||(claim?.state==="reserved"&&!reserved)||expiredTrial;
+ const cancelled=claim?.state==="cancelled";
+ const expired=claim?.state==="expired"||(claim?.state==="reserved"&&!reserved)||(!cancelled&&expiredTrial);
  async function activate(){
   if(!claim||busy)return;
   setBusy(true);setError("");
@@ -48,11 +49,12 @@ export default function StarterTrialCard({locale}:{locale:string}){
   }finally{setBusy(false)}
  }
  return <section className="mt-8 rounded-2xl border border-cyan-400/30 bg-slate-900/80 p-6" dir={fa?"rtl":"ltr"}>
-  <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-bold">{fa?"هدیه شروع رایگان":"Your free starter trial"}</h2><span className="rounded-full bg-cyan-400/15 px-3 py-1 text-sm text-cyan-200">{reserved?(fa?"آماده فعال‌سازی":"Ready to activate"):active?(fa?"فعال":"Active"):expired?(fa?"منقضی شده":"Expired"):claim?.state}</span></div>
+  <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-bold">{fa?"هدیه شروع رایگان":"Your free starter trial"}</h2><span className="rounded-full bg-cyan-400/15 px-3 py-1 text-sm text-cyan-200">{reserved?(fa?"آماده فعال‌سازی":"Ready to activate"):active?(fa?"فعال":"Active"):cancelled?(fa?"لغوشده":"Cancelled"):expired?(fa?"منقضی شده":"Expired"):claim?.state}</span></div>
   {claim&&<p className="mt-2 text-sm text-slate-400">{fa?"شناسه پلن":"Plan ID"}: {claim.planId}</p>}
   {reserved&&<><p className="mt-4 text-sm text-slate-300">{fa?"زمان باقی‌مانده برای فعال‌سازی":"Time left to activate"}: <strong className="text-white">{remaining(claim.reservationExpiresAt!,now)}</strong></p><p className="mt-2 text-sm text-slate-400">{fa?"مدت آزمایش پس از فعال‌سازی آغاز می‌شود؛ نیازی به پرداخت نیست.":"Your trial time starts after activation. No payment required."}</p><button type="button" disabled={busy} onClick={()=>void activate()} className="mt-4 rounded-xl bg-cyan-400 px-5 py-2 font-bold text-slate-950 disabled:opacity-50">{busy?"…":fa?"فعال‌سازی آزمایشی":"Activate Trial"}</button></>}
   {active&&<><p className="mt-4 text-sm text-emerald-300">{fa?"پلن آزمایشی فعال شده است.":"Your trial is activated."}</p>{activeExpiry&&<p className="mt-2 text-sm">{fa?"زمان باقی‌مانده":"Time remaining"}: {remaining(activeExpiry,now)}</p>}<Link href="/connection" className="mt-4 inline-block rounded-xl border border-cyan-400/40 px-4 py-2 text-cyan-300">{fa?"تنظیم اتصال و DNS":"Set up connection and DNS"}</Link></>}
   {missingExpiry&&<p role="alert" className="mt-4 text-sm text-amber-300">{fa?"زمان پایان اشتراک آزمایشی مشخص نیست؛ برای بررسی وضعیت دوباره تلاش کنید.":"Trial expiration is unavailable. Refresh to verify your subscription status."}</p>}
+  {cancelled&&<p className="mt-4 text-sm text-slate-300">{fa?"اشتراک آزمایشی شما لغو شده است؛ این پیشنهاد فقط یک بار قابل استفاده است.":"Your starter trial was cancelled. This offer can only be used once."}</p>}
   {expired&&<p className="mt-4 text-sm text-slate-300">{expiredTrial?(fa?"دوره آزمایشی شما پایان یافته است؛ این پلن فقط یک بار قابل استفاده است.":"Your trial has ended. This offer can only be used once."):(fa?"فرصت فعال‌سازی پایان یافته است؛ این پیشنهاد فقط یک بار ارائه می‌شود.":"The activation window has expired. This offer is available only once.")}</p>}
   {error&&<div role="alert" className="mt-4 text-sm text-red-300">{error}<button type="button" onClick={()=>void load()} className="ms-3 underline">{fa?"تلاش دوباره":"Retry"}</button></div>}
  </section>;
