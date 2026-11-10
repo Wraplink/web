@@ -42,6 +42,7 @@ export default function MarketContent({locale}: Props) {
     const [freeClaimed,setFreeClaimed]=useState<string[]>([]);
     const [claimsLoading,setClaimsLoading]=useState(true);
     const [claimsError,setClaimsError]=useState(false);
+    const [claimsUnauthorized,setClaimsUnauthorized]=useState(false);
     const [freeError,setFreeError]=useState<string|null>(null);
     const [freeNotice,setFreeNotice]=useState<string|null>(null);
     const [favoritesOnly, setFavoritesOnly] = useState(false);
@@ -98,8 +99,8 @@ export default function MarketContent({locale}: Props) {
         let active=true;
         setClaimsLoading(true);
         apiClient.get<{claims:{planId:string;planCode:string;source:string;state:string}[]}>("/api/v1/me/free-plans/claims")
-            .then(({data})=>{if(active){setFreeClaimed((data.claims??[]).map(c=>c.planCode).filter(Boolean));setClaimsError(false)}})
-            .catch(()=>{if(active)setClaimsError(true)})
+            .then(({data})=>{if(active){setFreeClaimed((data.claims??[]).map(c=>c.planCode).filter(Boolean));setClaimsError(false);setClaimsUnauthorized(false)}})
+            .catch((e)=>{if(active){const status=(e as {response?:{status?:number}}).response?.status;setClaimsUnauthorized(status===401);setClaimsError(status!==401)}})
             .finally(()=>{if(active)setClaimsLoading(false)});
         return ()=>{active=false};
     },[]);
@@ -235,7 +236,9 @@ export default function MarketContent({locale}: Props) {
                                         <p className="text-xs text-slate-400">{fa ? "قیمت پلن" : "Plan price"}</p>
                                         <p className="mt-2 break-words text-2xl font-black text-cyan-300">{plan.priceMinor===0?(fa?"رایگان":"Free"):formatPrice(plan, locale)}</p>
                                     </div>
-                                    {plan.priceMinor===0 ? (
+                                    {plan.priceMinor===0 && claimsUnauthorized ? (
+                                        <Link href="/login" className="mt-5 flex min-h-12 w-full items-center justify-center rounded-xl bg-emerald-400 px-4 py-3 font-bold text-slate-950">{fa?"ورود برای فعال‌سازی رایگان":"Sign in to activate free"}</Link>
+                                    ) : plan.priceMinor===0 ? (
                                         <button type="button" disabled={freeBusy!==null||claimsLoading||claimsError||freeClaimed.includes(plan.code)} onClick={()=>void claimFree(plan)} className="mt-5 flex min-h-12 w-full items-center justify-center rounded-xl bg-emerald-400 px-4 py-3 font-bold text-slate-950 disabled:opacity-50">{freeBusy===plan.code||claimsLoading?"…":freeClaimed.includes(plan.code)?(fa?"قبلاً استفاده شده":"Already claimed"):(fa?"فعال‌سازی رایگان":"Activate Free")}</button>
                                     ) : basketIds.includes(plan.code) ? (
                                         <Link href={inUserZone ? "/user/basket" : "/basket"}
