@@ -21,21 +21,19 @@ async function forward(request: NextRequest, context: {params: Promise<{path: st
     headers.delete("x-real-ip");
     headers.delete("x-forwarded-for");
     headers.delete("forwarded");
+    headers.delete("x-wraplink-verified-client-ip");
 
     // Next.js supplies X-Forwarded-For for incoming requests. Only accept
     // it when the Next.js ingress is secured against client-supplied values.
     // For local development this is opt-in; never trust raw client headers.
     if (process.env.BACKEND_PROXY_TRUST_NEXT_FORWARDED_FOR === "true") {
-        const forwarded = request.headers.get("x-forwarded-for");
-        if (forwarded) {
-            // Nginx overwrites X-Forwarded-For with the verified client IP.
-            // Next.js may append the Nginx peer; preserve the first verified hop.
-            const lastHop = forwarded.split(",")[0]?.trim() ?? "";
-            const mapped = /^::ffff:(\d{1,3}(?:\.\d{1,3}){3})$/i.exec(lastHop);
-            const clientIP = mapped && isIP(mapped[1]) === 4 ? mapped[1] : lastHop;
-            if (isIP(clientIP)) {
-                headers.set("x-forwarded-for", clientIP);
-            }
+        // Nginx overwrites this dedicated header using its observed TCP peer.
+        // Unlike X-Forwarded-For, Next.js does not rewrite this header.
+        const verified = request.headers.get("x-wraplink-verified-client-ip")?.trim() ?? "";
+        const mapped = /^::ffff:(\\d{1,3}(?:\\.\\d{1,3}){3})$/i.exec(verified);
+        const clientIP = mapped && isIP(mapped[1]) === 4 ? mapped[1] : verified;
+        if (isIP(clientIP) === 4) {
+            headers.set("x-forwarded-for", clientIP);
         }
     }
 
