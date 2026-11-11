@@ -1,27 +1,32 @@
-# Starter Plan UI specification
+# Starter Plan UI — implemented scope and verification
 
-Tracks #84 and #83. This is a design/acceptance specification, not implemented UI.
+Tracks #83 and #84. Backend contract implemented in Wraplink/backend PR #91 (merged).
 
-## Admin: Plans > Starter Plans
-- List: name, enabled, duration, data allowance, service capabilities, assignment policy, reservation TTL, assigned/activated/expired counts, last modified.
-- Create/edit: plan name, price fixed to 0 (read-only Free), duration in minutes, quota in GiB or unlimited, DNS/SNI/route options, region, status.
-- Policy editor: audience (new verified users), assignment trigger (email verification default, registration or first login optional), activation trigger (user click default, first DNS use optional, immediate optional), priority, reservation TTL (7 days default), enabled.
-- Warn on overlapping default policies and explain priority. Require confirmation to disable a live policy; disable affects future assignments only.
-- Archive rather than destructive delete. Audit actor and change timestamp.
-- Localize all labels and errors in English and Persian, RTL-aware.
+## Implemented in this branch
+- Admin starter-plan policy list, creation and enabled toggle, linked from Admin Plans.
+- Admin policy uses published, active, zero-price plans; priority, duration and reservation TTL; currently global region, email-verification assignment and manual activation only.
+- User dashboard starter-trial card: reserved/active/expired/cancelled/failed states, manual activation, countdown and bilingual messages.
+- Market: zero-priced plans display Free / رایگان and use direct claim API rather than basket/payment; lifetime claimed plan codes are compared case-insensitively.
+- Claim eligibility and duplicate prevention are enforced by backend, not only by disabled UI buttons.
 
-## User dashboard
-- After verification: show a reserved trial card with plan details, activation CTA, reservation expiry, and instructions for DNS/PS5 setup.
-- On activation: disable CTA while pending, show provisioning state; after activation show countdown, usage and expiry.
-- Expired/cancelled/claimed: show status, no second activation.
-- Market: zero-priced plans display Free/رایگان; distinguish manual free claim from auto-reserved starter offer.
-- Do not show payment method, wallet debit, card-to-card receipt, or checkout for zero-price activation.
+## API contract
+- GET /api/v1/me/starter-claims
+- POST /api/v1/me/starter-claims/{claimID}/activate
+- GET /api/v1/me/free-plans/claims
+- POST /api/v1/me/free-plans/claim
+- GET /api/v1/admin/starter-policies/
+- POST /api/v1/admin/starter-policies/
+- PATCH /api/v1/admin/starter-policies/{policyID}
 
-## Contract dependencies
-Implement against backend endpoints once finalized; see Wraplink/backend #90 and #88. Server is authoritative for eligibility, plan state, and countdown timestamps.
+## Not implemented or not yet verified
+- Editing existing policy details beyond enabled toggle.
+- Additional assignment triggers (registration/first login), first-use or immediate activation, region-specific policy, and policy audit/history.
+- Admin analytics for assigned/activated/expired counts.
+- Browser E2E in a deployed environment, mobile/accessibility audit, DNS/Edge entitlement propagation, and access revocation after expiration.
+- A private test-plan or production-write testing mode (explicitly not requested).
 
-## Acceptance
-- English/Persian; mobile/desktop; accessible loading/empty/error/success states.
-- Refresh and multiple clicks cannot duplicate claim.
-- User who verifies but does not activate retains the full configured trial duration until reservation TTL.
-- Correctly display policy disabled, reservation expired, already claimed, provisioning pending, and usage exhausted.
+## Deployment and testing
+- GitHub Actions CI passed for commit 71d48df (run 43018832674).
+- Backend free-plan staging smoke test is in backend PR #92; it explicitly rejects production endpoints.
+- There is no separate staging environment. Do not run destructive test scripts against production or claim full E2E verification from CI alone.
+- On production, restrict checks to read-only endpoints unless separately authorized for a specific disposable account and plan.
