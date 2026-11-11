@@ -100,7 +100,7 @@ export default function MarketContent({locale}: Props) {
         setClaimsLoading(true);
         apiClient.get<{claims:{planId:string;planCode:string;source:string;state:string}[]}>("/api/v1/me/free-plans/claims")
             .then(({data})=>{if(active){setFreeClaimed((data.claims??[]).map(c=>c.planCode?.toLowerCase()).filter((code):code is string=>Boolean(code)));setClaimsError(false);setClaimsUnauthorized(false)}})
-            .catch((e)=>{if(active){const status=(e as {response?:{status?:number}}).response?.status;setClaimsUnauthorized(status===401);setClaimsError(status!==401)}})
+            .catch((e)=>{if(active){const status=(e as {response?:{status?:number}}).response?.status;setFreeClaimed([]);setClaimsUnauthorized(status===401);setClaimsError(status!==401)}})
             .finally(()=>{if(active)setClaimsLoading(false)});
         return ()=>{active=false};
     },[]);
