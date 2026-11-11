@@ -24,6 +24,9 @@ export default function AdminDNSQueriesContent() {
     const [data, setData] = useState<Response>({queries:[],total:0,page:1,pageSize:PAGE_SIZE});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [clearing, setClearing] = useState(false);
+    const [confirmClear, setConfirmClear] = useState(false);
+    const [notice, setNotice] = useState("");
 
     useEffect(() => {
         const abort = new AbortController();
@@ -50,12 +53,30 @@ export default function AdminDNSQueriesContent() {
         return () => abort.abort();
     },[page,submitted,controller,rcode,qtype,mode,managed,refresh,fa]);
 
+    async function clearReports() {
+        setClearing(true);
+        setError("");
+        setNotice("");
+        try {
+            const result = await apiClient.delete<{deleted:number}>("/api/v1/admin/network/dns-queries?confirm=clear-all");
+            setNotice(fa ? `تعداد ${result.data.deleted} گزارش DNS حذف شد.` : `Deleted ${result.data.deleted} DNS query reports.`);
+            setPage(1);
+            setRefresh(n=>n+1);
+            setConfirmClear(false);
+        } catch {
+            setError(fa ? "حذف گزارش‌های DNS ناموفق بود." : "Unable to clear DNS reports.");
+        } finally {
+            setClearing(false);
+        }
+    }
+
     return <main className="mx-auto max-w-7xl px-6 py-10" dir={fa?"rtl":"ltr"}>
         <div className="flex flex-wrap items-center justify-between gap-4">
             <div><h1 className="text-3xl font-bold">{fa?"پایش درخواست‌های DNS":"DNS Query Monitoring"}</h1>
                 <p className="mt-2 text-sm text-gray-400">{fa?"درخواست‌های ثبت‌شده توسط کنترلرهای DNS":"Queries reported by registered DNS controllers"}</p></div>
             <div className="flex gap-3"><Link href="/admin/network" className="rounded-lg border border-white/20 px-4 py-2">{fa?"شبکه":"Network"}</Link>
-                <button type="button" onClick={()=>setRefresh(n=>n+1)} className="rounded-lg bg-cyan-600 px-4 py-2 text-white">{fa?"به‌روزرسانی":"Refresh"}</button></div>
+                <button type="button" onClick={()=>setRefresh(n=>n+1)} className="rounded-lg bg-cyan-600 px-4 py-2 text-white">{fa?"به‌روزرسانی":"Refresh"}</button>
+                <button type="button" disabled={clearing} onClick={()=>setConfirmClear(true)} className="rounded-lg border border-red-500/60 px-4 py-2 text-red-300 disabled:opacity-50">{fa?"حذف گزارش‌ها":"Clear reports"}</button></div>
         </div>
         <form className="mt-8 flex flex-wrap items-end gap-3" onSubmit={e=>{e.preventDefault();setPage(1);setSubmitted(search.trim())}}>
             <label className="min-w-48 flex-1 text-sm">{fa?"جست‌وجوی دامنه":"Domain search"}<input className="mt-2 w-full rounded-lg border border-white/20 bg-transparent p-3" value={search} onChange={e=>setSearch(e.target.value)} maxLength={253} /></label>
@@ -67,6 +88,15 @@ export default function AdminDNSQueriesContent() {
             <button type="submit" className="rounded-lg bg-cyan-600 px-5 py-3 text-white">{fa?"جست‌وجو":"Search"}</button>
             <button type="button" onClick={()=>{setSearch("");setSubmitted("");setController("");setRcode("");setQtype("");setMode("");setManaged("");setPage(1);setRefresh(n=>n+1)}} className="rounded-lg border border-white/20 px-5 py-3">{fa?"پاک کردن فیلترها":"Clear filters"}</button>
         </form>
+        {confirmClear&&<div role="dialog" aria-modal="true" aria-labelledby="dns-clear-title" className="mt-5 rounded-xl border border-red-500/50 bg-slate-950 p-5">
+            <h2 id="dns-clear-title" className="text-lg font-semibold">{fa?"حذف تمام گزارش‌های DNS؟":"Delete all DNS query reports?"}</h2>
+            <p className="mt-2 text-sm text-gray-300">{fa?"این کار تمام تاریخچه گزارش‌ها را برای همیشه حذف می‌کند. گزارش‌گیری DNS فعال می‌ماند و درخواست‌های جدید ثبت خواهند شد.":"This permanently deletes all stored DNS query history. DNS reporting stays enabled and new queries will continue to be recorded."}</p>
+            <div className="mt-4 flex gap-3">
+                <button type="button" disabled={clearing} onClick={()=>void clearReports()} className="rounded-lg bg-red-600 px-4 py-2 text-white disabled:opacity-50">{clearing?(fa?"در حال حذف…":"Deleting…"):(fa?"بله، حذف همه":"Yes, delete all")}</button>
+                <button type="button" disabled={clearing} onClick={()=>setConfirmClear(false)} className="rounded-lg border border-white/20 px-4 py-2">{fa?"انصراف":"Cancel"}</button>
+            </div>
+        </div>}
+        {notice&&<p role="status" className="mt-5 text-green-400">{notice}</p>}
         {error&&<p role="alert" className="mt-5 text-red-400">{error}</p>}
         <div className="mt-6 overflow-x-auto rounded-xl border border-white/15">
             <table className="w-full text-sm"><thead className="bg-white/5"><tr>
