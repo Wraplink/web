@@ -18,7 +18,7 @@ export default function proxy(request: NextRequest) {
     // Rewrite unprefixed default-locale URLs explicitly so /admin/plans and
     // /admin/starter-plans resolve to the same pages as /fa/admin/... .
     // Keep the public URL unchanged and leave /fa and /en to next-intl.
-    if (/^\\/admin(?:\\/|$)/.test(request.nextUrl.pathname)) {
+    if (request.nextUrl.pathname === "/admin" || request.nextUrl.pathname.startsWith("/admin/")) {
         const url = request.nextUrl.clone();
         url.pathname = `/fa${request.nextUrl.pathname}`;
         return NextResponse.rewrite(url);
