@@ -71,7 +71,7 @@ function toOrder(subscription: UserSubscription): Order {
         orderNumber: subscription.orderNumber,
         date: subscription.createdAt,
         status,
-        payment: subscription.status === "pending_payment" ? "Unpaid" : subscription.status === "confirmed" ? "Paid — reserved for next activation" : "Subscription",
+        payment: subscription.priceMinor === 0 ? "Free" : subscription.status === "pending_payment" ? "Unpaid" : subscription.status === "confirmed" ? "Paid — reserved for next activation" : "Subscription",
         total: subscription.priceMinor,
         currency: subscription.currency,
         items: [{id: subscription.planCode, name: subscription.planName, quantity: 1,
@@ -80,6 +80,7 @@ function toOrder(subscription: UserSubscription): Order {
 }
 
 function formatMoney(amount: number, currency: string, locale: string): string {
+    if (amount === 0) return locale === "fa" ? "رایگان" : "Free";
     return new Intl.NumberFormat(locale === "fa" ? "fa-IR" : "en-US", {
         style: "currency", currency,
     }).format(amount / (currency === "IRR" ? 1 : 100));
@@ -101,6 +102,7 @@ export default function OrdersContent({
             const subscriptions = await listSubscriptions();
             const enriched = await Promise.all(subscriptions.map(async subscription => {
                 const order = toOrder(subscription);
+                if (subscription.priceMinor === 0) return order;
                 try {
                     const receipt = await getCardReceipt(subscription.id);
                     if (receipt) {
