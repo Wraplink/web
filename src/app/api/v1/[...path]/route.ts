@@ -28,7 +28,9 @@ async function forward(request: NextRequest, context: {params: Promise<{path: st
     if (process.env.BACKEND_PROXY_TRUST_NEXT_FORWARDED_FOR === "true") {
         const forwarded = request.headers.get("x-forwarded-for");
         if (forwarded) {
-            const lastHop = forwarded.split(",").at(-1)?.trim() ?? "";
+            // Nginx overwrites X-Forwarded-For with the verified client IP.
+            // Next.js may append the Nginx peer; preserve the first verified hop.
+            const lastHop = forwarded.split(",")[0]?.trim() ?? "";
             const mapped = /^::ffff:(\d{1,3}(?:\.\d{1,3}){3})$/i.exec(lastHop);
             const clientIP = mapped && isIP(mapped[1]) === 4 ? mapped[1] : lastHop;
             if (isIP(clientIP)) {
