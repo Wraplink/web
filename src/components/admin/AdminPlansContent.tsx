@@ -38,7 +38,7 @@ export default function AdminPlansContent(){
  }catch(e){setError((e as {response?:{data?:{error?:string}}}).response?.data?.error||(e instanceof Error?e.message:"Unable to save plan"))}finally{setSaving(false)}}
  const status=(p:Plan)=>p.archivedAt?(fa?"بایگانی‌شده":"Archived"):!p.active?(fa?"غیرفعال":"Disabled"):p.publishAt&&new Date(p.publishAt)>new Date()?(fa?"زمان‌بندی‌شده":"Scheduled"):(fa?"منتشرشده":"Published");
  return <main className="mx-auto max-w-5xl px-6 py-10">
- <div className="flex items-center justify-between gap-3"><h1 className="text-3xl font-bold">{fa?"مدیریت پلن‌ها":"Manage plans"}</h1><Link href="/admin" className="text-cyan-300">{fa?"بازگشت به مدیریت":"Admin overview"}</Link></div>
+ <div className="flex items-center justify-between gap-3"><h1 className="text-3xl font-bold">{fa?"مدیریت پلن‌ها":"Manage plans"}</h1><Link href="/admin/starter-plans" className="text-cyan-300">{fa?"پلن‌های شروع رایگان":"Starter Plans"}</Link><Link href="/admin" className="text-cyan-300">{fa?"بازگشت به مدیریت":"Admin overview"}</Link></div>
  <p className="mt-3 text-sm text-gray-400">{fa?"پلن فقط در صورت فعال بودن و رسیدن زمان انتشار برای کاربران نمایش داده می‌شود.":"Plans become purchasable only when enabled and their publication date has arrived."}</p>
  {error&&<p role="alert" className="mt-4 text-red-300">{error}</p>}{message&&<p role="status" className="mt-4 text-green-300">{message}</p>}
  <form onSubmit={e=>{e.preventDefault();void save()}} className="mt-6 grid gap-4 rounded-2xl border border-white/15 bg-white/5 p-5 sm:grid-cols-2">

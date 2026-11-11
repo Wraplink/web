@@ -17,6 +17,7 @@ import {useEffect, useState} from "react";
 import {getDashboardSummary, type DashboardSummary} from "@/lib/api/dashboard";
 
 import {Link} from "@/i18n/navigation";
+import StarterTrialCard from "@/components/dashboard/StarterTrialCard";
 
 type Props = {
     locale: string;
@@ -92,6 +93,8 @@ export default function DashboardContent({locale}: Props) {
                 </p>
 
             </div>
+
+            <StarterTrialCard locale={locale}/>
 
             {/* Summary */}
 
