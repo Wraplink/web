@@ -36,7 +36,8 @@ type OrderStatus =
     | "delivered"
     | "cancelled"
     | "refunded"
-    | "rejected";
+    | "rejected"
+    | "expired";
 
 type OrderItem = {
     id: string;
@@ -57,6 +58,13 @@ type Order = {
     total: number;
     currency: string;
     items: OrderItem[];
+    durationDays: number;
+    dataLimitBytes?: number;
+    usedBytes?: number;
+    remainingBytes?: number;
+    subscriptionStatus: UserSubscription["status"];
+    startsAt?: string | null;
+    expiresAt?: string | null;
 };
 
 const initialOrders: Order[] = [];
@@ -65,9 +73,17 @@ function toOrder(subscription: UserSubscription): Order {
     const status: OrderStatus = subscription.status === "pending_payment" ? "pending" :
         subscription.status === "confirmed" ? "confirmed" :
         subscription.status === "active" ? "active" :
-        subscription.status === "cancelled" ? "cancelled" : "delivered";
+        subscription.status === "cancelled" ? "cancelled" :
+        subscription.status === "expired" ? "expired" : "delivered";
     return {
         id: subscription.id,
+        durationDays: subscription.durationDays,
+        dataLimitBytes: subscription.dataLimitBytes,
+        usedBytes: subscription.usedBytes,
+        remainingBytes: subscription.remainingBytes,
+        subscriptionStatus: subscription.status,
+        startsAt: subscription.startsAt,
+        expiresAt: subscription.expiresAt,
         orderNumber: subscription.orderNumber,
         date: subscription.createdAt,
         status,
@@ -77,6 +93,14 @@ function toOrder(subscription: UserSubscription): Order {
         items: [{id: subscription.planCode, name: subscription.planName, quantity: 1,
             price: subscription.priceMinor, refundable: false, refunded: false}],
     };
+}
+
+function formatBytes(bytes: number, locale: string): string {
+    if (!Number.isFinite(bytes) || bytes < 0) return "—";
+    if (bytes < 1024) return new Intl.NumberFormat(locale === "fa" ? "fa-IR" : "en-US").format(bytes) + " B";
+    const power = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), 4);
+    const unit = ["B", "KiB", "MiB", "GiB", "TiB"][power];
+    return new Intl.NumberFormat(locale === "fa" ? "fa-IR" : "en-US", {maximumFractionDigits: 2}).format(bytes / Math.pow(1024, power)) + " " + unit;
 }
 
 function formatMoney(amount: number, currency: string, locale: string): string {
@@ -121,7 +145,7 @@ export default function OrdersContent({
             }));
             setOrders(enriched);
         }
-        catch { setApiError("Unable to load subscriptions. Please retry."); }
+        catch { setApiError(locale === "fa" ? "بارگذاری سفارش‌ها ناموفق بود. دوباره تلاش کنید." : "Unable to load subscriptions. Please retry."); }
         finally { setFetching(false); }
     };
 
@@ -156,7 +180,7 @@ export default function OrdersContent({
             await cancelPendingSubscription(orderId);
             await reload();
         } catch {
-            setApiError("Could not cancel this subscription. It may no longer be pending.");
+            setApiError(locale === "fa" ? "لغو اشتراک ممکن نیست. ممکن است دیگر در انتظار پرداخت نباشد." : "Could not cancel this subscription. It may no longer be pending.");
         } finally {
             setActionLoading(null);
         }
@@ -349,8 +373,8 @@ export default function OrdersContent({
 
                 </div>
 
-                {apiError && <div role="alert" className="mb-5 rounded-xl border border-red-400/30 p-4 text-red-300">{apiError} <button type="button" className="ml-3 underline" onClick={() => void reload()}>Retry</button></div>}
-                {fetching && <p role="status" className="mb-5 text-gray-400">Loading orders…</p>}
+                {apiError && <div role="alert" className="mb-5 rounded-xl border border-red-400/30 p-4 text-red-300">{apiError} <button type="button" className="ml-3 underline" onClick={() => void reload()}>{locale === "fa" ? "تلاش مجدد" : "Retry"}</button></div>}
+                {fetching && <p role="status" className="mb-5 text-gray-400">{locale === "fa" ? "در حال بارگذاری سفارش‌ها…" : "Loading orders…"}</p>}
                 {/* Orders */}
 
                 <div className="space-y-4">
@@ -486,6 +510,7 @@ function OrderCard({
                                 {locale === "fa" ? "شماره سفارش" : "Order"} #WL-{order.orderNumber}
                             </div>
 
+                            <div className="mt-2 text-sm font-semibold text-gray-200">{order.items.map(item => item.name).join("، ")}</div>
                             <div className="mt-1 text-xs text-gray-500">{order.id}</div>
                             <div className="mt-1 text-sm text-gray-500">
                                 {order.date}
@@ -503,6 +528,7 @@ function OrderCard({
                         </div>
 
                         <StatusBadge
+                            locale={locale}
                             status={
                                 order.status
                             }
@@ -544,6 +570,38 @@ function OrderCard({
                         }
                         t={t}
                     />
+
+                    <div className="mt-6 rounded-2xl border border-white/10 bg-black/10 p-4">
+                        <h3 className="mb-3 font-bold">{locale === "fa" ? "مشخصات طرح خریداری‌شده" : "Purchased plan details"}</h3>
+                        <dl className="grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
+                            <div><dt className="text-gray-400">{locale === "fa" ? "نام طرح" : "Plan"}</dt><dd className="mt-1 font-semibold">{order.items.map(item => item.name).join("، ")}</dd></div>
+                            <div><dt className="text-gray-400">{locale === "fa" ? "حجم طرح" : "Data allowance"}</dt><dd className="mt-1 font-semibold">{order.dataLimitBytes === undefined ? "—" : order.dataLimitBytes === 0 ? (locale === "fa" ? "نامحدود" : "Unlimited") : formatBytes(order.dataLimitBytes, locale)}</dd></div>
+                            <div><dt className="text-gray-400">{locale === "fa" ? "مصرف‌شده" : "Used data"}</dt><dd className="mt-1 font-semibold">{order.usedBytes === undefined ? "—" : formatBytes(order.usedBytes, locale)}</dd></div>
+                            <div><dt className="text-gray-400">{locale === "fa" ? "حجم باقی‌مانده" : "Remaining data"}</dt><dd className="mt-1 font-semibold">{order.dataLimitBytes === 0 ? (locale === "fa" ? "نامحدود" : "Unlimited") : order.remainingBytes === undefined ? "—" : formatBytes(order.remainingBytes, locale)}</dd></div>
+                            <div><dt className="text-gray-400">{locale === "fa" ? "مدت اعتبار" : "Duration"}</dt><dd className="mt-1 font-semibold">{order.durationDays} {locale === "fa" ? "روز" : "days"}</dd></div>
+                            <div><dt className="text-gray-400">{locale === "fa" ? "وضعیت اشتراک" : "Subscription status"}</dt><dd className="mt-1 font-semibold">{order.subscriptionStatus === "confirmed" ? (locale === "fa" ? "رزرو شده" : "Reserved") : order.subscriptionStatus === "active" ? (locale === "fa" ? "فعال" : "Active") : order.subscriptionStatus === "expired" ? (locale === "fa" ? "منقضی" : "Expired") : order.subscriptionStatus === "pending_payment" ? (locale === "fa" ? "در انتظار پرداخت" : "Pending payment") : (locale === "fa" ? "لغو شده" : "Cancelled")}</dd></div>
+                            <div><dt className="text-gray-400">{locale === "fa" ? "شروع اعتبار" : "Starts"}</dt><dd className="mt-1 font-semibold">{order.startsAt ? new Date(order.startsAt).toLocaleDateString(locale === "fa" ? "fa-IR" : "en-US") : "—"}</dd></div>
+                            <div><dt className="text-gray-400">{locale === "fa" ? "پایان اعتبار" : "Expires"}</dt><dd className="mt-1 font-semibold">{order.expiresAt ? new Date(order.expiresAt).toLocaleDateString(locale === "fa" ? "fa-IR" : "en-US") : "—"}</dd></div>
+                        </dl>
+                    </div>
+
+                    {order.dataLimitBytes !== undefined && order.dataLimitBytes > 0 && order.usedBytes !== undefined && (
+                        <div className="mt-4 rounded-2xl border border-white/10 bg-black/10 p-4">
+                            <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-sm">
+                                <span className="font-semibold">{locale === "fa" ? "میزان مصرف حجم" : "Bandwidth usage"}</span>
+                                <span className="text-gray-400" dir="ltr">
+                                    {formatBytes(order.usedBytes, locale)} / {formatBytes(order.dataLimitBytes, locale)}
+                                </span>
+                            </div>
+                            <div className="h-2 overflow-hidden rounded-full bg-white/10" role="progressbar"
+                                 aria-label={locale === "fa" ? "میزان مصرف حجم" : "Bandwidth usage"}
+                                 aria-valuemin={0} aria-valuemax={100}
+                                 aria-valuenow={Math.round(Math.min(100, Math.max(0, order.usedBytes / order.dataLimitBytes * 100)))}>
+                                <div className="h-full rounded-full bg-cyan-400 transition-all"
+                                     style={{width: `${Math.min(100, Math.max(0, order.usedBytes / order.dataLimitBytes * 100))}%`}} />
+                            </div>
+                        </div>
+                    )}
 
                     {/* Payment */}
 
@@ -888,9 +946,11 @@ function FilterButton({
 function StatusBadge({
                          status,
                          t,
+                         locale,
                      }: {
     status: OrderStatus;
     t: ReturnType<typeof useTranslations>;
+    locale: string;
 }) {
     const styles: Record<
         OrderStatus,
@@ -912,13 +972,15 @@ function StatusBadge({
             "border-gray-400/20 bg-gray-400/10 text-gray-300",
         rejected:
             "border-red-400/20 bg-red-400/10 text-red-300",
+        expired:
+            "border-gray-400/20 bg-gray-400/10 text-gray-300",
     };
 
     return (
         <span
             className={`rounded-full border px-3 py-1 text-xs font-semibold ${styles[status]}`}
         >
-            {status === "rejected" ? "Rejected" : t(`status.${status}`)}
+            {status === "expired" ? (locale === "fa" ? "منقضی شده" : "Expired") : status === "rejected" ? (locale === "fa" ? "رد شده" : "Rejected") : t(`status.${status}`)}
         </span>
     );
 }

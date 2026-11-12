@@ -8,6 +8,9 @@ export type UserSubscription = {
     priceMinor: number;
     currency: string;
     durationDays: number;
+    dataLimitBytes?: number;
+    usedBytes?: number;
+    remainingBytes?: number;
     status: "pending_payment" | "confirmed" | "active" | "expired" | "cancelled";
     createdAt: string;
     startsAt?: string | null;
