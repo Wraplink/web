@@ -86,7 +86,15 @@ type BackendModeResponse = {
 
 type BackendErrorResponse = {
     error?: string;
+    code?: string;
 };
+
+export class ConnectionActivationError extends Error {
+    constructor(public readonly code: string) {
+        super(code);
+        this.name = "ConnectionActivationError";
+    }
+}
 
 export async function getConnectionStatus(): Promise<ConnectionStatus> {
     // The mode belongs to the account and persists independently of an
@@ -138,10 +146,13 @@ export async function connect(): Promise<void> {
             "/api/v1/me/network/entitlement"
         );
     } catch (error) {
-        throw readableBackendError(
-            error,
-            "Could not activate network entitlement"
-        );
+        if (axios.isAxiosError<BackendErrorResponse>(error)) {
+            const code = error.response?.data?.code;
+            if (code === "NO_USABLE_SUBSCRIPTION" || code === "CLIENT_IP_IN_USE") {
+                throw new ConnectionActivationError(code);
+            }
+        }
+        throw new ConnectionActivationError("CONNECTION_FAILED");
     }
 }
 
