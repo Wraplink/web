@@ -145,7 +145,7 @@ export default function OrdersContent({
             }));
             setOrders(enriched);
         }
-        catch { setApiError("Unable to load subscriptions. Please retry."); }
+        catch { setApiError(locale === "fa" ? "بارگذاری سفارش‌ها ناموفق بود. دوباره تلاش کنید." : "Unable to load subscriptions. Please retry."); }
         finally { setFetching(false); }
     };
 
@@ -180,7 +180,7 @@ export default function OrdersContent({
             await cancelPendingSubscription(orderId);
             await reload();
         } catch {
-            setApiError("Could not cancel this subscription. It may no longer be pending.");
+            setApiError(locale === "fa" ? "لغو اشتراک ممکن نیست. ممکن است دیگر در انتظار پرداخت نباشد." : "Could not cancel this subscription. It may no longer be pending.");
         } finally {
             setActionLoading(null);
         }
@@ -373,8 +373,8 @@ export default function OrdersContent({
 
                 </div>
 
-                {apiError && <div role="alert" className="mb-5 rounded-xl border border-red-400/30 p-4 text-red-300">{apiError} <button type="button" className="ml-3 underline" onClick={() => void reload()}>Retry</button></div>}
-                {fetching && <p role="status" className="mb-5 text-gray-400">Loading orders…</p>}
+                {apiError && <div role="alert" className="mb-5 rounded-xl border border-red-400/30 p-4 text-red-300">{apiError} <button type="button" className="ml-3 underline" onClick={() => void reload()}>{locale === "fa" ? "تلاش مجدد" : "Retry"}</button></div>}
+                {fetching && <p role="status" className="mb-5 text-gray-400">{locale === "fa" ? "در حال بارگذاری سفارش‌ها…" : "Loading orders…"}</p>}
                 {/* Orders */}
 
                 <div className="space-y-4">
