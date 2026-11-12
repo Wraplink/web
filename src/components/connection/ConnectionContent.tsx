@@ -409,7 +409,7 @@ export default function ConnectionContent({
                                 ) : (
                                     <>
                                         <button type="button" onClick={() => void toggleConnection()} disabled={connectionLoading} className="rounded-lg bg-cyan-500 px-4 py-2 font-semibold text-slate-950 disabled:opacity-50">{t("errors.tryAgain")}</button>
-                                        <a href={`/${locale}/user/support`} className="rounded-lg border border-white/30 px-4 py-2">{t("errors.supportTicket")}</a>
+                                        <a href={`/${locale}/support`} className="rounded-lg border border-white/30 px-4 py-2">{t("errors.supportTicket")}</a>
                                     </>
                                 )}
                             </div>
