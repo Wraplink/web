@@ -26,6 +26,7 @@ import {useTranslations} from "next-intl";
 
 import {
     connect,
+    ConnectionActivationError,
     disconnect,
     getConnectionEvents,
     getConnectionStatus,
@@ -68,6 +69,7 @@ export default function ConnectionContent({
 
     const [error, setError] =
         useState<string | null>(null);
+    const [connectErrorCode, setConnectErrorCode] = useState<string | null>(null);
 
     const [diagnosticLoading, setDiagnosticLoading] =
         useState<DiagnosticType | null>(null);
@@ -199,6 +201,7 @@ export default function ConnectionContent({
         try {
             setConnectionLoading(true);
             setError(null);
+            setConnectErrorCode(null);
 
             if (connection.connected) {
                 await disconnect();
@@ -230,9 +233,13 @@ export default function ConnectionContent({
                 err
             );
 
-            setError(
-                t("errors.connectionFailed")
-            );
+            if (err instanceof ConnectionActivationError) {
+                setConnectErrorCode(err.code);
+                setError(t(err.code === "NO_USABLE_SUBSCRIPTION" ? "errors.noUsableSubscription" : err.code === "CLIENT_IP_IN_USE" ? "errors.ipInUse" : "errors.connectionFailedDetailed"));
+            } else {
+                setConnectErrorCode("CONNECTION_FAILED");
+                setError(t("errors.connectionFailedDetailed"));
+            }
         } finally {
             setConnectionLoading(false);
         }
@@ -393,12 +400,21 @@ export default function ConnectionContent({
 
                 {/* Error */}
                 {error && (
-                    <ErrorBanner
-                        message={error}
-                        onClose={() =>
-                            setError(null)
-                        }
-                    />
+                    <div className="space-y-3" role="alert">
+                        <ErrorBanner message={error} onClose={() => { setError(null); setConnectErrorCode(null); }}/>
+                        {connectErrorCode && (
+                            <div className="flex flex-wrap gap-3">
+                                {connectErrorCode === "NO_USABLE_SUBSCRIPTION" ? (
+                                    <a href={`/${locale}/user/market`} className="rounded-lg bg-cyan-500 px-4 py-2 font-semibold text-slate-950">{t("errors.buyPlan")}</a>
+                                ) : (
+                                    <>
+                                        <button type="button" onClick={() => void toggleConnection()} disabled={connectionLoading} className="rounded-lg bg-cyan-500 px-4 py-2 font-semibold text-slate-950 disabled:opacity-50">{t("errors.tryAgain")}</button>
+                                        <a href={`/${locale}/user/support`} className="rounded-lg border border-white/30 px-4 py-2">{t("errors.supportTicket")}</a>
+                                    </>
+                                )}
+                            </div>
+                        )}
+                    </div>
                 )}
 
                 {liveConnection && (
