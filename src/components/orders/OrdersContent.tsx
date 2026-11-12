@@ -57,6 +57,10 @@ type Order = {
     total: number;
     currency: string;
     items: OrderItem[];
+    durationDays: number;
+    subscriptionStatus: UserSubscription["status"];
+    startsAt?: string | null;
+    expiresAt?: string | null;
 };
 
 const initialOrders: Order[] = [];
@@ -68,6 +72,10 @@ function toOrder(subscription: UserSubscription): Order {
         subscription.status === "cancelled" ? "cancelled" : "delivered";
     return {
         id: subscription.id,
+        durationDays: subscription.durationDays,
+        subscriptionStatus: subscription.status,
+        startsAt: subscription.startsAt,
+        expiresAt: subscription.expiresAt,
         orderNumber: subscription.orderNumber,
         date: subscription.createdAt,
         status,
@@ -486,6 +494,7 @@ function OrderCard({
                                 {locale === "fa" ? "شماره سفارش" : "Order"} #WL-{order.orderNumber}
                             </div>
 
+                            <div className="mt-2 text-sm font-semibold text-gray-200">{order.items.map(item => item.name).join("، ")}</div>
                             <div className="mt-1 text-xs text-gray-500">{order.id}</div>
                             <div className="mt-1 text-sm text-gray-500">
                                 {order.date}
@@ -544,6 +553,17 @@ function OrderCard({
                         }
                         t={t}
                     />
+
+                    <div className="mt-6 rounded-2xl border border-white/10 bg-black/10 p-4">
+                        <h3 className="mb-3 font-bold">{locale === "fa" ? "مشخصات طرح خریداری‌شده" : "Purchased plan details"}</h3>
+                        <dl className="grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
+                            <div><dt className="text-gray-400">{locale === "fa" ? "نام طرح" : "Plan"}</dt><dd className="mt-1 font-semibold">{order.items.map(item => item.name).join("، ")}</dd></div>
+                            <div><dt className="text-gray-400">{locale === "fa" ? "مدت اعتبار" : "Duration"}</dt><dd className="mt-1 font-semibold">{order.durationDays} {locale === "fa" ? "روز" : "days"}</dd></div>
+                            <div><dt className="text-gray-400">{locale === "fa" ? "وضعیت اشتراک" : "Subscription status"}</dt><dd className="mt-1 font-semibold">{order.subscriptionStatus === "confirmed" ? (locale === "fa" ? "رزرو شده" : "Reserved") : order.subscriptionStatus === "active" ? (locale === "fa" ? "فعال" : "Active") : order.subscriptionStatus === "expired" ? (locale === "fa" ? "منقضی" : "Expired") : order.subscriptionStatus === "pending_payment" ? (locale === "fa" ? "در انتظار پرداخت" : "Pending payment") : (locale === "fa" ? "لغو شده" : "Cancelled")}</dd></div>
+                            <div><dt className="text-gray-400">{locale === "fa" ? "شروع اعتبار" : "Starts"}</dt><dd className="mt-1 font-semibold">{order.startsAt ? new Date(order.startsAt).toLocaleDateString(locale === "fa" ? "fa-IR" : "en-US") : "—"}</dd></div>
+                            <div><dt className="text-gray-400">{locale === "fa" ? "پایان اعتبار" : "Expires"}</dt><dd className="mt-1 font-semibold">{order.expiresAt ? new Date(order.expiresAt).toLocaleDateString(locale === "fa" ? "fa-IR" : "en-US") : "—"}</dd></div>
+                        </dl>
+                    </div>
 
                     {/* Payment */}
 
