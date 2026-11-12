@@ -5,6 +5,7 @@ export type UserSubscription = {
     orderNumber: number;
     planCode: string;
     planName: string;
+    planDescription?: string;
     priceMinor: number;
     currency: string;
     durationDays: number;
