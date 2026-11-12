@@ -585,6 +585,24 @@ function OrderCard({
                         </dl>
                     </div>
 
+                    {order.dataLimitBytes !== undefined && order.dataLimitBytes > 0 && order.usedBytes !== undefined && (
+                        <div className="mt-4 rounded-2xl border border-white/10 bg-black/10 p-4">
+                            <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-sm">
+                                <span className="font-semibold">{locale === "fa" ? "میزان مصرف حجم" : "Bandwidth usage"}</span>
+                                <span className="text-gray-400" dir="ltr">
+                                    {formatBytes(order.usedBytes, locale)} / {formatBytes(order.dataLimitBytes, locale)}
+                                </span>
+                            </div>
+                            <div className="h-2 overflow-hidden rounded-full bg-white/10" role="progressbar"
+                                 aria-label={locale === "fa" ? "میزان مصرف حجم" : "Bandwidth usage"}
+                                 aria-valuemin={0} aria-valuemax={100}
+                                 aria-valuenow={Math.round(Math.min(100, Math.max(0, order.usedBytes / order.dataLimitBytes * 100)))}>
+                                <div className="h-full rounded-full bg-cyan-400 transition-all"
+                                     style={{width: `${Math.min(100, Math.max(0, order.usedBytes / order.dataLimitBytes * 100))}%`}} />
+                            </div>
+                        </div>
+                    )}
+
                     {/* Payment */}
 
                     <div className="mt-6 flex flex-wrap gap-4">
