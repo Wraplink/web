@@ -528,6 +528,7 @@ function OrderCard({
                         </div>
 
                         <StatusBadge
+                            locale={locale}
                             status={
                                 order.status
                             }
@@ -927,9 +928,11 @@ function FilterButton({
 function StatusBadge({
                          status,
                          t,
+                         locale,
                      }: {
     status: OrderStatus;
     t: ReturnType<typeof useTranslations>;
+    locale: string;
 }) {
     const styles: Record<
         OrderStatus,
@@ -951,13 +954,15 @@ function StatusBadge({
             "border-gray-400/20 bg-gray-400/10 text-gray-300",
         rejected:
             "border-red-400/20 bg-red-400/10 text-red-300",
+        expired:
+            "border-gray-400/20 bg-gray-400/10 text-gray-300",
     };
 
     return (
         <span
             className={`rounded-full border px-3 py-1 text-xs font-semibold ${styles[status]}`}
         >
-            {status === "rejected" ? "Rejected" : t(`status.${status}`)}
+            {status === "expired" ? (locale === "fa" ? "منقضی شده" : "Expired") : status === "rejected" ? (locale === "fa" ? "رد شده" : "Rejected") : t(`status.${status}`)}
         </span>
     );
 }
