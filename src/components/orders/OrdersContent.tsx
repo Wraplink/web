@@ -59,6 +59,7 @@ type Order = {
     currency: string;
     items: OrderItem[];
     durationDays: number;
+    planDescription?: string;
     dataLimitBytes?: number;
     usedBytes?: number;
     remainingBytes?: number;
@@ -78,6 +79,7 @@ function toOrder(subscription: UserSubscription): Order {
     return {
         id: subscription.id,
         durationDays: subscription.durationDays,
+        planDescription: subscription.planDescription,
         dataLimitBytes: subscription.dataLimitBytes,
         usedBytes: subscription.usedBytes,
         remainingBytes: subscription.remainingBytes,
@@ -573,6 +575,9 @@ function OrderCard({
 
                     <div className="mt-6 rounded-2xl border border-white/10 bg-black/10 p-4">
                         <h3 className="mb-3 font-bold">{locale === "fa" ? "مشخصات طرح خریداری‌شده" : "Purchased plan details"}</h3>
+                        {order.planDescription?.trim() && (
+                            <p className="mb-4 whitespace-pre-wrap text-sm leading-7 text-gray-300">{order.planDescription}</p>
+                        )}
                         <dl className="grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
                             <div><dt className="text-gray-400">{locale === "fa" ? "نام طرح" : "Plan"}</dt><dd className="mt-1 font-semibold">{order.items.map(item => item.name).join("، ")}</dd></div>
                             <div><dt className="text-gray-400">{locale === "fa" ? "حجم طرح" : "Data allowance"}</dt><dd className="mt-1 font-semibold">{order.dataLimitBytes === undefined ? "—" : order.dataLimitBytes === 0 ? (locale === "fa" ? "نامحدود" : "Unlimited") : formatBytes(order.dataLimitBytes, locale)}</dd></div>
