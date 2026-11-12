@@ -406,7 +406,13 @@
       "connectionFailed": "تغییر وضعیت اتصال ناموفق بود.",
       "diagnosticFailed": "اجرای تست عیب‌یابی ناموفق بود.",
       "modeUpdateFailed": "به‌روزرسانی حالت اتصال ناموفق بود.",
-      "copyFailed": "کپی در کلیپ‌بورد امکان‌پذیر نیست."
+      "copyFailed": "کپی در کلیپ‌بورد امکان‌پذیر نیست.",
+      "noUsableSubscription": "Your plan has no remaining bandwidth and no reserved plan is available. Buy another plan to connect.",
+      "ipInUse": "This public IP is already active on another account. Try again or contact support.",
+      "connectionFailedDetailed": "Connection failed. Try again, or create a support ticket if the problem persists.",
+      "buyPlan": "Buy a plan",
+      "tryAgain": "Try again",
+      "supportTicket": "Create support ticket"
     },
     "connectionDetails": {
       "title": "Connection Details",
