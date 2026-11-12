@@ -58,6 +58,9 @@ type Order = {
     currency: string;
     items: OrderItem[];
     durationDays: number;
+    dataLimitBytes?: number;
+    usedBytes?: number;
+    remainingBytes?: number;
     subscriptionStatus: UserSubscription["status"];
     startsAt?: string | null;
     expiresAt?: string | null;
@@ -73,6 +76,9 @@ function toOrder(subscription: UserSubscription): Order {
     return {
         id: subscription.id,
         durationDays: subscription.durationDays,
+        dataLimitBytes: subscription.dataLimitBytes,
+        usedBytes: subscription.usedBytes,
+        remainingBytes: subscription.remainingBytes,
         subscriptionStatus: subscription.status,
         startsAt: subscription.startsAt,
         expiresAt: subscription.expiresAt,
@@ -85,6 +91,14 @@ function toOrder(subscription: UserSubscription): Order {
         items: [{id: subscription.planCode, name: subscription.planName, quantity: 1,
             price: subscription.priceMinor, refundable: false, refunded: false}],
     };
+}
+
+function formatBytes(bytes: number, locale: string): string {
+    if (!Number.isFinite(bytes) || bytes < 0) return "—";
+    if (bytes < 1024) return new Intl.NumberFormat(locale === "fa" ? "fa-IR" : "en-US").format(bytes) + " B";
+    const power = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), 4);
+    const unit = ["B", "KiB", "MiB", "GiB", "TiB"][power];
+    return new Intl.NumberFormat(locale === "fa" ? "fa-IR" : "en-US", {maximumFractionDigits: 2}).format(bytes / Math.pow(1024, power)) + " " + unit;
 }
 
 function formatMoney(amount: number, currency: string, locale: string): string {
@@ -558,6 +572,9 @@ function OrderCard({
                         <h3 className="mb-3 font-bold">{locale === "fa" ? "مشخصات طرح خریداری‌شده" : "Purchased plan details"}</h3>
                         <dl className="grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
                             <div><dt className="text-gray-400">{locale === "fa" ? "نام طرح" : "Plan"}</dt><dd className="mt-1 font-semibold">{order.items.map(item => item.name).join("، ")}</dd></div>
+                            <div><dt className="text-gray-400">{locale === "fa" ? "حجم طرح" : "Data allowance"}</dt><dd className="mt-1 font-semibold">{order.dataLimitBytes === undefined ? "—" : order.dataLimitBytes === 0 ? (locale === "fa" ? "نامحدود" : "Unlimited") : formatBytes(order.dataLimitBytes, locale)}</dd></div>
+                            <div><dt className="text-gray-400">{locale === "fa" ? "مصرف‌شده" : "Used data"}</dt><dd className="mt-1 font-semibold">{order.usedBytes === undefined ? "—" : formatBytes(order.usedBytes, locale)}</dd></div>
+                            <div><dt className="text-gray-400">{locale === "fa" ? "حجم باقی‌مانده" : "Remaining data"}</dt><dd className="mt-1 font-semibold">{order.dataLimitBytes === 0 ? (locale === "fa" ? "نامحدود" : "Unlimited") : order.remainingBytes === undefined ? "—" : formatBytes(order.remainingBytes, locale)}</dd></div>
                             <div><dt className="text-gray-400">{locale === "fa" ? "مدت اعتبار" : "Duration"}</dt><dd className="mt-1 font-semibold">{order.durationDays} {locale === "fa" ? "روز" : "days"}</dd></div>
                             <div><dt className="text-gray-400">{locale === "fa" ? "وضعیت اشتراک" : "Subscription status"}</dt><dd className="mt-1 font-semibold">{order.subscriptionStatus === "confirmed" ? (locale === "fa" ? "رزرو شده" : "Reserved") : order.subscriptionStatus === "active" ? (locale === "fa" ? "فعال" : "Active") : order.subscriptionStatus === "expired" ? (locale === "fa" ? "منقضی" : "Expired") : order.subscriptionStatus === "pending_payment" ? (locale === "fa" ? "در انتظار پرداخت" : "Pending payment") : (locale === "fa" ? "لغو شده" : "Cancelled")}</dd></div>
                             <div><dt className="text-gray-400">{locale === "fa" ? "شروع اعتبار" : "Starts"}</dt><dd className="mt-1 font-semibold">{order.startsAt ? new Date(order.startsAt).toLocaleDateString(locale === "fa" ? "fa-IR" : "en-US") : "—"}</dd></div>
