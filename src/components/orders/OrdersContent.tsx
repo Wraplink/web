@@ -36,7 +36,8 @@ type OrderStatus =
     | "delivered"
     | "cancelled"
     | "refunded"
-    | "rejected";
+    | "rejected"
+    | "expired";
 
 type OrderItem = {
     id: string;
@@ -72,7 +73,8 @@ function toOrder(subscription: UserSubscription): Order {
     const status: OrderStatus = subscription.status === "pending_payment" ? "pending" :
         subscription.status === "confirmed" ? "confirmed" :
         subscription.status === "active" ? "active" :
-        subscription.status === "cancelled" ? "cancelled" : "delivered";
+        subscription.status === "cancelled" ? "cancelled" :
+        subscription.status === "expired" ? "expired" : "delivered";
     return {
         id: subscription.id,
         durationDays: subscription.durationDays,
