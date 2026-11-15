@@ -9,6 +9,7 @@ export type ConnectionMode =
 
 export type ConnectionStatus = {
     connected: boolean;
+    dnsReady: boolean;
     latency: number;
     packetLoss: number;
     primaryDns: string;
@@ -109,10 +110,6 @@ export async function getConnectionStatus(): Promise<ConnectionStatus> {
         "/api/v1/me/network/access"
     );
 
-    if (accessResponse.data.status !== "active") {
-        return disconnectedStatus(mode);
-    }
-
     // Backend chooses these addresses from the registered dns-control nodes.
     // Never substitute static frontend IPs or cached values.
     const dnsServers = Array.from(new Set(
@@ -124,6 +121,7 @@ export async function getConnectionStatus(): Promise<ConnectionStatus> {
 
     return {
         connected: true,
+        dnsReady: accessResponse.data.status === "active" && dnsServers.length > 0,
         latency: 0,
         packetLoss: 0,
         primaryDns: dnsServers[0] ?? "-",
@@ -268,6 +266,7 @@ function readableBackendError(
 function disconnectedStatus(mode: ConnectionMode): ConnectionStatus {
     return {
         connected: false,
+        dnsReady: false,
         latency: 0,
         packetLoss: 0,
         primaryDns: "-",
