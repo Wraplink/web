@@ -417,6 +417,12 @@ export default function ConnectionContent({
                     </div>
                 )}
 
+                {liveConnection?.connected && !liveConnection.dnsReady && (
+                    <div className="mb-5 rounded-xl border border-amber-400/40 bg-amber-400/10 px-4 py-3 text-sm text-amber-100" role="status">
+                        {t("errors.dnsNotReady")}
+                    </div>
+                )}
+
                 {liveConnection && (
                     <>
                         {/* Top grid */}
