@@ -9,6 +9,7 @@ export type ConnectionMode =
 
 export type ConnectionStatus = {
     connected: boolean;
+    dnsReady: boolean;
     latency: number;
     packetLoss: number;
     primaryDns: string;
@@ -105,18 +106,25 @@ export async function getConnectionStatus(): Promise<ConnectionStatus> {
         return disconnectedStatus(mode);
     }
 
-    const accessResponse = await apiClient.get<BackendAccessInfo>(
-        "/api/v1/me/network/access"
-    );
-
-    if (accessResponse.data.status !== "active") {
-        return disconnectedStatus(mode);
+    // Entitlement activation is authoritative. A temporary failure in the
+    // separate access-details endpoint must not make the power button bounce off.
+    let access: BackendAccessInfo | null = null;
+    try {
+        const response = await apiClient.get<BackendAccessInfo>(
+            "/api/v1/me/network/access"
+        );
+        access = response.data;
+    } catch (error) {
+        // Authentication failures must still be handled by the API client.
+        if (!axios.isAxiosError(error) || error.response?.status === 401 || error.response?.status === 403) {
+            throw error;
+        }
     }
 
     // Backend chooses these addresses from the registered dns-control nodes.
     // Never substitute static frontend IPs or cached values.
     const dnsServers = Array.from(new Set(
-        (accessResponse.data.connection?.dnsServers ?? [])
+        (access?.connection?.dnsServers ?? [])
             .filter((value): value is string => typeof value === "string")
             .map((value) => value.trim())
             .filter(Boolean)
@@ -124,6 +132,7 @@ export async function getConnectionStatus(): Promise<ConnectionStatus> {
 
     return {
         connected: true,
+        dnsReady: access?.status === "active" && dnsServers.length > 0,
         latency: 0,
         packetLoss: 0,
         primaryDns: dnsServers[0] ?? "-",
@@ -134,9 +143,9 @@ export async function getConnectionStatus(): Promise<ConnectionStatus> {
         load: 0,
         mode,
         clientIp: entitlement.clientIp,
-        planCode: accessResponse.data.planCode,
-        remainingBytes: accessResponse.data.remainingBytes,
-        expiresAt: accessResponse.data.expiresAt,
+        planCode: access?.planCode ?? entitlement.planCode,
+        remainingBytes: access?.remainingBytes ?? entitlement.remainingBytes,
+        expiresAt: access?.expiresAt ?? entitlement.expiresAt,
     };
 }
 
@@ -268,6 +277,7 @@ function readableBackendError(
 function disconnectedStatus(mode: ConnectionMode): ConnectionStatus {
     return {
         connected: false,
+        dnsReady: false,
         latency: 0,
         packetLoss: 0,
         primaryDns: "-",

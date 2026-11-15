@@ -410,6 +410,7 @@
       "noUsableSubscription": "Your plan has no remaining bandwidth and no reserved plan is available. Buy another plan to connect.",
       "ipInUse": "This public IP is already active on another account. Try again or contact support.",
       "connectionFailedDetailed": "Connection failed. Try again, or create a support ticket if the problem persists.",
+      "dnsNotReady": "Your plan is activated, but no usable DNS server is available yet. Check DNS Control registration and synchronization. An Edge Agent is required for proxy and full-route modes.",
       "buyPlan": "Buy a plan",
       "tryAgain": "Try again",
       "supportTicket": "Create support ticket"
