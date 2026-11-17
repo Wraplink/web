@@ -1008,17 +1008,17 @@ function StatusCard({
             <div className="space-y-4">
                 <MetricRow
                     label="Latency"
-                    value="—"
+                    value={connection.latency === null ? "—" : `${connection.latency} ms`}
                 />
 
                 <MetricRow
                     label="Packet Loss"
-                    value="—"
+                    value={connection.packetLoss === null ? "—" : `${connection.packetLoss}%`}
                 />
 
                 <MetricRow
                     label="Server Load"
-                    value="—"
+                    value={connection.load === null ? "—" : `${connection.load}%`}
                 />
             </div>
         </section>
