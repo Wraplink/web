@@ -423,6 +423,14 @@ export default function ConnectionContent({
                     </div>
                 )}
 
+                {liveConnection?.connected && (
+                    <div className="mb-5 rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/70" role="status">
+                        <p>Edge Agent: {liveConnection.agentReady ? "Available" : "Unavailable or unverified"}</p>
+                        <p>SNI: {liveConnection.sniReady ? "Available" : "Unavailable"} · Full route: {liveConnection.routeReady ? "Available" : "Unavailable"}</p>
+                        <p className="text-xs text-white/40">Control-plane availability only; device traffic has not been verified.</p>
+                    </div>
+                )}
+
                 {liveConnection && (
                     <>
                         {/* Top grid */}
