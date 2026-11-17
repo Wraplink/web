@@ -22,6 +22,8 @@ export default function AdminNetworkContent(){
  const [error,setError]=useState("");
  const [refreshIn,setRefreshIn]=useState(REFRESH_SECONDS);
  const [checkingNodes,setCheckingNodes]=useState(false);
+ const [deletingNode,setDeletingNode]=useState<string|null>(null);
+ const [deleteTarget,setDeleteTarget]=useState<{id:string;type:"dns"|"edge";region:string}|null>(null);
  const checkingRef=useRef(false);
  const normalizedNetworkSearch=networkSearch.trim().toLowerCase();
  const unifiedNodes=useMemo(()=>[
@@ -56,6 +58,19 @@ export default function AdminNetworkContent(){
   try {const {data}=await apiClient.get<{addresses:RouteIP[]}>("/api/v1/admin/network/route-agent-ips");setRouteIPs(data.addresses)}
   catch {setError("Unable to load route agent IP inventory")}
  }
+ async function removeNode(){
+  if(!deleteTarget||deletingNode)return;
+  const target=deleteTarget;
+  setDeletingNode(target.type+":"+target.id);setError("");
+  try{
+   await apiClient.delete(`/api/v1/admin/network/nodes/${target.type}/${encodeURIComponent(target.id)}`);
+   setDeleteTarget(null);
+   await refreshNodes();
+  }catch(e){
+   const status=(e as {response?:{status?:number;data?:{error?:string}}}).response?.status;
+   setError(status===409?(locale==="fa"?"نود فعال است یا تخصیص فعال دارد.":"Node is active or has active assignments."):status===403?(locale==="fa"?"دسترسی مدیر لازم است.":"Administrator permission required."):(locale==="fa"?"حذف نود ناموفق بود.":"Failed to remove node."));
+  }finally{setDeletingNode(null)}
+ }
  useEffect(()=>{void load()},[]);
  useEffect(()=>{
   const timer=window.setInterval(()=>{
@@ -81,8 +96,9 @@ export default function AdminNetworkContent(){
     <label className="block min-w-0 flex-1 text-sm">{locale==="fa"?"جست‌وجوی شبکه":"Search network"}<input type="search" value={networkSearch} onChange={e=>setNetworkSearch(e.target.value)} placeholder={locale==="fa"?"شناسه، نوع، منطقه، IP یا وضعیت":"ID, type, region, IP or status"} className="mt-2 block w-full rounded-lg border border-white/20 bg-transparent p-3" /></label>
     <label className="block text-sm">{locale==="fa"?"نوع":"Type"}<select value={nodeType} onChange={e=>setNodeType(e.target.value as "all"|"dns"|"edge")} className="mt-2 block w-full rounded-lg border border-white/20 bg-slate-950 p-3"><option value="all">{locale==="fa"?"همه":"All types"}</option><option value="dns">DNS Control</option><option value="edge">Edge Agent</option></select></label>
    </div>
-   {loading?<p className="mt-5">{locale==="fa"?"در حال بارگذاری…":"Loading network nodes…"}</p>:<div className="mt-5 overflow-x-auto"><table className="w-full text-left text-sm" dir={locale==="fa"?"rtl":"ltr"}><thead><tr><th scope="col" className="p-2">{locale==="fa"?"شناسه":"Node"}</th><th scope="col" className="p-2">{locale==="fa"?"نوع":"Type"}</th><th scope="col" className="p-2">{locale==="fa"?"منطقه":"Region"}</th><th scope="col" className="p-2">{locale==="fa"?"وضعیت":"Health"}</th><th scope="col" className="p-2">{locale==="fa"?"آدرس‌های DNS":"DNS addresses"}</th><th scope="col" className="p-2">{locale==="fa"?"ظرفیت SNI / Route":"SNI / Route capacity"}</th><th scope="col" className="p-2">{locale==="fa"?"آخرین فعالیت":"Last activity"}</th></tr></thead><tbody>{visibleNodes.map(node=><tr key={node.key} className="border-t border-white/10"><td className="p-2 font-medium">{node.id}</td><td className="p-2">{node.type==="dns"?"DNS Control":"Edge Agent"}</td><td className="p-2">{node.region||"—"}</td><td className={node.online?"p-2 text-green-400":"p-2 text-amber-300"}>{node.online?(locale==="fa"?"آنلاین":"Online"):(locale==="fa"?"آفلاین / قدیمی":"Offline / stale")}</td><td className="p-2">{node.addresses||"—"}</td><td className="p-2">{node.capacity}</td><td className="p-2">{node.lastSeenAt?new Date(node.lastSeenAt).toLocaleString(locale):"—"}</td></tr>)}</tbody></table>{visibleNodes.length===0&&<p className="mt-4 text-sm text-gray-400">{locale==="fa"?"موردی مطابق فیلترها یافت نشد.":"No network nodes match your filters."}</p>}</div>}
+   {loading?<p className="mt-5">{locale==="fa"?"در حال بارگذاری…":"Loading network nodes…"}</p>:<div className="mt-5 overflow-x-auto"><table className="w-full text-left text-sm" dir={locale==="fa"?"rtl":"ltr"}><thead><tr><th scope="col" className="p-2">{locale==="fa"?"شناسه":"Node"}</th><th scope="col" className="p-2">{locale==="fa"?"نوع":"Type"}</th><th scope="col" className="p-2">{locale==="fa"?"منطقه":"Region"}</th><th scope="col" className="p-2">{locale==="fa"?"وضعیت":"Health"}</th><th scope="col" className="p-2">{locale==="fa"?"آدرس‌های DNS":"DNS addresses"}</th><th scope="col" className="p-2">{locale==="fa"?"ظرفیت SNI / Route":"SNI / Route capacity"}</th><th scope="col" className="p-2">{locale==="fa"?"آخرین فعالیت":"Last activity"}</th><th scope="col" className="p-2">{locale==="fa"?"عملیات":"Actions"}</th></tr></thead><tbody>{visibleNodes.map(node=><tr key={node.key} className="border-t border-white/10"><td className="p-2 font-medium">{node.id}</td><td className="p-2">{node.type==="dns"?"DNS Control":"Edge Agent"}</td><td className="p-2">{node.region||"—"}</td><td className={node.online?"p-2 text-green-400":"p-2 text-amber-300"}>{node.online?(locale==="fa"?"آنلاین":"Online"):(locale==="fa"?"آفلاین / قدیمی":"Offline / stale")}</td><td className="p-2">{node.addresses||"—"}</td><td className="p-2">{node.capacity}</td><td className="p-2">{node.lastSeenAt?new Date(node.lastSeenAt).toLocaleString(locale):"—"}</td><td className="p-2"><button type="button" disabled={node.online||!!deletingNode} onClick={()=>setDeleteTarget({id:node.id,type:node.type,region:node.region})} className="rounded border border-red-400/50 px-3 py-1 text-red-300 disabled:cursor-not-allowed disabled:opacity-30" title={node.online?(locale==="fa"?"نود آنلاین قابل حذف نیست":"Online nodes cannot be removed"):undefined}>{locale==="fa"?"حذف":"Remove"}</button></td></tr>)}</tbody></table>{visibleNodes.length===0&&<p className="mt-4 text-sm text-gray-400">{locale==="fa"?"موردی مطابق فیلترها یافت نشد.":"No network nodes match your filters."}</p>}</div>}
   </section>
+  {deleteTarget&&<div role="dialog" aria-modal="true" aria-labelledby="delete-node-title" className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"><div className="w-full max-w-md rounded-xl border border-white/20 bg-slate-950 p-6"><h2 id="delete-node-title" className="text-lg font-semibold">{locale==="fa"?"تأیید حذف نود":"Confirm node removal"}</h2><p className="mt-3 text-sm text-gray-300">{deleteTarget.id} · {deleteTarget.type==="dns"?"DNS Control":"Edge Agent"} · {deleteTarget.region||"—"}</p><p className="mt-3 text-sm text-amber-200">{locale==="fa"?"حذف فقط برای نود آفلاین و بدون تخصیص فعال مجاز است.":"Only offline nodes without active assignments can be removed."}</p><div className="mt-6 flex justify-end gap-3"><button type="button" disabled={!!deletingNode} onClick={()=>setDeleteTarget(null)} className="rounded-lg border px-4 py-2">{locale==="fa"?"انصراف":"Cancel"}</button><button type="button" disabled={!!deletingNode} onClick={()=>void removeNode()} className="rounded-lg bg-red-700 px-4 py-2 text-white disabled:opacity-50">{deletingNode?(locale==="fa"?"در حال حذف…":"Removing…"):(locale==="fa"?"حذف نود":"Remove node")}</button></div></div></div>}
   <div className="mt-5 flex flex-wrap gap-5"><Link href="/admin/network/dns-queries" className="text-cyan-300 underline">{locale==="fa"?"پایش درخواست‌های DNS":"Monitor DNS queries"}</Link><Link href="/admin/domain-policies" className="text-cyan-300 underline">{locale==="fa"?"مدیریت سیاست‌های تفکیک دامنه":"Manage domain resolution policies"}</Link></div>
   <section className="mt-8 rounded-xl border border-white/15 p-5">
    <h2 className="font-semibold">Edge agent public IP inventory</h2>
