@@ -137,6 +137,9 @@ export default function ConnectionContent({
                 err
             );
 
+            // Do not retain a previously successful state after a failed refresh.
+            setConnection(null);
+            setDiagnosticResults({});
             setError(
                 t("errors.loadFailed")
             );
@@ -220,6 +223,10 @@ export default function ConnectionContent({
                 err
             );
 
+            // A mutation may have succeeded even if its follow-up status read failed.
+            // Reload before showing another power action; never retain stale readiness.
+            setConnection(null);
+            setDiagnosticResults({});
             if (err instanceof ConnectionActivationError) {
                 setConnectErrorCode(err.code);
                 setError(t(err.code === "NO_USABLE_SUBSCRIPTION" ? "errors.noUsableSubscription" : err.code === "CLIENT_IP_IN_USE" ? "errors.ipInUse" : "errors.connectionFailedDetailed"));
