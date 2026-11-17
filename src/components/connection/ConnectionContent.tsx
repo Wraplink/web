@@ -39,7 +39,6 @@ import {
     type DiagnosticType,
 } from "@/lib/api/connection";
 
-import {useConnectionRealtime} from "@/hooks/useConnectionRealtime";
 
 type Props = {
     locale: string;
@@ -164,26 +163,9 @@ export default function ConnectionContent({
      * SSE:
      * GET /api/v1/connection/stream
      */
-    const realtime =
-        useConnectionRealtime({
-            enabled:
-                connection?.connected ?? false,
-        });
-
-    const liveConnection: ConnectionStatus | null =
-        connection
-            ? {
-                ...connection,
-                latency:
-                    realtime.latency,
-                packetLoss:
-                    realtime.packetLoss,
-                edge:
-                    realtime.edge,
-                load:
-                    realtime.load,
-            }
-            : null;
+    // No client telemetry is available yet. Preserve the backend's assigned
+    // edge information instead of replacing it with a mock value.
+    const liveConnection: ConnectionStatus | null = connection;
 
     /*
      * Connect / disconnect.
