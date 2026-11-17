@@ -431,6 +431,7 @@ export default function ConnectionContent({
                                 connected={
                                     liveConnection.connected
                                 }
+                                dnsReady={liveConnection.dnsReady}
                                 loading={
                                     connectionLoading
                                 }
@@ -804,10 +805,12 @@ function SectionHeader({
 
 function ConnectionPowerCard({
                                  connected,
+                                 dnsReady,
                                  loading,
                                  onToggle,
                              }: {
     connected: boolean;
+    dnsReady: boolean;
     loading: boolean;
     onToggle: () => void;
 }) {
@@ -816,7 +819,7 @@ function ConnectionPowerCard({
             <div className="flex flex-col items-center justify-center py-6">
                 <div className="relative">
                     {/* Outer animated rings */}
-                    {connected && (
+                    {connected && dnsReady && (
                         <>
                             <span
                                 className="
@@ -849,7 +852,7 @@ function ConnectionPowerCard({
                         onClick={onToggle}
                         disabled={loading}
                         aria-label={
-                            connected
+                            connected && dnsReady
                                 ? "Disconnect"
                                 : "Connect"
                         }
@@ -867,7 +870,7 @@ function ConnectionPowerCard({
                             duration-300
 
                             ${
-                            connected
+                            connected && dnsReady
                                 ? `
                                         border-cyan-400/70
                                         bg-cyan-400/10
@@ -887,7 +890,7 @@ function ConnectionPowerCard({
                         `}
                     >
                         {/* Inner glow */}
-                        {connected && (
+                        {connected && dnsReady && (
                             <span
                                 className="
                                     absolute
@@ -908,7 +911,7 @@ function ConnectionPowerCard({
                                 border
                                 transition-colors
                                 ${
-                                connected
+                                connected && dnsReady
                                     ? "border-cyan-400/40"
                                     : "border-white/10"
                             }
@@ -937,7 +940,7 @@ function ConnectionPowerCard({
                                     transition-all
                                     duration-300
                                     ${
-                                    connected
+                                    connected && dnsReady
                                         ? "text-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.8)]"
                                         : "text-white/50 group-hover:text-cyan-400"
                                 }
@@ -957,7 +960,7 @@ function ConnectionPowerCard({
                             rounded-full
                             transition-all
                             ${
-                            connected
+                            connected && dnsReady
                                 ? "bg-cyan-400 shadow-[0_0_15px_rgba(34,211,238,1)] animate-pulse"
                                 : "bg-white/20"
                         }
@@ -965,13 +968,13 @@ function ConnectionPowerCard({
                     />
 
                     <h2 className="text-xl font-semibold">
-                        {connected
+                        {connected && dnsReady
                             ? "Connected"
                             : "Disconnected"}
                     </h2>
 
                     <p className="mt-1 text-sm text-white/40">
-                        {connected
+                        {connected && dnsReady
                             ? "Your connection is active"
                             : "Click to connect"}
                     </p>
@@ -1000,7 +1003,7 @@ function StatusCard({
 
                     <h3 className="mt-1 text-xl font-semibold">
                         {connection.connected
-                            ? "Online"
+                            ? (connection.dnsReady ? "Access provisioned" : "DNS unavailable")
                             : "Offline"}
                     </h3>
                 </div>
@@ -1015,17 +1018,17 @@ function StatusCard({
             <div className="space-y-4">
                 <MetricRow
                     label="Latency"
-                    value={`${connection.latency} ms`}
+                    value="—"
                 />
 
                 <MetricRow
                     label="Packet Loss"
-                    value={`${connection.packetLoss}%`}
+                    value="—"
                 />
 
                 <MetricRow
                     label="Server Load"
-                    value={`${connection.load}%`}
+                    value="—"
                 />
             </div>
         </section>
