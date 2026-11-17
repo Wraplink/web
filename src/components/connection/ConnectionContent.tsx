@@ -411,6 +411,15 @@ export default function ConnectionContent({
                     </div>
                 )}
 
+                {!liveConnection && !loading && (
+                    <div className="mb-5 rounded-xl border border-amber-400/30 bg-amber-400/10 p-4" role="status">
+                        <p className="mb-3 text-sm text-amber-100">Connection status is unavailable. No connection state is assumed.</p>
+                        <button type="button" onClick={() => void loadConnection()} className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-slate-950">
+                            Retry status check
+                        </button>
+                    </div>
+                )}
+
                 {liveConnection?.connected && !liveConnection.dnsReady && (
                     <div className="mb-5 rounded-xl border border-amber-400/40 bg-amber-400/10 px-4 py-3 text-sm text-amber-100" role="status">
                         {t("errors.dnsNotReady")}
