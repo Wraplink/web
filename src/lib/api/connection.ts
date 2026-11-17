@@ -14,14 +14,14 @@ export type ConnectionStatus = {
     sniReady: boolean;
     routeReady: boolean;
     readinessReason: string;
-    latency: number;
-    packetLoss: number;
+    latency: number | null;
+    packetLoss: number | null;
     primaryDns: string;
     secondaryDns: string;
     edge: string;
     region: string;
     country: string;
-    load: number;
+    load: number | null;
     mode: ConnectionMode;
     clientIp: string;
     planCode: string;
@@ -150,14 +150,14 @@ export async function getConnectionStatus(): Promise<ConnectionStatus> {
         sniReady: access?.readiness?.sniReady === true,
         routeReady: access?.readiness?.routeReady === true,
         readinessReason: access?.readiness?.reason ?? "READINESS_UNAVAILABLE",
-        latency: 0,
-        packetLoss: 0,
+        latency: null,
+        packetLoss: null,
         primaryDns: dnsServers[0] ?? "-",
         secondaryDns: dnsServers[1] ?? "-",
         edge: `Entitled IP ${entitlement.clientIp}`,
         region: "-",
         country: "-",
-        load: 0,
+        load: null,
         mode,
         clientIp: entitlement.clientIp,
         planCode: access?.planCode ?? entitlement.planCode,
@@ -299,14 +299,14 @@ function disconnectedStatus(mode: ConnectionMode): ConnectionStatus {
         sniReady: false,
         routeReady: false,
         readinessReason: "ACCESS_NOT_ACTIVE",
-        latency: 0,
-        packetLoss: 0,
+        latency: null,
+        packetLoss: null,
         primaryDns: "-",
         secondaryDns: "-",
         edge: "-",
         region: "-",
         country: "-",
-        load: 0,
+        load: null,
         mode,
         clientIp: "-",
         planCode: "-",
