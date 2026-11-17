@@ -10,6 +10,10 @@ export type ConnectionMode =
 export type ConnectionStatus = {
     connected: boolean;
     dnsReady: boolean;
+    agentReady: boolean;
+    sniReady: boolean;
+    routeReady: boolean;
+    readinessReason: string;
     latency: number;
     packetLoss: number;
     primaryDns: string;
@@ -46,6 +50,14 @@ export type ConnectionEvent = {
 
 type BackendAccessInfo = {
     dnsRegistryReady?: boolean;
+    readiness?: {
+        dnsReady: boolean;
+        agentReady: boolean;
+        sniReady: boolean;
+        routeReady: boolean;
+        reason: string;
+        clientVerified: boolean;
+    };
     subscriptionId: string;
     planCode: string;
     status:
@@ -134,6 +146,10 @@ export async function getConnectionStatus(): Promise<ConnectionStatus> {
     return {
         connected: true,
         dnsReady: access?.status === "active" && access?.dnsRegistryReady === true && dnsServers.length > 0,
+        agentReady: access?.readiness?.agentReady === true,
+        sniReady: access?.readiness?.sniReady === true,
+        routeReady: access?.readiness?.routeReady === true,
+        readinessReason: access?.readiness?.reason ?? "READINESS_UNAVAILABLE",
         latency: 0,
         packetLoss: 0,
         primaryDns: dnsServers[0] ?? "-",
@@ -279,6 +295,10 @@ function disconnectedStatus(mode: ConnectionMode): ConnectionStatus {
     return {
         connected: false,
         dnsReady: false,
+        agentReady: false,
+        sniReady: false,
+        routeReady: false,
+        readinessReason: "ACCESS_NOT_ACTIVE",
         latency: 0,
         packetLoss: 0,
         primaryDns: "-",
