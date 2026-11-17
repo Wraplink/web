@@ -13,6 +13,14 @@ export const API_BASE_URL = normalizeApiBaseUrl(
 let accessToken: string | null = null;
 let refreshPromise: Promise<string> | null = null;
 
+export const AUTH_SESSION_EXPIRED_EVENT = "wraplink:auth-session-expired";
+
+function notifySessionExpired() {
+    if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event(AUTH_SESSION_EXPIRED_EVENT));
+    }
+}
+
 export function setAccessToken(token: string | null) {
     accessToken = token?.trim() || null;
 }
@@ -68,6 +76,14 @@ apiClient.interceptors.response.use(
             throw error;
         }
 
+        // Another request may already have refreshed the token while this one failed.
+        const failedToken = config.headers.get("Authorization");
+        if (accessToken && failedToken !== `Bearer ${accessToken}`) {
+            config._wraplinkRetry = true;
+            config.headers.set("Authorization", `Bearer ${accessToken}`);
+            return apiClient.request(config);
+        }
+
         config._wraplinkRetry = true;
 
         try {
@@ -79,7 +95,13 @@ apiClient.interceptors.response.use(
 
             return apiClient.request(config);
         } catch (refreshError) {
-            setAccessToken(null);
+            // Network/server failures are transient; only an explicit auth rejection
+            // proves the refresh session is invalid.
+            if (axios.isAxiosError(refreshError) &&
+                [401, 403].includes(refreshError.response?.status ?? 0)) {
+                setAccessToken(null);
+                notifySessionExpired();
+            }
             throw refreshError;
         }
     }
