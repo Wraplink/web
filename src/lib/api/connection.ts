@@ -10,14 +10,18 @@ export type ConnectionMode =
 export type ConnectionStatus = {
     connected: boolean;
     dnsReady: boolean;
-    latency: number;
-    packetLoss: number;
+    agentReady: boolean;
+    sniReady: boolean;
+    routeReady: boolean;
+    readinessReason: string;
+    latency: number | null;
+    packetLoss: number | null;
     primaryDns: string;
     secondaryDns: string;
     edge: string;
     region: string;
     country: string;
-    load: number;
+    load: number | null;
     mode: ConnectionMode;
     clientIp: string;
     planCode: string;
@@ -45,6 +49,15 @@ export type ConnectionEvent = {
 };
 
 type BackendAccessInfo = {
+    dnsRegistryReady?: boolean;
+    readiness?: {
+        dnsReady: boolean;
+        agentReady: boolean;
+        sniReady: boolean;
+        routeReady: boolean;
+        reason: string;
+        clientVerified: boolean;
+    };
     subscriptionId: string;
     planCode: string;
     status:
@@ -132,15 +145,19 @@ export async function getConnectionStatus(): Promise<ConnectionStatus> {
 
     return {
         connected: true,
-        dnsReady: access?.status === "active" && dnsServers.length > 0,
-        latency: 0,
-        packetLoss: 0,
+        dnsReady: access?.status === "active" && access?.dnsRegistryReady === true && dnsServers.length > 0,
+        agentReady: access?.readiness?.agentReady === true,
+        sniReady: access?.readiness?.sniReady === true,
+        routeReady: access?.readiness?.routeReady === true,
+        readinessReason: access?.readiness?.reason ?? "READINESS_UNAVAILABLE",
+        latency: null,
+        packetLoss: null,
         primaryDns: dnsServers[0] ?? "-",
         secondaryDns: dnsServers[1] ?? "-",
         edge: `Entitled IP ${entitlement.clientIp}`,
         region: "-",
         country: "-",
-        load: 0,
+        load: null,
         mode,
         clientIp: entitlement.clientIp,
         planCode: access?.planCode ?? entitlement.planCode,
@@ -278,14 +295,18 @@ function disconnectedStatus(mode: ConnectionMode): ConnectionStatus {
     return {
         connected: false,
         dnsReady: false,
-        latency: 0,
-        packetLoss: 0,
+        agentReady: false,
+        sniReady: false,
+        routeReady: false,
+        readinessReason: "ACCESS_NOT_ACTIVE",
+        latency: null,
+        packetLoss: null,
         primaryDns: "-",
         secondaryDns: "-",
         edge: "-",
         region: "-",
         country: "-",
-        load: 0,
+        load: null,
         mode,
         clientIp: "-",
         planCode: "-",

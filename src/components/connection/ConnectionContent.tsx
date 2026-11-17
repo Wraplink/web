@@ -39,7 +39,6 @@ import {
     type DiagnosticType,
 } from "@/lib/api/connection";
 
-import {useConnectionRealtime} from "@/hooks/useConnectionRealtime";
 
 type Props = {
     locale: string;
@@ -138,6 +137,9 @@ export default function ConnectionContent({
                 err
             );
 
+            // Do not retain a previously successful state after a failed refresh.
+            setConnection(null);
+            setDiagnosticResults({});
             setError(
                 t("errors.loadFailed")
             );
@@ -164,26 +166,9 @@ export default function ConnectionContent({
      * SSE:
      * GET /api/v1/connection/stream
      */
-    const realtime =
-        useConnectionRealtime({
-            enabled:
-                connection?.connected ?? false,
-        });
-
-    const liveConnection: ConnectionStatus | null =
-        connection
-            ? {
-                ...connection,
-                latency:
-                    realtime.latency,
-                packetLoss:
-                    realtime.packetLoss,
-                edge:
-                    realtime.edge,
-                load:
-                    realtime.load,
-            }
-            : null;
+    // No client telemetry is available yet. Preserve the backend's assigned
+    // edge information instead of replacing it with a mock value.
+    const liveConnection: ConnectionStatus | null = connection;
 
     /*
      * Connect / disconnect.
@@ -212,6 +197,11 @@ export default function ConnectionContent({
                         ? {
                             ...current,
                             connected: false,
+                            dnsReady: false,
+                            agentReady: false,
+                            sniReady: false,
+                            routeReady: false,
+                            readinessReason: "ACCESS_NOT_ACTIVE",
                             primaryDns: "-",
                             secondaryDns: "-",
                             edge: "-",
@@ -233,6 +223,10 @@ export default function ConnectionContent({
                 err
             );
 
+            // A mutation may have succeeded even if its follow-up status read failed.
+            // Reload before showing another power action; never retain stale readiness.
+            setConnection(null);
+            setDiagnosticResults({});
             if (err instanceof ConnectionActivationError) {
                 setConnectErrorCode(err.code);
                 setError(t(err.code === "NO_USABLE_SUBSCRIPTION" ? "errors.noUsableSubscription" : err.code === "CLIENT_IP_IN_USE" ? "errors.ipInUse" : "errors.connectionFailedDetailed"));
@@ -417,9 +411,26 @@ export default function ConnectionContent({
                     </div>
                 )}
 
+                {!liveConnection && !loading && (
+                    <div className="mb-5 rounded-xl border border-amber-400/30 bg-amber-400/10 p-4" role="status">
+                        <p className="mb-3 text-sm text-amber-100">Connection status is unavailable. No connection state is assumed.</p>
+                        <button type="button" onClick={() => void loadConnection()} className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-slate-950">
+                            Retry status check
+                        </button>
+                    </div>
+                )}
+
                 {liveConnection?.connected && !liveConnection.dnsReady && (
                     <div className="mb-5 rounded-xl border border-amber-400/40 bg-amber-400/10 px-4 py-3 text-sm text-amber-100" role="status">
                         {t("errors.dnsNotReady")}
+                    </div>
+                )}
+
+                {liveConnection?.connected && (
+                    <div className="mb-5 rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white/70" role="status">
+                        <p>Edge Agent: {liveConnection.agentReady ? "Available" : "Unavailable or unverified"}</p>
+                        <p>SNI: {liveConnection.sniReady ? "Available" : "Unavailable"} · Full route: {liveConnection.routeReady ? "Available" : "Unavailable"}</p>
+                        <p className="text-xs text-white/40">Control-plane availability only; device traffic has not been verified.</p>
                     </div>
                 )}
 
@@ -431,6 +442,7 @@ export default function ConnectionContent({
                                 connected={
                                     liveConnection.connected
                                 }
+                                dnsReady={liveConnection.dnsReady}
                                 loading={
                                     connectionLoading
                                 }
@@ -804,10 +816,12 @@ function SectionHeader({
 
 function ConnectionPowerCard({
                                  connected,
+                                 dnsReady,
                                  loading,
                                  onToggle,
                              }: {
     connected: boolean;
+    dnsReady: boolean;
     loading: boolean;
     onToggle: () => void;
 }) {
@@ -816,7 +830,7 @@ function ConnectionPowerCard({
             <div className="flex flex-col items-center justify-center py-6">
                 <div className="relative">
                     {/* Outer animated rings */}
-                    {connected && (
+                    {connected && dnsReady && (
                         <>
                             <span
                                 className="
@@ -849,7 +863,7 @@ function ConnectionPowerCard({
                         onClick={onToggle}
                         disabled={loading}
                         aria-label={
-                            connected
+                            connected && dnsReady
                                 ? "Disconnect"
                                 : "Connect"
                         }
@@ -867,7 +881,7 @@ function ConnectionPowerCard({
                             duration-300
 
                             ${
-                            connected
+                            connected && dnsReady
                                 ? `
                                         border-cyan-400/70
                                         bg-cyan-400/10
@@ -887,7 +901,7 @@ function ConnectionPowerCard({
                         `}
                     >
                         {/* Inner glow */}
-                        {connected && (
+                        {connected && dnsReady && (
                             <span
                                 className="
                                     absolute
@@ -908,7 +922,7 @@ function ConnectionPowerCard({
                                 border
                                 transition-colors
                                 ${
-                                connected
+                                connected && dnsReady
                                     ? "border-cyan-400/40"
                                     : "border-white/10"
                             }
@@ -937,7 +951,7 @@ function ConnectionPowerCard({
                                     transition-all
                                     duration-300
                                     ${
-                                    connected
+                                    connected && dnsReady
                                         ? "text-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.8)]"
                                         : "text-white/50 group-hover:text-cyan-400"
                                 }
@@ -957,7 +971,7 @@ function ConnectionPowerCard({
                             rounded-full
                             transition-all
                             ${
-                            connected
+                            connected && dnsReady
                                 ? "bg-cyan-400 shadow-[0_0_15px_rgba(34,211,238,1)] animate-pulse"
                                 : "bg-white/20"
                         }
@@ -965,15 +979,15 @@ function ConnectionPowerCard({
                     />
 
                     <h2 className="text-xl font-semibold">
-                        {connected
-                            ? "Connected"
-                            : "Disconnected"}
+                        {connected && dnsReady
+                            ? "Access provisioned"
+                            : connected ? "DNS unavailable" : "Access inactive"}
                     </h2>
 
                     <p className="mt-1 text-sm text-white/40">
-                        {connected
-                            ? "Your connection is active"
-                            : "Click to connect"}
+                        {connected && dnsReady
+                            ? "DNS assigned; device connectivity not verified"
+                            : connected ? "Access is active, but DNS is not ready" : "Click to activate network access"}
                     </p>
                 </div>
             </div>
@@ -1000,12 +1014,12 @@ function StatusCard({
 
                     <h3 className="mt-1 text-xl font-semibold">
                         {connection.connected
-                            ? "Online"
+                            ? (connection.readinessReason === "READINESS_UNAVAILABLE" ? "Readiness unavailable" : connection.dnsReady ? "Access provisioned" : "DNS unavailable")
                             : "Offline"}
                     </h3>
                 </div>
 
-                {connection.connected ? (
+                {connection.connected && connection.dnsReady ? (
                     <CheckCircle2 className="h-7 w-7 text-cyan-400"/>
                 ) : (
                     <XCircle className="h-7 w-7 text-white/30"/>
@@ -1015,17 +1029,17 @@ function StatusCard({
             <div className="space-y-4">
                 <MetricRow
                     label="Latency"
-                    value={`${connection.latency} ms`}
+                    value={connection.latency === null ? "—" : `${connection.latency} ms`}
                 />
 
                 <MetricRow
                     label="Packet Loss"
-                    value={`${connection.packetLoss}%`}
+                    value={connection.packetLoss === null ? "—" : `${connection.packetLoss}%`}
                 />
 
                 <MetricRow
                     label="Server Load"
-                    value={`${connection.load}%`}
+                    value={connection.load === null ? "—" : `${connection.load}%`}
                 />
             </div>
         </section>
