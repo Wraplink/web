@@ -68,7 +68,7 @@ export default function AdminNetworkContent(){
    await refreshNodes();
   }catch(e){
    const status=(e as {response?:{status?:number;data?:{error?:string}}}).response?.status;
-   setError(status===409?(locale==="fa"?"نود فعال است یا تخصیص فعال دارد.":"Node is active or has active assignments."):status===403?(locale==="fa"?"دسترسی مدیر لازم است.":"Administrator permission required."):(locale==="fa"?"حذف نود ناموفق بود.":"Failed to remove node."));
+   setError(status===409?(locale==="fa"?"نود هنوز فعال است یا دارای آدرس مسیریابی ثبت‌شده است. ابتدا منابع مسیریابی را آزاد کنید.":"Node is still active or has registered route IP inventory. Retire route resources first."):status===403?(locale==="fa"?"دسترسی مدیر لازم است.":"Administrator permission required."):(locale==="fa"?"حذف نود ناموفق بود.":"Failed to remove node."));
   }finally{setDeletingNode(null)}
  }
  useEffect(()=>{void load()},[]);
