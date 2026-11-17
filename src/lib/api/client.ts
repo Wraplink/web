@@ -70,9 +70,20 @@ apiClient.interceptors.response.use(
         if (
             !config ||
             response?.status !== 401 ||
-            config._wraplinkRetry ||
             isAuthenticationBootstrapRequest(config.url)
         ) {
+            throw error;
+        }
+
+        // A refresh succeeded, but the protected endpoint still rejected the
+        // retried access token. Avoid an endless retry loop or stale admin UI.
+        // Do not log out if a different request has since installed a newer token.
+        if (config._wraplinkRetry) {
+            const rejectedToken = config.headers.get("Authorization");
+            if (accessToken && rejectedToken === `Bearer ${accessToken}`) {
+                setAccessToken(null);
+                notifySessionExpired();
+            }
             throw error;
         }
 
