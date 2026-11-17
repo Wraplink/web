@@ -14,6 +14,7 @@ import {
     setAuthUser,
 } from "@/lib/auth";
 import {restoreSession} from "@/lib/api/auth";
+import {AUTH_SESSION_EXPIRED_EVENT} from "@/lib/api/client";
 
 export default function AuthGuard({
     children,
@@ -30,6 +31,16 @@ export default function AuthGuard({
         useState(false);
     const [restoreError, setRestoreError] = useState(false);
     const [retry, setRetry] = useState(0);
+
+    useEffect(() => {
+        const onSessionExpired = () => {
+            clearAuthSession();
+            setAuthenticated(false);
+            router.replace(`/auth/login?returnUrl=${encodeURIComponent(pathname)}`);
+        };
+        window.addEventListener(AUTH_SESSION_EXPIRED_EVENT, onSessionExpired);
+        return () => window.removeEventListener(AUTH_SESSION_EXPIRED_EVENT, onSessionExpired);
+    }, [pathname, router]);
 
     useEffect(() => {
         let cancelled = false;
