@@ -1014,7 +1014,7 @@ function StatusCard({
 
                     <h3 className="mt-1 text-xl font-semibold">
                         {connection.connected
-                            ? (connection.dnsReady ? "Access provisioned" : "DNS unavailable")
+                            ? (connection.readinessReason === "READINESS_UNAVAILABLE" ? "Readiness unavailable" : connection.dnsReady ? "Access provisioned" : "DNS unavailable")
                             : "Offline"}
                     </h3>
                 </div>
