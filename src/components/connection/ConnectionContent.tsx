@@ -969,14 +969,14 @@ function ConnectionPowerCard({
 
                     <h2 className="text-xl font-semibold">
                         {connected && dnsReady
-                            ? "Connected"
-                            : "Disconnected"}
+                            ? "Access provisioned"
+                            : connected ? "DNS unavailable" : "Access inactive"}
                     </h2>
 
                     <p className="mt-1 text-sm text-white/40">
                         {connected && dnsReady
-                            ? "Your connection is active"
-                            : "Click to connect"}
+                            ? "DNS assigned; device connectivity not verified"
+                            : connected ? "Access is active, but DNS is not ready" : "Click to activate network access"}
                     </p>
                 </div>
             </div>
