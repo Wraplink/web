@@ -45,6 +45,7 @@ export type ConnectionEvent = {
 };
 
 type BackendAccessInfo = {
+    dnsRegistryReady?: boolean;
     subscriptionId: string;
     planCode: string;
     status:
@@ -132,7 +133,7 @@ export async function getConnectionStatus(): Promise<ConnectionStatus> {
 
     return {
         connected: true,
-        dnsReady: access?.status === "active" && dnsServers.length > 0,
+        dnsReady: access?.status === "active" && access?.dnsRegistryReady === true && dnsServers.length > 0,
         latency: 0,
         packetLoss: 0,
         primaryDns: dnsServers[0] ?? "-",
