@@ -194,6 +194,11 @@ export default function ConnectionContent({
                         ? {
                             ...current,
                             connected: false,
+                            dnsReady: false,
+                            agentReady: false,
+                            sniReady: false,
+                            routeReady: false,
+                            readinessReason: "ACCESS_NOT_ACTIVE",
                             primaryDns: "-",
                             secondaryDns: "-",
                             edge: "-",
@@ -998,7 +1003,7 @@ function StatusCard({
                     </h3>
                 </div>
 
-                {connection.connected ? (
+                {connection.connected && connection.dnsReady ? (
                     <CheckCircle2 className="h-7 w-7 text-cyan-400"/>
                 ) : (
                     <XCircle className="h-7 w-7 text-white/30"/>
