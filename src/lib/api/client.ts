@@ -120,13 +120,33 @@ apiClient.interceptors.response.use(
 
 export async function refreshAccessToken(): Promise<string> {
     if (!refreshPromise) {
-        refreshPromise = requestRefreshToken()
+        // Refresh tokens rotate on every successful call. A module-level
+        // promise only deduplicates requests in this tab; without a shared
+        // lock, two tabs can submit the same cookie and trigger backend replay
+        // detection, which revokes the entire session family.
+        refreshPromise = requestRefreshTokenWithCrossTabLock()
             .finally(() => {
                 refreshPromise = null;
             });
     }
 
     return refreshPromise;
+}
+
+async function requestRefreshTokenWithCrossTabLock(): Promise<string> {
+    // The Web Locks API serializes refresh calls across tabs/windows of the
+    // same origin. Each waiter sends its request only after the previous
+    // response (including Set-Cookie) has completed.
+    if (typeof navigator !== "undefined" && navigator.locks) {
+        return navigator.locks.request(
+            "wraplink-auth-refresh",
+            {mode: "exclusive"},
+            () => requestRefreshToken()
+        );
+    }
+
+    // Older browsers retain the existing per-tab single-flight behavior.
+    return requestRefreshToken();
 }
 
 async function requestRefreshToken(): Promise<string> {
