@@ -32,7 +32,7 @@ export default function AdminPlansContent(){
   }catch(e){setError((e as {response?:{data?:{error?:string}}}).response?.data?.error||(fa?"حذف پلن ناموفق بود.":"Unable to retire plan."))}finally{setRetiringCode(null)}
  }
  async function save(){setSaving(true);setError("");setMessage("");try{
- if(!/^[a-z0-9][a-z0-9_-]{1,63}$/.test(draft.code)||!draft.name.trim()||!Number.isSafeInteger(draft.priceMinor)||draft.priceMinor<0||!Number.isSafeInteger(draft.dataLimitBytes)||draft.dataLimitBytes<0||(draft.unlimitedBandwidth&&draft.dataLimitBytes!==0)||!Number.isInteger(draft.durationDays)||draft.durationDays<1){throw new Error(fa?"مقادیر پلن معتبر نیست.":"Invalid plan fields.")}
+ if(!/^[a-z0-9][a-z0-9_-]{1,63}$/.test(draft.code)||!draft.name.trim()||!Number.isSafeInteger(draft.priceMinor)||draft.priceMinor<0||!Number.isSafeInteger(draft.dataLimitBytes)||draft.dataLimitBytes<0||(draft.unlimitedBandwidth&&draft.dataLimitBytes!==0)||(!draft.unlimitedBandwidth&&draft.dataLimitBytes===0)||!Number.isInteger(draft.durationDays)||draft.durationDays<1){throw new Error(fa?"مقادیر پلن معتبر نیست.":"Invalid plan fields.")}
  const publishAt=dateInput?new Date(dateInput).toISOString():null;
  await apiClient.put("/api/v1/admin/plans/",{...draft,dataLimitBytes:draft.unlimitedBandwidth?0:draft.dataLimitBytes,publishAt});await load();reset();setMessage(fa?"پلن ذخیره شد.":"Plan saved.")
  }catch(e){setError((e as {response?:{data?:{error?:string}}}).response?.data?.error||(e instanceof Error?e.message:"Unable to save plan"))}finally{setSaving(false)}}
