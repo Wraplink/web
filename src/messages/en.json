@@ -320,6 +320,15 @@
     "retry": "Retry"
   },
   "ConnectionPage": {
+    "readiness": {
+      "edgeAgent": "Edge Agent",
+      "sni": "SNI",
+      "fullRoute": "Full route",
+      "available": "Available",
+      "unavailable": "Unavailable",
+      "unavailableOrUnverified": "Unavailable or unverified",
+      "controlPlaneNote": "Control-plane availability only; device traffic has not been verified."
+    },
     "badge": "Connection Dashboard",
     "title": "Connection Management",
     "subtitle": "Monitor your WrapLink connection, DNS configuration, edge server and diagnostics.",
