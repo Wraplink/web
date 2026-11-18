@@ -12,6 +12,7 @@ export type UsageSummary = {
     planCode: string;
     status: string;
     dataLimitBytes: number;
+    unlimitedBandwidth: boolean;
     usedBytes: number;
     remainingBytes: number;
     percentUsed: number;
