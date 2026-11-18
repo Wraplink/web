@@ -320,6 +320,15 @@
     "retry": "تلاش مجدد"
   },
   "ConnectionPage": {
+    "readiness": {
+      "edgeAgent": "عامل لبه",
+      "sni": "پروکسی SNI",
+      "fullRoute": "مسیریابی کامل",
+      "available": "در دسترس",
+      "unavailable": "در دسترس نیست",
+      "unavailableOrUnverified": "در دسترس نیست یا تأیید نشده",
+      "controlPlaneNote": "این وضعیت فقط دسترس‌پذیری سرویس‌های کنترلی را نشان می‌دهد؛ عبور ترافیک دستگاه هنوز تأیید نشده است."
+    },
     "badge": "داشبورد اتصال",
     "title": "مدیریت اتصال",
     "subtitle": "وضعیت اتصال WrapLink، تنظیمات DNS، سرور Edge و ابزارهای عیب‌یابی را مشاهده کنید.",
