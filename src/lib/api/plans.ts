@@ -9,6 +9,7 @@ export type MarketPlan = {
     currency: string;
     durationDays: number;
     dataLimitBytes: number;
+    unlimitedBandwidth: boolean;
     isPopular: boolean;
     createdAt: string;
 };
