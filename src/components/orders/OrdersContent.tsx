@@ -61,6 +61,7 @@ type Order = {
     durationDays: number;
     planDescription?: string;
     dataLimitBytes?: number;
+    unlimitedBandwidth?: boolean;
     usedBytes?: number;
     remainingBytes?: number;
     subscriptionStatus: UserSubscription["status"];
@@ -81,6 +82,7 @@ function toOrder(subscription: UserSubscription): Order {
         durationDays: subscription.durationDays,
         planDescription: subscription.planDescription,
         dataLimitBytes: subscription.dataLimitBytes,
+        unlimitedBandwidth: subscription.unlimitedBandwidth,
         usedBytes: subscription.usedBytes,
         remainingBytes: subscription.remainingBytes,
         subscriptionStatus: subscription.status,
@@ -580,7 +582,7 @@ function OrderCard({
                         )}
                         <dl className="grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
                             <div><dt className="text-gray-400">{locale === "fa" ? "نام طرح" : "Plan"}</dt><dd className="mt-1 font-semibold">{order.items.map(item => item.name).join("، ")}</dd></div>
-                            <div><dt className="text-gray-400">{locale === "fa" ? "حجم طرح" : "Data allowance"}</dt><dd className="mt-1 font-semibold">{order.dataLimitBytes === undefined ? "—" : order.dataLimitBytes === 0 ? (locale === "fa" ? "نامحدود" : "Unlimited") : formatBytes(order.dataLimitBytes, locale)}</dd></div>
+                            <div><dt className="text-gray-400">{locale === "fa" ? "حجم طرح" : "Data allowance"}</dt><dd className="mt-1 font-semibold">{order.dataLimitBytes === undefined ? "—" : order.unlimitedBandwidth ? (locale === "fa" ? "نامحدود" : "Unlimited") : formatBytes(order.dataLimitBytes, locale)}</dd></div>
                             <div><dt className="text-gray-400">{locale === "fa" ? "مصرف‌شده" : "Used data"}</dt><dd className="mt-1 font-semibold">{order.usedBytes === undefined ? "—" : formatBytes(order.usedBytes, locale)}</dd></div>
                             <div><dt className="text-gray-400">{locale === "fa" ? "حجم باقی‌مانده" : "Remaining data"}</dt><dd className="mt-1 font-semibold">{order.dataLimitBytes === 0 ? (locale === "fa" ? "نامحدود" : "Unlimited") : order.remainingBytes === undefined ? "—" : formatBytes(order.remainingBytes, locale)}</dd></div>
                             <div><dt className="text-gray-400">{locale === "fa" ? "مدت اعتبار" : "Duration"}</dt><dd className="mt-1 font-semibold">{order.durationDays} {locale === "fa" ? "روز" : "days"}</dd></div>
@@ -590,7 +592,7 @@ function OrderCard({
                         </dl>
                     </div>
 
-                    {order.dataLimitBytes !== undefined && order.dataLimitBytes > 0 && order.usedBytes !== undefined && (
+                    {!order.unlimitedBandwidth && order.dataLimitBytes !== undefined && order.dataLimitBytes > 0 && order.usedBytes !== undefined && (
                         <div className="mt-4 rounded-2xl border border-white/10 bg-black/10 p-4">
                             <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-sm">
                                 <span className="font-semibold">{locale === "fa" ? "میزان مصرف حجم" : "Bandwidth usage"}</span>
