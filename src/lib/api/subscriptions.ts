@@ -10,6 +10,7 @@ export type UserSubscription = {
     currency: string;
     durationDays: number;
     dataLimitBytes?: number;
+    unlimitedBandwidth?: boolean;
     usedBytes?: number;
     remainingBytes?: number;
     status: "pending_payment" | "confirmed" | "active" | "expired" | "cancelled";

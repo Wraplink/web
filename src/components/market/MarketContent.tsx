@@ -59,7 +59,7 @@ export default function MarketContent({locale}: Props) {
     };
 
     const formatData = (bytes: number) => {
-        if (bytes === 0) return fa ? "نامحدود" : "Unlimited";
+        if (bytes === 0) return fa ? "نامشخص" : "Unknown";
         if (!Number.isFinite(bytes) || bytes < 0) return fa ? "نامشخص" : "Unknown";
         const localeTag = fa ? "fa-IR" : "en-US";
         const units = ["B", "KB", "MB", "GB", "TB"];
@@ -223,7 +223,7 @@ export default function MarketContent({locale}: Props) {
                                     <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
                                         <Database size={18} className="mb-2 text-cyan-300"/>
                                         <p className="text-xs text-slate-400">{fa ? "حجم ترافیک" : "Data allowance"}</p>
-                                        <p className="mt-1 text-base font-bold text-white" dir="auto">{formatData(plan.dataLimitBytes)}</p>
+                                        <p className="mt-1 text-base font-bold text-white" dir="auto">{plan.unlimitedBandwidth ? (fa ? "نامحدود" : "Unlimited") : formatData(plan.dataLimitBytes)}</p>
                                     </div>
                                     <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
                                         <CalendarDays size={18} className="mb-2 text-cyan-300"/>
