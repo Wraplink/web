@@ -1,15 +1,16 @@
 # Full Route status in Admin Network
 
-The Full Route column in Admin → Network currently uses the existing backend agent inventory endpoint `GET /api/v1/admin/network/agents`.
+The Full Route column in Admin → Network uses the backend agent inventory endpoint `GET /api/v1/admin/network/agents`.
 
 | UI state | Current condition |
 | --- | --- |
 | Offline | Agent heartbeat is stale (`online=false`) |
-| No capacity | Agent is online but reports `routeCapacity=0` |
-| Online (advertised capacity) | Agent is online and reports `routeCapacity>0` |
+| Disabled | Agent is online but reports `routeCapacity=0` |
+| Unavailable | Agent is online with route capacity, but has no enabled registered routing IP (or an older backend lacks status reporting) |
+| Provisioned (unverified) | Agent is online with route capacity and at least one enabled registered routing IP |
 | — | DNS controller row; not an Edge Agent |
 
-**Important:** “Online (advertised capacity)” is **not** an end-to-end forwarding check. It only indicates a recent heartbeat and nonzero configured capacity. A public route IP, nftables DNAT rules, forwarding configuration, and successful traffic flow are not verified by this column.
+**Important:** “Provisioned (unverified)” is **not** an end-to-end forwarding check. It only indicates a recent heartbeat and nonzero configured capacity. A public route IP, nftables DNAT rules, forwarding configuration, and successful traffic flow are not verified by this column.
 
 ## Follow-up health protocol
 
