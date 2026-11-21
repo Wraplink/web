@@ -94,6 +94,7 @@ export default function AdminNetworkContent(){
  return <main className="mx-auto max-w-5xl px-6 py-12">
   <div className="flex flex-wrap items-center justify-between gap-4"><h1 className="text-3xl font-bold">Network operations</h1><div className="flex items-center gap-3"><span role="status" className="text-sm text-gray-400">{checkingNodes?"Checking DNS controllers…":`Auto-refresh in ${refreshIn}s`}</span><button onClick={()=>{setRefreshIn(REFRESH_SECONDS);void refreshNodes()}} disabled={loading||checkingNodes} className="rounded-lg border px-4 py-2 disabled:opacity-50">Refresh now</button></div></div>
   <p className="mt-3 text-gray-400">DNS controller registration and heartbeat status from the backend registry.</p>
+  <p className="mt-3"><Link href="/admin/network/online-users" className="text-cyan-300 underline">{locale==="fa"?"کاربران آنلاین شبکه":"Online network sessions"}</Link></p>
   {error&&<p role="alert" className="mt-4 text-red-400">{error}</p>}
   <section className="mt-8 rounded-xl border border-white/15 p-5">
    <h2 className="font-semibold">{locale==="fa"?"وضعیت کنترلرهای DNS و عامل‌های شبکه":"DNS controllers and Edge Agents"}</h2>
