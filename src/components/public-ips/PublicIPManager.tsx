@@ -16,6 +16,8 @@ export default function PublicIPManager({locale}:{locale:string}) {
  const [ip,setIP]=useState("");
  const [label,setLabel]=useState("");
  const [busy,setBusy]=useState(false);
+ const [editing,setEditing]=useState<string|null>(null);
+ const [editLabel,setEditLabel]=useState("");
  const [loading,setLoading]=useState(true);
  const [error,setError]=useState("");
  const [notice,setNotice]=useState("");
@@ -43,6 +45,8 @@ export default function PublicIPManager({locale}:{locale:string}) {
    const status=(e as {response?:{status?:number}})?.response?.status;
    setError(status===409?tr("This address is in use or cannot be changed.","این آدرس در حال استفاده است یا قابل تغییر نیست."):
     status===401?tr("Please sign in again.","لطفاً دوباره وارد شوید."):
+    status===400?tr("Check the IP address and label.","آدرس IP و عنوان را بررسی کنید."):
+    status===422?tr("Your public IPv4 could not be determined. Check your connection.","IP عمومی شما قابل تشخیص نیست. اتصال را بررسی کنید."):
     tr("Operation failed. Please try again.","عملیات ناموفق بود. دوباره تلاش کنید."));
   }finally{setBusy(false)}
  };
@@ -73,7 +77,17 @@ export default function PublicIPManager({locale}:{locale:string}) {
     <div key={a.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/20 p-4">
      <div><p className="font-mono" dir="ltr">{a.ipAddress}</p><p className="text-sm text-slate-300">{a.label||"—"}</p>
       <p className="text-xs text-slate-400">{a.verifiedAt?tr("Verified","تأیید شده"):tr("Not verified","تأیید نشده")}</p></div>
-     <div className="flex gap-2">
+     <div className="flex flex-wrap gap-2">
+      {editing===a.id?
+       <form className="flex gap-2" onSubmit={e=>{
+        e.preventDefault();
+        void run(async()=>{await apiClient.patch(base+"/"+a.id,{label:editLabel.trim()});setEditing(null)},tr("Label updated.","عنوان به‌روزرسانی شد."));
+       }}>
+        <input aria-label={tr("New label","عنوان جدید")} value={editLabel} maxLength={100} onChange={e=>setEditLabel(e.target.value)} className="w-36 rounded border border-white/30 bg-transparent p-2"/>
+        <button disabled={busy} className="rounded border border-sky-400 px-3 py-2">{tr("Save","ذخیره")}</button>
+        <button type="button" onClick={()=>setEditing(null)}>{tr("Cancel","انصراف")}</button>
+       </form>:
+       <button disabled={busy} className="rounded border border-white/30 px-3 py-2" onClick={()=>{setEditing(a.id);setEditLabel(a.label)}}>{tr("Rename","تغییر عنوان")}</button>}
       {!a.verifiedAt&&<button disabled={busy} className="rounded border border-sky-400 px-3 py-2 disabled:opacity-50" onClick={()=>void run(()=>apiClient.post(base+"/"+a.id+"/verify"),tr("IP verified.","IP تأیید شد."))}>{tr("Verify from this IP","تأیید از همین IP")}</button>}
       <button disabled={busy} className="rounded border border-red-400 px-3 py-2 text-red-200 disabled:opacity-50" onClick={()=>{
        if(window.confirm(tr("Delete this unused address?","این آدرس بدون استفاده حذف شود؟")))void run(()=>apiClient.delete(base+"/"+a.id),tr("IP deleted.","IP حذف شد."));
