@@ -22,21 +22,24 @@ export default function PublicIPManager({locale}:{locale:string}) {
  const [error,setError]=useState("");
  const [notice,setNotice]=useState("");
  const tr=(en:string,persian:string)=>fa?persian:en;
- const refresh=useCallback(async()=>{
+ const refresh=useCallback(async(signal?:AbortSignal)=>{
   const [saved,events,detected]=await Promise.all([
-   apiClient.get<Collection<Address>>(base),
-   apiClient.get<Collection<HistoryEvent>>(base+"/history"),
-   apiClient.get<{ipAddress:string}>(base+"/observed").catch(()=>({data:{ipAddress:""}}))
+   apiClient.get<Collection<Address>>(base,{signal}),
+   apiClient.get<Collection<HistoryEvent>>(base+"/history",{signal}),
+   apiClient.get<{ipAddress:string}>(base+"/observed",{signal}).catch(error=>{
+    if(signal?.aborted)throw error;
+    return {data:{ipAddress:""}};
+   })
   ]);
   setAddresses(saved.data.items??[]);
   setHistory(events.data.items??[]);
   setObserved(detected.data.ipAddress??"");
  },[]);
  useEffect(()=>{
-  let active=true;
-  refresh().catch(()=>{if(active)setError(fa?"دریافت اطلاعات IP ناموفق بود.":"Could not load IP addresses.");})
-   .finally(()=>{if(active)setLoading(false);});
-  return ()=>{active=false};
+  const controller=new AbortController();
+  refresh(controller.signal).catch(()=>{if(!controller.signal.aborted)setError(fa?"دریافت اطلاعات IP ناموفق بود.":"Could not load IP addresses.");})
+   .finally(()=>{if(!controller.signal.aborted)setLoading(false);});
+  return ()=>controller.abort();
  },[refresh,fa]);
  const run=async(action:()=>Promise<unknown>,success:string)=>{
   setBusy(true);setError("");setNotice("");
