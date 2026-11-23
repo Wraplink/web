@@ -121,7 +121,7 @@ export default function MarketContent({locale}: Props) {
         const q = search.trim().toLowerCase();
         const selected = selectedPlanCode?.toLowerCase();
         return plans.filter(plan =>
-            (!selected || plan.code.toLowerCase() === selected) && (!selected || !favoritesOnly || favorites.includes(plan.code)) && (!q || [plan.code, plan.name, plan.description].some(value =>
+            (!selected || plan.code.toLowerCase() === selected) && (!!selected || !favoritesOnly || favorites.includes(plan.code)) && (!q || [plan.code, plan.name, plan.description].some(value =>
                 value.toLowerCase().includes(q)
             ))
         );
