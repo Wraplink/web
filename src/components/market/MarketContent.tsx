@@ -25,6 +25,10 @@ export default function MarketContent({locale}: Props) {
     const inUserZone = usePathname().startsWith("/user/");
     const [plans, setPlans] = useState<MarketPlan[]>([]);
     const [search, setSearch] = useState("");
+    useEffect(() => {
+        const code = new URLSearchParams(window.location.search).get("plan");
+        if (code) setSearch(code);
+    }, []);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [retry, setRetry] = useState(0);
