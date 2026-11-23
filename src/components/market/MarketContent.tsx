@@ -11,6 +11,7 @@ import {apiClient} from "@/lib/api/client";
 type Props = {locale: string};
 
 function formatPrice(plan: MarketPlan, locale: string) {
+    if (plan.priceMinor === 0) return locale === "fa" ? "رایگان" : "Free";
     const currency = plan.currency.toUpperCase();
     const amount = plan.priceMinor / (currency === "IRR" ? 1 : 100);
     return new Intl.NumberFormat(locale === "fa" ? "fa-IR" : "en-US", {
