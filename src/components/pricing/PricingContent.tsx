@@ -83,7 +83,7 @@ export default function PricingContent({locale}: Props) {
                                     <Feature value="Smart DNS"/>
                                     <Feature value="Gaming Edge"/>
                                 </div>
-                                <Link href="/market" className="mt-10 block rounded-xl bg-cyan-400 py-3 text-center font-bold text-black transition hover:scale-105">{t("buy")}</Link>
+                                <Link href={`/market?plan=${encodeURIComponent(plan.code)}`} className="mt-10 block rounded-xl bg-cyan-400 py-3 text-center font-bold text-black transition hover:scale-105">{t("buy")}</Link>
                             </article>
                         );
                     })}
