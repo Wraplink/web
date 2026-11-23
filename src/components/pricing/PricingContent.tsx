@@ -80,10 +80,8 @@ export default function PricingContent({locale}: Props) {
                                 <div className="mt-8 space-y-4">
                                     <Feature value={plan.unlimitedBandwidth ? (fa ? "حجم نامحدود" : "Unlimited bandwidth") : formatData(plan.dataLimitBytes, locale)}/>
                                     <Feature value={`${new Intl.NumberFormat(fa ? "fa-IR" : "en-US").format(plan.durationDays)} ${fa ? "روز" : "days"}`}/>
-                                    <Feature value="Smart DNS"/>
-                                    <Feature value="Gaming Edge"/>
                                 </div>
-                                <Link href={`/market?plan=${encodeURIComponent(plan.code)}`} className="mt-10 block rounded-xl bg-cyan-400 py-3 text-center font-bold text-black transition hover:scale-105">{t("buy")}</Link>
+                                <Link href={`/market?plan=${encodeURIComponent(plan.code)}`} className="mt-10 block rounded-xl bg-cyan-400 py-3 text-center font-bold text-black transition hover:scale-105">{plan.priceMinor === 0 ? (fa ? "دریافت رایگان" : "Get free plan") : t("buy")}</Link>
                             </article>
                         );
                     })}
