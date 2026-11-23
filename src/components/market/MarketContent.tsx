@@ -25,9 +25,10 @@ export default function MarketContent({locale}: Props) {
     const inUserZone = usePathname().startsWith("/user/");
     const [plans, setPlans] = useState<MarketPlan[]>([]);
     const [search, setSearch] = useState("");
+    const [selectedPlanCode, setSelectedPlanCode] = useState<string | null>(null);
     useEffect(() => {
         const code = new URLSearchParams(window.location.search).get("plan");
-        if (code) setSearch(code);
+        if (code) setSelectedPlanCode(code);
     }, []);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -111,12 +112,13 @@ export default function MarketContent({locale}: Props) {
 
     const filteredPlans = useMemo(() => {
         const q = search.trim().toLowerCase();
+        const selected = selectedPlanCode?.toLowerCase();
         return plans.filter(plan =>
-            (!favoritesOnly || favorites.includes(plan.code)) && (!q || [plan.code, plan.name, plan.description].some(value =>
+            (!selected || plan.code.toLowerCase() === selected) && (!favoritesOnly || favorites.includes(plan.code)) && (!q || [plan.code, plan.name, plan.description].some(value =>
                 value.toLowerCase().includes(q)
             ))
         );
-    }, [plans, search, favorites, favoritesOnly]);
+    }, [plans, search, favorites, favoritesOnly, selectedPlanCode]);
 
     const claimFree = async (plan:MarketPlan) => {
         if(freeBusy||freeClaimed.includes(plan.code.toLowerCase()))return;
@@ -179,10 +181,11 @@ export default function MarketContent({locale}: Props) {
                 </div>}
                 <div className="mt-10 flex max-w-md items-center rounded-xl border border-white/10 bg-white/5 px-4">
                     <Search size={19} className="text-gray-500"/>
-                    <input value={search} onChange={event => setSearch(event.target.value)}
+                    <input value={search} onChange={event => {setSelectedPlanCode(null); setSearch(event.target.value);}}
                         type="search" placeholder={t("search")}
                         className="w-full bg-transparent px-3 py-3 text-sm text-white outline-none"/>
                 </div>
+                {selectedPlanCode && <button type="button" onClick={() => {setSelectedPlanCode(null); window.history.replaceState(null, "", window.location.pathname);}} className="mt-4 text-sm text-cyan-300 underline">{fa ? "نمایش همه پلن‌ها" : "Show all plans"}</button>}
                 <button type="button" onClick={() => setFavoritesOnly(value => !value)} aria-pressed={favoritesOnly}
                     className={`mt-4 inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-sm transition ${favoritesOnly ? "border-rose-400/60 bg-rose-400/15 text-rose-200" : "border-white/15 bg-white/5 text-gray-300 hover:border-rose-400/50"}`}>
                     <Heart size={17} fill={favoritesOnly ? "currentColor" : "none"}/>
