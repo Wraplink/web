@@ -320,6 +320,27 @@
     "retry": "Retry"
   },
   "ConnectionPage": {
+    "ipDialog": {
+      "title": "Connect to WrapLink",
+      "description": "Use the public IPv4 address detected for your current network, or select it yourself.",
+      "automatic": "Use detected IP",
+      "manual": "Public IPv4 address",
+      "connect": "Connect with this IP",
+      "connecting": "Connecting…",
+      "saved": "Saved IP addresses",
+      "loading": "Loading saved addresses…",
+      "loadFailed": "Could not load saved addresses.",
+      "retry": "Retry",
+      "empty": "No saved addresses yet.",
+      "delete": "Delete",
+      "deleteIp": "Delete saved address {ip}",
+      "deleting": "Deleting…",
+      "deleteFailed": "Could not delete the saved address.",
+      "cancel": "Cancel",
+      "invalidIp": "Enter a valid IPv4 address.",
+      "ipMismatch": "This address does not match your current network. Switch to that network or use the detected IP.",
+      "publicIpv4Required": "Your current network needs a public IPv4 address to connect."
+    },
     "readiness": {
       "edgeAgent": "Edge Agent",
       "sni": "SNI",
