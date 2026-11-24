@@ -1,6 +1,6 @@
 "use client";
 
-import {useEffect, useState, type FormEvent} from "react";
+import {useEffect, useRef, useState, type FormEvent} from "react";
 import {useTranslations} from "next-intl";
 
 import {Button} from "@/components/ui/button";
@@ -32,6 +32,8 @@ export default function ConnectionIpDialog({
     const [loadAttempt, setLoadAttempt] = useState(0);
     const [deleteFailed, setDeleteFailed] = useState(false);
     const [deleting, setDeleting] = useState<string | null>(null);
+    const approvalLinkInput = useRef<HTMLInputElement>(null);
+    const [copyResult, setCopyResult] = useState<{url: string; copied: boolean} | null>(null);
     const busy = connecting || deleting !== null;
     const approvalUrl = approval && new URL(
         `${locale === routing.defaultLocale ? "" : `/${locale}`}/connection#approve-ip=${approval.id}`,
@@ -77,6 +79,18 @@ export default function ConnectionIpDialog({
         }
     };
 
+    const copyApprovalLink = async (url: string) => {
+        setCopyResult(null);
+        try {
+            await navigator.clipboard.writeText(url);
+            setCopyResult({url, copied: true});
+        } catch {
+            approvalLinkInput.current?.focus();
+            approvalLinkInput.current?.select();
+            setCopyResult({url, copied: false});
+        }
+    };
+
     const submitIp = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (!busy && clientIp.trim()) void onConnect(clientIp.trim());
@@ -111,8 +125,17 @@ export default function ConnectionIpDialog({
                     <section className="space-y-2 border-t pt-3">
                         <p>{t("approvalInstructions")}</p>
                         <label htmlFor="ip-approval-link" className="font-medium">{t("approvalLink")}</label>
-                        <Input id="ip-approval-link" dir="ltr" value={approvalUrl} readOnly
+                        <Input ref={approvalLinkInput} id="ip-approval-link" dir="ltr" value={approvalUrl} readOnly
                             onFocus={(event) => event.currentTarget.select()} />
+                        <Button type="button" variant="secondary" className="min-h-11 w-full"
+                            onClick={() => void copyApprovalLink(approvalUrl)}>
+                            {t("copyApprovalLink")}
+                        </Button>
+                        {copyResult?.url === approvalUrl && (
+                            <p role="status" className={copyResult.copied ? "text-muted-foreground" : "text-destructive"}>
+                                {t(copyResult.copied ? "approvalLinkCopied" : "approvalLinkCopyFailed")}
+                            </p>
+                        )}
                         <Button type="button" variant="outline" disabled={busy} onClick={() => void onCheckApproval()}>
                             {t("approvalCheck")}
                         </Button>

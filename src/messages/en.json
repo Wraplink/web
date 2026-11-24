@@ -323,6 +323,9 @@
     "ipDialog": {
       "close": "Close",
       "approvalInstructions": "To approve this IP, open the link on that network and sign in to the same account. The link expires after 10 minutes.",
+      "copyApprovalLink": "Copy approval link",
+      "approvalLinkCopied": "Approval link copied.",
+      "approvalLinkCopyFailed": "Could not copy the link automatically. Press and hold the link to copy it.",
       "approvalLink": "Approval link",
       "approvalCheck": "Check connection",
       "approvalPending": "Approval is still pending. Open the link on the requested network to approve it.",
