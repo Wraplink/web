@@ -1,9 +1,11 @@
 "use client";
+import {useAdminCapabilities} from "./adminCapabilities";
 import {useEffect,useState} from "react";
 import {useLocale} from "next-intl";
 import {adminUsers,updateAdminUserStatus,type AdminUser} from "@/lib/api/admin";
 
 export default function AdminUsersContent(){
+ const canManage=useAdminCapabilities().includes("access");
  const fa=useLocale()==="fa";
  const [users,setUsers]=useState<AdminUser[]>([]);
  const [search,setSearch]=useState("");
@@ -31,9 +33,9 @@ export default function AdminUsersContent(){
   </form>
   {error&&<p role="alert" className="mb-4 text-red-400">{error}</p>}
   {loading?<p>{fa?"در حال بارگذاری…":"Loading…"}</p>:<div className="overflow-x-auto rounded-xl border border-white/15">
-   <table className="w-full text-left text-sm"><thead className="bg-white/10"><tr><th className="p-3">{fa?"نام":"Name"}</th><th className="p-3">{fa?"ایمیل":"Email"}</th><th className="p-3">{fa?"وضعیت":"Status"}</th><th className="p-3">{fa?"تأیید شده":"Verified"}</th><th className="p-3">{fa?"تاریخ ثبت‌نام":"Registered"}</th><th className="p-3">{fa?"عملیات":"Actions"}</th></tr></thead>
-   <tbody>{users.map(u=><tr key={u.id} className="border-t border-white/10"><td className="p-3">{u.name}</td><td className="p-3">{u.email}</td><td className="p-3">{fa?({active:"فعال",suspended:"معلق",deleted:"حذف‌شده"} as Record<string,string>)[u.status]??u.status:u.status}</td><td className="p-3">{u.emailVerified?(fa?"بله":"Yes"):(fa?"خیر":"No")}</td><td className="p-3">{new Date(u.createdAt).toLocaleDateString(fa?"fa-IR":"en-US")}</td><td className="p-3"><div className="flex gap-2">{u.status==="active"&&<button type="button" disabled={acting!==null} onClick={()=>void changeStatus(u,"suspend")} className="rounded border border-amber-500 px-2 py-1 text-amber-300">{fa?"تعلیق":"Suspend"}</button>}{u.status==="suspended"&&<button type="button" disabled={acting!==null} onClick={()=>void changeStatus(u,"restore")} className="rounded border border-green-500 px-2 py-1 text-green-300">{fa?"فعال‌سازی مجدد":"Restore"}</button>}{u.status!=="deleted"&&<button type="button" disabled={acting!==null} onClick={()=>void changeStatus(u,"delete")} className="rounded border border-red-500 px-2 py-1 text-red-300">{fa?"حذف":"Delete"}</button>}</div></td></tr>)}</tbody></table>
+   <table className="w-full text-left text-sm"><thead className="bg-white/10"><tr><th className="p-3">{fa?"نام":"Name"}</th><th className="p-3">{fa?"ایمیل":"Email"}</th><th className="p-3">{fa?"وضعیت":"Status"}</th><th className="p-3">{fa?"تأیید شده":"Verified"}</th><th className="p-3">{fa?"تاریخ ثبت‌نام":"Registered"}</th>{canManage&&<th className="p-3">{fa?"عملیات":"Actions"}</th>}</tr></thead>
+   <tbody>{users.map(u=><tr key={u.id} className="border-t border-white/10"><td className="p-3">{u.name}</td><td className="p-3">{u.email}{canManage&&<div className="select-all text-xs text-gray-400">{u.id}</div>}</td><td className="p-3">{fa?({active:"فعال",suspended:"معلق",deleted:"حذف‌شده"} as Record<string,string>)[u.status]??u.status:u.status}</td><td className="p-3">{u.emailVerified?(fa?"بله":"Yes"):(fa?"خیر":"No")}</td><td className="p-3">{new Date(u.createdAt).toLocaleDateString(fa?"fa-IR":"en-US")}</td>{canManage&&<td className="p-3"><div className="flex gap-2">{u.status==="active"&&<button type="button" disabled={acting!==null} onClick={()=>void changeStatus(u,"suspend")} className="rounded border border-amber-500 px-2 py-1 text-amber-300">{fa?"تعلیق":"Suspend"}</button>}{u.status==="suspended"&&<button type="button" disabled={acting!==null} onClick={()=>void changeStatus(u,"restore")} className="rounded border border-green-500 px-2 py-1 text-green-300">{fa?"فعال‌سازی مجدد":"Restore"}</button>}{u.status!=="deleted"&&<button type="button" disabled={acting!==null} onClick={()=>void changeStatus(u,"delete")} className="rounded border border-red-500 px-2 py-1 text-red-300">{fa?"حذف":"Delete"}</button>}</div></td>}</tr>)}</tbody></table>
   </div>}
-  <p className="mt-3 text-xs text-gray-500">Showing up to 100 users. Deletion permanently removes account records and related data.</p>
+  <p className="mt-3 text-xs text-gray-500">{canManage?"Showing up to 100 users. Deletion permanently removes account records and related data.":"Showing up to 100 users."}</p>
  </main>;
 }
