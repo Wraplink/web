@@ -6,22 +6,26 @@ import {useTranslations} from "next-intl";
 import {Button} from "@/components/ui/button";
 import {Dialog, DialogContent, DialogDescription, DialogTitle} from "@/components/ui/dialog";
 import {Input} from "@/components/ui/input";
-import {deleteSavedConnectionIp, getSavedConnectionIps} from "@/lib/api/connection";
+import {routing} from "@/i18n/routing";
+import {deleteSavedConnectionIp, getSavedConnectionIps, type ConnectionIpApproval} from "@/lib/api/connection";
 
 type Props = {
     locale: string;
     connecting: boolean;
     error: string | null;
+    approval: ConnectionIpApproval | null;
+    onCheckApproval: () => Promise<void>;
     onClearError: () => void;
     onClose: () => void;
     onConnect: (clientIp?: string) => Promise<void>;
 };
 
 export default function ConnectionIpDialog({
-    locale, connecting, error, onClearError, onClose, onConnect,
+    locale, connecting, error, approval, onCheckApproval, onClearError, onClose, onConnect,
 }: Props) {
     const t = useTranslations("ConnectionPage.ipDialog");
     const [clientIp, setClientIp] = useState("");
+    const [detectedIp, setDetectedIp] = useState<string>();
     const [savedIps, setSavedIps] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
     const [loadFailed, setLoadFailed] = useState(false);
@@ -29,12 +33,19 @@ export default function ConnectionIpDialog({
     const [deleteFailed, setDeleteFailed] = useState(false);
     const [deleting, setDeleting] = useState<string | null>(null);
     const busy = connecting || deleting !== null;
+    const approvalUrl = approval && new URL(
+        `${locale === routing.defaultLocale ? "" : `/${locale}`}/connection#approve-ip=${approval.id}`,
+        window.location.origin,
+    ).href;
 
     useEffect(() => {
         let current = true;
         getSavedConnectionIps()
-            .then((ips) => {
-                if (current) setSavedIps(ips);
+            .then(({ips, detectedIp}) => {
+                if (current) {
+                    setSavedIps(ips);
+                    setDetectedIp(detectedIp);
+                }
             })
             .catch(() => {
                 if (current) setLoadFailed(true);
@@ -77,7 +88,7 @@ export default function ConnectionIpDialog({
                 <DialogTitle>{t("title")}</DialogTitle>
                 <DialogDescription>{t("description")}</DialogDescription>
                 <Button type="button" variant="outline" disabled={busy} onClick={() => void onConnect()}>
-                    {t("automatic")}
+                    {t("automatic")} {detectedIp && <bdi className="font-mono">{detectedIp}</bdi>}
                 </Button>
                 <form onSubmit={submitIp} className="space-y-2">
                     <label htmlFor="connection-ip" className="font-medium">{t("manual")}</label>
@@ -94,8 +105,20 @@ export default function ConnectionIpDialog({
                         {t("connect")}
                     </Button>
                     {connecting && <p role="status">{t("connecting")}</p>}
-                    {error && <p role="alert" className="text-red-500">{error}</p>}
+
                 </form>
+                {approvalUrl && (
+                    <section className="space-y-2 border-t pt-3">
+                        <p>{t("approvalInstructions")}</p>
+                        <label htmlFor="ip-approval-link" className="font-medium">{t("approvalLink")}</label>
+                        <Input id="ip-approval-link" dir="ltr" value={approvalUrl} readOnly
+                            onFocus={(event) => event.currentTarget.select()} />
+                        <Button type="button" variant="outline" disabled={busy} onClick={() => void onCheckApproval()}>
+                            {t("approvalCheck")}
+                        </Button>
+                    </section>
+                )}
+                {error && <p role="alert" className="text-red-500">{error}</p>}
                 <section className="space-y-2 border-t pt-3">
                     <h3 className="font-medium">{t("saved")}</h3>
                     {loading && <p role="status">{t("loading")}</p>}
@@ -133,7 +156,7 @@ export default function ConnectionIpDialog({
                     )}
                     {deleteFailed && <p role="alert" className="text-red-500">{t("deleteFailed")}</p>}
                 </section>
-                <Button type="button" variant="ghost" disabled={busy} onClick={onClose}>{t("cancel")}</Button>
+                <Button type="button" variant="ghost" disabled={busy} onClick={onClose}>{t(approval ? "close" : "cancel")}</Button>
             </DialogContent>
         </Dialog>
     );

@@ -13,6 +13,7 @@ import {
     isAuthenticated,
     setAuthUser,
 } from "@/lib/auth";
+import {preserveConnectionApproval} from "@/lib/connectionApprovalLink";
 import {restoreSession} from "@/lib/api/auth";
 import {AUTH_SESSION_EXPIRED_EVENT} from "@/lib/api/client";
 
@@ -34,9 +35,10 @@ export default function AuthGuard({
 
     useEffect(() => {
         const onSessionExpired = () => {
+            const returnPath = preserveConnectionApproval(pathname) ? "/connection" : pathname;
             clearAuthSession();
             setAuthenticated(false);
-            router.replace(`/auth/login?returnUrl=${encodeURIComponent(pathname)}`);
+            router.replace(`/auth/login?returnUrl=${encodeURIComponent(returnPath)}`);
         };
         window.addEventListener(AUTH_SESSION_EXPIRED_EVENT, onSessionExpired);
         return () => window.removeEventListener(AUTH_SESSION_EXPIRED_EVENT, onSessionExpired);
@@ -73,10 +75,9 @@ export default function AuthGuard({
 
                 setAuthenticated(false);
                 if (!axios.isAxiosError(error) || error.response?.status === 401 || error.response?.status === 403) {
+                    const returnPath = preserveConnectionApproval(pathname) ? "/connection" : pathname;
                     clearAuthSession();
-                    router.replace(
-                    `/auth/login?returnUrl=${encodeURIComponent(pathname)}`
-                    );
+                    router.replace(`/auth/login?returnUrl=${encodeURIComponent(returnPath)}`);
                 } else {
                     setRestoreError(true);
                 }
