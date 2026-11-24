@@ -24,6 +24,8 @@ import {
 } from "react";
 import {useTranslations} from "next-intl";
 
+import ConnectionIpDialog from "./ConnectionIpDialog";
+
 import {
     connect,
     ConnectionActivationError,
@@ -69,6 +71,8 @@ export default function ConnectionContent({
     const [error, setError] =
         useState<string | null>(null);
     const [connectErrorCode, setConnectErrorCode] = useState<string | null>(null);
+    const [ipDialogOpen, setIpDialogOpen] = useState(false);
+    const [ipDialogError, setIpDialogError] = useState<string | null>(null);
 
     const [diagnosticLoading, setDiagnosticLoading] =
         useState<DiagnosticType | null>(null);
@@ -126,6 +130,7 @@ export default function ConnectionContent({
         try {
             setLoading(true);
             setError(null);
+            setConnectErrorCode(null);
 
             // Fetch independently; event history must not delay connection status.
             void refreshEvents();
@@ -170,23 +175,26 @@ export default function ConnectionContent({
     // edge information instead of replacing it with a mock value.
     const liveConnection: ConnectionStatus | null = connection;
 
-    /*
-     * Connect / disconnect.
-     *
-     * BACKEND TODO:
-     *
-     * POST /api/v1/connection/connect
-     * POST /api/v1/connection/disconnect
-     */
-    const toggleConnection = async () => {
-        if (!connection) {
-            return;
+    const handlePowerClick = () => {
+        if (!connection || connectionLoading) return;
+        if (connection.connected) {
+            void changeConnection();
+        } else {
+            setError(null);
+            setConnectErrorCode(null);
+            setIpDialogError(null);
+            setIpDialogOpen(true);
         }
+    };
+
+    const changeConnection = async (clientIp?: string) => {
+        if (!connection || connectionLoading) return;
 
         try {
             setConnectionLoading(true);
             setError(null);
             setConnectErrorCode(null);
+            setIpDialogError(null);
 
             if (connection.connected) {
                 await disconnect();
@@ -210,7 +218,8 @@ export default function ConnectionContent({
                 );
                 setDiagnosticResults({});
             } else {
-                await connect();
+                await connect(clientIp);
+                setIpDialogOpen(false);
             }
 
             // Fresh backend selection on each connect and disconnect.
@@ -223,17 +232,34 @@ export default function ConnectionContent({
                 err
             );
 
-            // A mutation may have succeeded even if its follow-up status read failed.
-            // Reload before showing another power action; never retain stale readiness.
+            if (err instanceof ConnectionActivationError) {
+                switch (err.code) {
+                    case "INVALID_CLIENT_IP":
+                        setIpDialogError(t("ipDialog.invalidIp"));
+                        return;
+                    case "CLIENT_IP_MISMATCH":
+                        setIpDialogError(t("ipDialog.ipMismatch"));
+                        return;
+                    case "PUBLIC_IPV4_REQUIRED":
+                        setIpDialogError(t("ipDialog.publicIpv4Required"));
+                        return;
+                    case "CLIENT_IP_IN_USE":
+                        setIpDialogError(t("errors.ipInUse"));
+                        return;
+                    case "NO_USABLE_SUBSCRIPTION":
+                        setIpDialogOpen(false);
+                        setConnectErrorCode(err.code);
+                        setError(t("errors.noUsableSubscription"));
+                        return;
+                }
+            }
+
+            // A failed status refresh can follow a successful mutation.
+            setIpDialogOpen(false);
             setConnection(null);
             setDiagnosticResults({});
-            if (err instanceof ConnectionActivationError) {
-                setConnectErrorCode(err.code);
-                setError(t(err.code === "NO_USABLE_SUBSCRIPTION" ? "errors.noUsableSubscription" : err.code === "CLIENT_IP_IN_USE" ? "errors.ipInUse" : "errors.connectionFailedDetailed"));
-            } else {
-                setConnectErrorCode("CONNECTION_FAILED");
-                setError(t("errors.connectionFailedDetailed"));
-            }
+            setConnectErrorCode("CONNECTION_FAILED");
+            setError(t("errors.connectionFailedDetailed"));
         } finally {
             setConnectionLoading(false);
         }
@@ -368,6 +394,16 @@ export default function ConnectionContent({
 
     return (
         <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
+            {ipDialogOpen && (
+                <ConnectionIpDialog
+                    locale={locale}
+                    connecting={connectionLoading}
+                    error={ipDialogError}
+                    onClearError={() => setIpDialogError(null)}
+                    onClose={() => setIpDialogOpen(false)}
+                    onConnect={changeConnection}
+                />
+            )}
             <div className="mx-auto max-w-7xl">
                 {/* Header */}
                 <div
@@ -402,7 +438,7 @@ export default function ConnectionContent({
                                     <a href={`/${locale}/user/market`} className="rounded-lg bg-cyan-500 px-4 py-2 font-semibold text-slate-950">{t("errors.buyPlan")}</a>
                                 ) : (
                                     <>
-                                        <button type="button" onClick={() => void toggleConnection()} disabled={connectionLoading} className="rounded-lg bg-cyan-500 px-4 py-2 font-semibold text-slate-950 disabled:opacity-50">{t("errors.tryAgain")}</button>
+                                        <button type="button" onClick={() => void loadConnection()} disabled={connectionLoading} className="rounded-lg bg-cyan-500 px-4 py-2 font-semibold text-slate-950 disabled:opacity-50">{t("errors.tryAgain")}</button>
                                         <a href={`/${locale}/support`} className="rounded-lg border border-white/30 px-4 py-2">{t("errors.supportTicket")}</a>
                                     </>
                                 )}
@@ -447,7 +483,7 @@ export default function ConnectionContent({
                                     connectionLoading
                                 }
                                 onToggle={
-                                    toggleConnection
+                                    handlePowerClick
                                 }
                             />
 

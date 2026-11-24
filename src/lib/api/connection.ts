@@ -166,20 +166,30 @@ export async function getConnectionStatus(): Promise<ConnectionStatus> {
     };
 }
 
-export async function connect(): Promise<void> {
+export async function connect(clientIp?: string): Promise<void> {
     try {
         await apiClient.post<BackendEntitlement>(
-            "/api/v1/me/network/entitlement"
+            "/api/v1/me/network/entitlement",
+            clientIp === undefined ? undefined : {clientIp}
         );
     } catch (error) {
         if (axios.isAxiosError<BackendErrorResponse>(error)) {
             const code = error.response?.data?.code;
-            if (code === "NO_USABLE_SUBSCRIPTION" || code === "CLIENT_IP_IN_USE") {
+            if (code && ["NO_USABLE_SUBSCRIPTION", "CLIENT_IP_IN_USE", "INVALID_CLIENT_IP", "CLIENT_IP_MISMATCH", "PUBLIC_IPV4_REQUIRED"].includes(code)) {
                 throw new ConnectionActivationError(code);
             }
         }
         throw new ConnectionActivationError("CONNECTION_FAILED");
     }
+}
+
+export async function getSavedConnectionIps(): Promise<string[]> {
+    const {data} = await apiClient.get<{ips: string[]}>("/api/v1/me/network/saved-ips");
+    return data.ips;
+}
+
+export async function deleteSavedConnectionIp(clientIp: string): Promise<void> {
+    await apiClient.delete("/api/v1/me/network/saved-ips", {params: {clientIp}});
 }
 
 export async function disconnect(): Promise<void> {
