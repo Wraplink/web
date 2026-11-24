@@ -25,10 +25,13 @@ import {
 import {useTranslations} from "next-intl";
 
 import ConnectionIpDialog from "./ConnectionIpDialog";
+import ConfirmConnectionIpDialog from "./ConfirmConnectionIpDialog";
 
 import {
     connect,
     ConnectionActivationError,
+    createConnectionIpApproval,
+    type ConnectionIpApproval,
     disconnect,
     getConnectionEvents,
     getConnectionStatus,
@@ -72,6 +75,7 @@ export default function ConnectionContent({
         useState<string | null>(null);
     const [connectErrorCode, setConnectErrorCode] = useState<string | null>(null);
     const [ipDialogOpen, setIpDialogOpen] = useState(false);
+    const [ipApproval, setIpApproval] = useState<ConnectionIpApproval | null>(null);
     const [ipDialogError, setIpDialogError] = useState<string | null>(null);
 
     const [diagnosticLoading, setDiagnosticLoading] =
@@ -183,6 +187,7 @@ export default function ConnectionContent({
             setError(null);
             setConnectErrorCode(null);
             setIpDialogError(null);
+            setIpApproval(null);
             setIpDialogOpen(true);
         }
     };
@@ -195,6 +200,7 @@ export default function ConnectionContent({
             setError(null);
             setConnectErrorCode(null);
             setIpDialogError(null);
+            setIpApproval(null);
 
             if (connection.connected) {
                 await disconnect();
@@ -227,21 +233,24 @@ export default function ConnectionContent({
             setConnection(updated);
             void refreshEvents();
         } catch (err) {
-            console.error(
-                "Failed to change connection state:",
-                err
-            );
-
             if (err instanceof ConnectionActivationError) {
                 switch (err.code) {
                     case "INVALID_CLIENT_IP":
                         setIpDialogError(t("ipDialog.invalidIp"));
                         return;
                     case "CLIENT_IP_MISMATCH":
-                        setIpDialogError(t("ipDialog.ipMismatch"));
-                        return;
                     case "PUBLIC_IPV4_REQUIRED":
-                        setIpDialogError(t("ipDialog.publicIpv4Required"));
+                        if (!clientIp) {
+                            setIpDialogError(t("ipDialog.publicIpv4Required"));
+                            return;
+                        }
+                        try {
+                            setIpApproval(await createConnectionIpApproval(clientIp));
+                        } catch (approvalError) {
+                            setIpDialogError(t(approvalError instanceof ConnectionActivationError && approvalError.code === "INVALID_CLIENT_IP"
+                                ? "ipDialog.invalidIp"
+                                : "ipDialog.approvalFailed"));
+                        }
                         return;
                     case "CLIENT_IP_IN_USE":
                         setIpDialogError(t("errors.ipInUse"));
@@ -254,12 +263,35 @@ export default function ConnectionContent({
                 }
             }
 
+            console.error("Failed to change connection state:", err);
             // A failed status refresh can follow a successful mutation.
             setIpDialogOpen(false);
             setConnection(null);
             setDiagnosticResults({});
             setConnectErrorCode("CONNECTION_FAILED");
             setError(t("errors.connectionFailedDetailed"));
+        } finally {
+            setConnectionLoading(false);
+        }
+    };
+
+    const checkIpApproval = async () => {
+        if (!ipApproval || connectionLoading) return;
+        setConnectionLoading(true);
+        setIpDialogError(null);
+        try {
+            const updated = await getConnectionStatus();
+            if (updated.connected && updated.clientIp === ipApproval.clientIp) {
+                setConnection(updated);
+                setIpDialogOpen(false);
+                void refreshEvents();
+            } else {
+                setIpDialogError(t(Date.parse(ipApproval.expiresAt) <= Date.now()
+                    ? "ipDialog.approvalExpired"
+                    : "ipDialog.approvalPending"));
+            }
+        } catch {
+            setIpDialogError(t("ipDialog.approvalCheckFailed"));
         } finally {
             setConnectionLoading(false);
         }
@@ -394,12 +426,19 @@ export default function ConnectionContent({
 
     return (
         <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
+            <ConfirmConnectionIpDialog locale={locale} onApproved={async () => {
+                setIpDialogOpen(false);
+                setIpApproval(null);
+                await loadConnection();
+            }}/>
             {ipDialogOpen && (
                 <ConnectionIpDialog
                     locale={locale}
                     connecting={connectionLoading}
                     error={ipDialogError}
-                    onClearError={() => setIpDialogError(null)}
+                    approval={ipApproval}
+                    onCheckApproval={checkIpApproval}
+                    onClearError={() => { setIpDialogError(null); setIpApproval(null); }}
                     onClose={() => setIpDialogOpen(false)}
                     onConnect={changeConnection}
                 />
