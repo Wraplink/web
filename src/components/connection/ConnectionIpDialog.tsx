@@ -84,7 +84,7 @@ export default function ConnectionIpDialog({
 
     return (
         <Dialog open onOpenChange={(open) => { if (!open && !busy) onClose(); }}>
-            <DialogContent dir={locale === "fa" ? "rtl" : "ltr"} showCloseButton={false} className="max-h-[calc(100dvh-2rem)] overflow-auto sm:max-w-md">
+            <DialogContent dir={locale === "fa" ? "rtl" : "ltr"} showCloseButton={false} className="wraplink-user-dialog max-h-[calc(100dvh-2rem)] overflow-auto sm:max-w-md">
                 <DialogTitle>{t("title")}</DialogTitle>
                 <DialogDescription>{t("description")}</DialogDescription>
                 <Button type="button" variant="outline" disabled={busy} onClick={() => void onConnect()}>
@@ -118,7 +118,7 @@ export default function ConnectionIpDialog({
                         </Button>
                     </section>
                 )}
-                {error && <p role="alert" className="text-red-500">{error}</p>}
+                {error && <p role="alert" className="text-destructive">{error}</p>}
                 <section className="space-y-2 border-t pt-3">
                     <h3 className="font-medium">{t("saved")}</h3>
                     {loading && <p role="status">{t("loading")}</p>}
@@ -154,7 +154,7 @@ export default function ConnectionIpDialog({
                             ))}
                         </ul>
                     )}
-                    {deleteFailed && <p role="alert" className="text-red-500">{t("deleteFailed")}</p>}
+                    {deleteFailed && <p role="alert" className="text-destructive">{t("deleteFailed")}</p>}
                 </section>
                 <Button type="button" variant="ghost" disabled={busy} onClick={onClose}>{t(approval ? "close" : "cancel")}</Button>
             </DialogContent>

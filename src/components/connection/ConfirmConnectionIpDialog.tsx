@@ -68,10 +68,10 @@ export default function ConfirmConnectionIpDialog({
 
     return (
         <Dialog open onOpenChange={(open) => { if (!open && !confirming) close(); }}>
-            <DialogContent dir={locale === "fa" ? "rtl" : "ltr"} showCloseButton={false}>
+            <DialogContent dir={locale === "fa" ? "rtl" : "ltr"} showCloseButton={false} className="wraplink-user-dialog">
                 <DialogTitle>{t("ipDialog.approveTitle")}</DialogTitle>
                 <DialogDescription>{t("ipDialog.approveDescription")}</DialogDescription>
-                {error && <p role="alert" className="text-red-500">{error}</p>}
+                {error && <p role="alert" className="text-destructive">{error}</p>}
                 <Button type="button" disabled={confirming} onClick={() => void approve()}>
                     {t(confirming ? "ipDialog.connecting" : "ipDialog.approve")}
                 </Button>
