@@ -70,7 +70,8 @@ apiClient.interceptors.response.use(
         if (
             !config ||
             response?.status !== 401 ||
-            isAuthenticationBootstrapRequest(config.url)
+            isAuthenticationBootstrapRequest(config.url) ||
+            isPublicPlanRequest(config.url)
         ) {
             throw error;
         }
@@ -173,6 +174,13 @@ async function requestRefreshToken(): Promise<string> {
 
     setAccessToken(token);
     return token;
+}
+
+// Public catalog requests must not trigger refresh-token rotation or a logout
+// when the API is temporarily misconfigured or rejects anonymous traffic.
+function isPublicPlanRequest(url: string | undefined): boolean {
+    if (!url) return false;
+    return /^\/api\/v1\/plans(?:\/[^/?#]+)?(?:[?#]|$)/.test(url);
 }
 
 function isAuthenticationBootstrapRequest(
