@@ -1,6 +1,7 @@
 "use client";
 
 import {useCallback, useMemo, useState} from "react";
+import GoogleAuthButton from "./GoogleAuthButton";
 import {useRouter} from "next/navigation";
 import {Turnstile, captchaEnabled} from "@/components/security/Turnstile";
 import {apiClient} from "@/lib/api/client";
@@ -66,6 +67,7 @@ export default function RegisterContent({
     const [errors, setErrors] =
         useState<FormErrors>({});
 
+    const [captchaAttempt, setCaptchaAttempt] = useState(0);
     const [captchaToken, setCaptchaToken] = useState("");
     const onCaptchaToken = useCallback((token: string) => setCaptchaToken(token), []);
 
@@ -627,7 +629,7 @@ export default function RegisterContent({
 
                         </div>
 
-                        <Turnstile onToken={onCaptchaToken}/>
+                        <Turnstile key={captchaAttempt} onToken={onCaptchaToken}/>
 
                         {/* Submit */}
 
@@ -647,6 +649,21 @@ export default function RegisterContent({
                         </button>
 
                     </form>
+
+                    <GoogleAuthButton
+                        locale={locale}
+                        disabled={isSubmitting || !acceptedTerms || !acceptedPrivacy || (captchaEnabled && !captchaToken)}
+                        registration={{
+                            termsVersion: TERMS_VERSION,
+                            privacyVersion: PRIVACY_VERSION,
+                            marketingConsent,
+                            captchaToken,
+                        }}
+                        onStartFailure={() => {
+                            setCaptchaToken("");
+                            setCaptchaAttempt((value) => value + 1);
+                        }}
+                    />
 
                     <div className="mt-8 text-center text-gray-400">
 

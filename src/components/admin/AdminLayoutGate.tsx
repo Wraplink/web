@@ -6,6 +6,7 @@ import {apiClient} from "@/lib/api/client";
 
 export default function AdminLayoutGate({children}:{children:ReactNode}){
  const locale=useLocale();
+ const [canManageAccess,setCanManageAccess]=useState(false);
  const [status,setStatus]=useState<"loading"|"allowed"|"denied">("loading");
  useEffect(()=>{
   let active=true;
@@ -13,12 +14,13 @@ export default function AdminLayoutGate({children}:{children:ReactNode}){
    apiClient.get("/api/v1/admin/access/permissions"),
    apiClient.get("/api/v1/admin/payment-reviews/receipts"),
    apiClient.get("/api/v1/admin/payment-reviews/discounts")
-  ]).then(results=>{if(active)setStatus(results.some(x=>x.status==="fulfilled")?"allowed":"denied")});
+  ]).then(results=>{if(active){setCanManageAccess(results[0].status==="fulfilled");setStatus(results.some(x=>x.status==="fulfilled")?"allowed":"denied")}});
   return()=>{active=false};
  },[]);
  if(status==="loading")return <div className="p-10" role="status">{locale==="fa"?"در حال بررسی دسترسی مدیریت…":"Checking administrator access…"}</div>;
  if(status==="denied")return <main className="p-10"><h1 className="text-2xl font-bold">{locale==="fa"?"دسترسی مدیریت در دسترس نیست":"Administrator access unavailable"}</h1><p className="mt-3 text-gray-400">{locale==="fa"?"حساب شما مجوز مدیریت ندارد یا سرویس مدیریت در دسترس نیست.":"Your account does not have an administrator role, or the administration API cannot be reached."}</p></main>;
  const tabs=[["",locale==="fa"?"نمای کلی":"Overview"],["users",locale==="fa"?"کاربران":"Users"],["orders",locale==="fa"?"سفارش‌ها":"Orders"],["payment-reviews",locale==="fa"?"پرداخت‌ها":"Payments"],["contact-messages",locale==="fa"?"پیام‌های تماس":"Contact messages"],["payment-methods",locale==="fa"?"کارت‌ها و روش‌های پرداخت":"Payment methods"],["discounts",locale==="fa"?"تخفیف‌ها":"Discounts"],["access",locale==="fa"?"مجوزها":"Permissions"],["network",locale==="fa"?"شبکه":"Network"],["domain-policies",locale==="fa"?"سیاست‌های دامنه":"Domain policies"]];
+ if(canManageAccess)tabs.push(["authentication",locale==="fa"?"احراز هویت":"Authentication"]);
  return <div>
   <div className="flex items-center gap-3 border-b border-white/10 px-6 py-4">
    <img src="/wraplink-symbol.svg" alt="" width={68} height={44} className="h-11 w-auto" />
