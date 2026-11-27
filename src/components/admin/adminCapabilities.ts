@@ -16,6 +16,7 @@ export const adminSections = [
   {path: "network", permission: "network_monitor", en: "Network", fa: "شبکه"},
   {path: "domain-policies", permission: "domain_policies", en: "Domain policies", fa: "سیاست‌های دامنه"},
   {path: "access", permission: "access", en: "Permissions", fa: "مجوزها"},
+  {path: "authentication", permission: "access", en: "Authentication", fa: "احراز هویت"},
 ] as const;
 
 export const AdminCapabilitiesContext = createContext<readonly AdminCapability[]>([]);

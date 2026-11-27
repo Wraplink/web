@@ -1,6 +1,7 @@
 "use client";
 
 import axios from "axios";
+import GoogleAuthButton from "./GoogleAuthButton";
 import {useEffect, useState} from "react";
 import {
     Eye,
@@ -23,7 +24,10 @@ type Props = {
 export default function LoginContent({locale}: Props) {
     const t = useTranslations("LoginPage");
     const router = useRouter();
-    const registrationHref = `/auth/register${typeof window !== "undefined" ? window.location.search : ""}`;
+    const returnUrlParam = typeof window !== "undefined"
+        ? new URLSearchParams(window.location.search).get("returnUrl") : null;
+    const registrationHref = returnUrlParam
+        ? `/auth/register?returnUrl=${encodeURIComponent(returnUrlParam)}` : "/auth/register";
 
     const [checkingSession, setCheckingSession] = useState(true);
 
@@ -300,6 +304,8 @@ export default function LoginContent({locale}: Props) {
                         </button>
 
                     </form>
+
+                    <GoogleAuthButton locale={locale} disabled={loading} rememberDevice={rememberDevice}/>
 
                     <div className="mt-8 text-center text-gray-400">
 

@@ -857,5 +857,21 @@
       "push": "Push",
       "sms": "SMS"
     }
+  },
+  "GoogleAuth": {
+    "login": "Sign in with Google",
+    "register": "Register with Google",
+    "connecting": "Connecting to Google…",
+    "loginError": "Google sign-in failed. Try again, or register with Google if you are new to WrapLink.",
+    "registrationError": "Google registration failed. Try again, or sign in with your existing account."
+  },
+  "AdminGoogleAuth": {
+    "title": "Authentication",
+    "loading": "Loading authentication settings…",
+    "toggle": "Allow Google registration and sign-in",
+    "unconfigured": "Configure the Google OAuth credentials and callback URL on the server to enable this option.",
+    "saved": "Settings saved.",
+    "loadError": "Could not load authentication settings.",
+    "saveError": "Could not save authentication settings."
   }
 }
