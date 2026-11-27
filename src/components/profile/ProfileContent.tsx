@@ -1,8 +1,11 @@
 "use client";
 import ThemePicker from "./ThemePicker";
 
-import {useEffect,useState} from "react";
-import {getProfile,updateProfile,changeProfilePassword,getProfileSessions,revokeProfileSession,revokeOtherProfileSessions,type Profile,type ManagedSession} from "@/lib/api/profile";
+import {useEffect,useState,type FormEvent} from "react";
+import {isAxiosError} from "axios";
+import {useRouter} from "@/i18n/navigation";
+import {clearAuthSession} from "@/lib/auth";
+import {getProfile,updateProfile,changeProfilePassword,getProfileSessions,revokeProfileSession,revokeOtherProfileSessions,deleteProfile,type Profile,type ManagedSession} from "@/lib/api/profile";
 import {
     User,
     Mail,
@@ -38,6 +41,33 @@ export default function ProfileContent({
                                        }: Props) {
 
     const t = useTranslations("ProfilePage");
+    const router = useRouter();
+
+    const [confirmingDeletion, setConfirmingDeletion] = useState(false);
+    const [deletionConfirmation, setDeletionConfirmation] = useState("");
+    const [deleting, setDeleting] = useState(false);
+    const [deletionError, setDeletionError] = useState("");
+
+    async function handleDeleteAccount(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        if (deleting || !deletionConfirmation) return;
+
+        setDeleting(true);
+        setDeletionError("");
+        try {
+            await deleteProfile(deleteWithEmail
+                ? {confirmationEmail: deletionConfirmation.trim()}
+                : {currentPassword: deletionConfirmation});
+        } catch (error) {
+            const status = isAxiosError(error) ? error.response?.status : undefined;
+            setDeletionError(t(status === 403 ? (deleteWithEmail ? "deletion.incorrectEmail" : "deletion.incorrectPassword") :
+                status === 409 ? "deletion.unavailable" : "deletion.failed"));
+            setDeleting(false);
+            return;
+        }
+        clearAuthSession();
+        router.replace("/auth/login");
+    }
 
 
     const [name, setName] = useState("");
@@ -48,6 +78,7 @@ export default function ProfileContent({
     useEffect(()=>{let active=true;void Promise.all([getProfile(),getProfileSessions()]).then(([p,s])=>{if(active){setProfile(p);setName(p.full_name);setSessions(s)}}).catch(()=>{if(active)setError("Unable to load profile or sessions")}).finally(()=>{if(active)setLoading(false)});return()=>{active=false}},[]);
 
     const email=profile?.email??"";
+    const deleteWithEmail = profile?.has_password === false;
 
     const [saving, setSaving] =
         useState(false);
@@ -376,6 +407,63 @@ export default function ProfileContent({
                 </div>
 
             </div>
+
+            {profile && (
+                <div className="mt-8 rounded-3xl border border-red-400/20 bg-white/5 p-8">
+                    <h2 className="flex items-center gap-3 text-xl font-bold">
+                        <AlertTriangle size={20} className="text-red-400" aria-hidden="true"/>
+                        {t("deletion.title")}
+                    </h2>
+                    <p className="mt-2 text-sm text-gray-400">{t("deletion.description")}</p>
+
+                    {confirmingDeletion ? (
+                        <form onSubmit={handleDeleteAccount} className="mt-5 max-w-md space-y-4">
+                            <label className="block text-sm text-gray-300">
+                                <span className="mb-2 block">{t(deleteWithEmail ? "deletion.email" : "deletion.password")}</span>
+                                <input
+                                    type={deleteWithEmail ? "email" : "password"}
+                                    autoComplete={deleteWithEmail ? "off" : "current-password"}
+                                    className="input"
+                                    value={deletionConfirmation}
+                                    onChange={(event) => setDeletionConfirmation(event.target.value)}
+                                    disabled={deleting}
+                                    required
+                                />
+                            </label>
+                            {deletionError && <p role="alert" className="text-sm text-red-300">{deletionError}</p>}
+                            <div className="flex flex-wrap gap-3">
+                                <button
+                                    type="submit"
+                                    disabled={deleting || !deletionConfirmation}
+                                    className="rounded-xl bg-red-600 px-4 py-2 font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+                                >
+                                    {t(deleting ? "deletion.deleting" : "deletion.confirm")}
+                                </button>
+                                <button
+                                    type="button"
+                                    disabled={deleting}
+                                    onClick={() => {
+                                        setConfirmingDeletion(false);
+                                        setDeletionConfirmation("");
+                                        setDeletionError("");
+                                    }}
+                                    className="rounded-xl border border-white/20 px-4 py-2 text-sm disabled:opacity-50"
+                                >
+                                    {t("deletion.cancel")}
+                                </button>
+                            </div>
+                        </form>
+                    ) : (
+                        <button
+                            type="button"
+                            onClick={() => setConfirmingDeletion(true)}
+                            className="mt-5 rounded-xl border border-red-400/20 bg-red-400/5 px-4 py-2 font-semibold text-red-400 hover:bg-red-400/10"
+                        >
+                            {t("deletion.title")}
+                        </button>
+                    )}
+                </div>
+            )}
 
         </section>
     );

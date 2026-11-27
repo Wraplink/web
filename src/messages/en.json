@@ -817,6 +817,19 @@
       "twoFactorEnabled": "Two-factor authentication is enabled.",
       "twoFactorDisabled": "Two-factor authentication is disabled."
     },
+    "deletion": {
+      "title": "Delete account",
+      "description": "Account deletion is permanent. You will lose access and be signed out on all devices. Billing and audit records are retained.",
+      "password": "Enter your current password to continue",
+      "confirm": "Permanently delete account",
+      "deleting": "Deleting account…",
+      "cancel": "Cancel",
+      "email": "Type your account email to confirm",
+      "incorrectEmail": "The email does not match your account.",
+      "incorrectPassword": "Your current password is incorrect.",
+      "unavailable": "This account cannot be deleted from your profile.",
+      "failed": "Could not delete your account. Please try again."
+    },
     "sessions": {
       "title": "Active Sessions",
       "description": "Review devices currently signed in to your account.",
