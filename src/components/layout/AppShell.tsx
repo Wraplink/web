@@ -26,6 +26,7 @@ const authenticatedRoutes = [
     "/bandwidth",
     "/notifications",
     "/profile",
+    "/public-ips",
     "/admin",
 ];
 
