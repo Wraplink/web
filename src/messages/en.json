@@ -872,6 +872,7 @@
     }
   },
   "GoogleAuth": {
+    "registrationRequired": "Accept the terms and privacy policy above, then select Register with Google to finish creating your account.",
     "login": "Sign in with Google",
     "register": "Register with Google",
     "connecting": "Connecting to Google…",

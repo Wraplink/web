@@ -64,9 +64,14 @@ function GoogleAuthAction({
         }
     }
 
+    const needsRegistration = registration && searchParams.get("googleSignup") === "1";
+
     if (!available && !failed) return null;
     return (
         <div className="mt-4 space-y-2">
+            {available && needsRegistration && (
+                <p role="status" className="text-sm text-gray-300">{t("registrationRequired")}</p>
+            )}
             {available && (
                 <button
                     type="button"
