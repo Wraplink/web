@@ -1,6 +1,6 @@
 import {apiClient} from "@/lib/api/client";
 
-export type AdminUser={id:string;email:string;name:string;status:string;emailVerified:boolean;createdAt:string};
+export type AdminUser={id:string;email:string;name:string;status:string;emailVerified:boolean;emailReleased?:boolean;createdAt:string};
 export type AdminOrder={id:string;userId:string;email:string;status:string;amountMinor:number;currency:string;receiptStatus:string;createdAt:string};
 export type AdminSectionPermission =
  "users" | "orders" | "payment_methods" | "plans" | "starter_plans" |
@@ -30,6 +30,6 @@ export async function updateAdminPermission(userId:string,permission:GrantableAd
  await apiClient.put(`/api/v1/admin/access/users/${encodeURIComponent(userId)}/permissions/${permission}`,{enabled});
 }
 
-export async function updateAdminUserStatus(userId:string,action:"suspend"|"restore"|"delete"):Promise<void>{
+export async function updateAdminUserStatus(userId:string,action:"suspend"|"restore"|"delete"|"release_email"):Promise<void>{
  await apiClient.patch(`/api/v1/admin/access/users/${encodeURIComponent(userId)}/status`,{action});
 }
