@@ -133,8 +133,6 @@
     "badge": "Choose Your Plan",
     "title": "Flexible Plans for Every Gamer",
     "description": "Select the bandwidth and duration that fits your gaming style.",
-    "monthly": "Monthly",
-    "yearly": "Yearly",
     "buy": "Buy Now",
     "paymentTitle": "Supported Payments",
     "payments": {
@@ -143,29 +141,15 @@
       "cart": "Cart-to-Cart",
       "isp": "ISP Payment"
     },
-    "plans": {
-      "starter": {
-        "name": "Starter",
-        "description": "Perfect for casual gaming.",
-        "bandwidth": "50 GB",
-        "duration": "30 Days",
-        "price": "199,000 Toman"
-      },
-      "pro": {
-        "name": "Pro",
-        "description": "Competitive gamers' favorite.",
-        "bandwidth": "200 GB",
-        "duration": "30 Days",
-        "price": "799,000 Toman"
-      },
-      "ultimate": {
-        "name": "Ultimate",
-        "description": "Maximum performance and bandwidth.",
-        "bandwidth": "Unlimited",
-        "duration": "30 Days",
-        "price": "999,000 Toman"
-      }
-    }
+    "loading": "Loading plans…",
+    "loadError": "Unable to load plans.",
+    "retry": "Try again",
+    "empty": "No plans are currently available.",
+    "popular": "Most popular",
+    "free": "Free",
+    "unlimited": "Unlimited data",
+    "duration": "{days} days",
+    "activate": "Activate Free"
   },
   "LoginPage": {
     "badge": "Secure Sign In",
