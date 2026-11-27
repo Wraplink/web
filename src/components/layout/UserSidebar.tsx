@@ -31,7 +31,7 @@ import {
     useRouter,
 } from "@/i18n/navigation";
 
-import {apiClient} from "@/lib/api/client";
+import {adminCapabilities} from "@/lib/api/admin";
 import LanguageSwitcher from "./LanguageSwitcher";
 import {getNotifications} from "@/lib/notifications";
 
@@ -90,13 +90,10 @@ export default function UserSidebar({
     useEffect(() => {
         if (!user) {return;}
         let active = true;
-        Promise.allSettled([
-            apiClient.get("/api/v1/admin/access/permissions"),
-            apiClient.get("/api/v1/admin/payment-reviews/receipts"),
-            apiClient.get("/api/v1/admin/payment-reviews/discounts"),
-        ]).then(results => {
-            if (active) setCanAdmin(results.some(result => result.status === "fulfilled"));
-        });
+        adminCapabilities().then(
+            permissions => {if (active) setCanAdmin(permissions.length > 0);},
+            () => {if (active) setCanAdmin(false);},
+        );
         return () => {active = false;};
     }, [user]);
 

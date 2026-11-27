@@ -6,19 +6,10 @@ import {useTranslations} from "next-intl";
 import {Link, usePathname} from "@/i18n/navigation";
 import {addBasketItem, getBasket} from "@/lib/basket";
 import {getMarketPlans, type MarketPlan} from "@/lib/api/plans";
+import {formatPlanData, formatPlanPrice} from "@/lib/plan-format";
 import {apiClient} from "@/lib/api/client";
 
 type Props = {locale: string};
-
-function formatPrice(plan: MarketPlan, locale: string) {
-    const currency = plan.currency.toUpperCase();
-    const amount = plan.priceMinor / (currency === "IRR" ? 1 : 100);
-    return new Intl.NumberFormat(locale === "fa" ? "fa-IR" : "en-US", {
-        style: "currency",
-        currency,
-        maximumFractionDigits: currency === "IRR" ? 0 : 2,
-    }).format(amount);
-}
 
 export default function MarketContent({locale}: Props) {
     const t = useTranslations("MarketPage");
@@ -57,18 +48,6 @@ export default function MarketContent({locale}: Props) {
             return next;
         });
     };
-
-    const formatData = (bytes: number) => {
-        if (bytes === 0) return fa ? "نامشخص" : "Unknown";
-        if (!Number.isFinite(bytes) || bytes < 0) return fa ? "نامشخص" : "Unknown";
-        const localeTag = fa ? "fa-IR" : "en-US";
-        const units = ["B", "KB", "MB", "GB", "TB"];
-        let amount = bytes;
-        let unit = 0;
-        while (amount >= 1024 && unit < units.length - 1) { amount /= 1024; unit++; }
-        return `${new Intl.NumberFormat(localeTag, {maximumFractionDigits: amount < 10 ? 2 : 1}).format(amount)} ${units[unit]}`;
-    };
-
 
     useEffect(() => {
         const basket = getBasket();
@@ -223,7 +202,7 @@ export default function MarketContent({locale}: Props) {
                                     <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
                                         <Database size={18} className="mb-2 text-cyan-300"/>
                                         <p className="text-xs text-slate-400">{fa ? "حجم ترافیک" : "Data allowance"}</p>
-                                        <p className="mt-1 text-base font-bold text-white" dir="auto">{plan.unlimitedBandwidth ? (fa ? "نامحدود" : "Unlimited") : formatData(plan.dataLimitBytes)}</p>
+                                        <p className="mt-1 text-base font-bold text-white" dir="auto">{plan.unlimitedBandwidth ? (fa ? "نامحدود" : "Unlimited") : formatPlanData(plan.dataLimitBytes, locale)}</p>
                                     </div>
                                     <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
                                         <CalendarDays size={18} className="mb-2 text-cyan-300"/>
@@ -234,7 +213,7 @@ export default function MarketContent({locale}: Props) {
                                 <div className="mt-auto pt-6">
                                     <div className="border-t border-white/10 pt-5">
                                         <p className="text-xs text-slate-400">{fa ? "قیمت پلن" : "Plan price"}</p>
-                                        <p className="mt-2 break-words text-2xl font-black text-cyan-300">{plan.priceMinor===0?(fa?"رایگان":"Free"):formatPrice(plan, locale)}</p>
+                                        <p className="mt-2 break-words text-2xl font-black text-cyan-300">{plan.priceMinor===0?(fa?"رایگان":"Free"):formatPlanPrice(plan, locale)}</p>
                                     </div>
                                     {plan.priceMinor===0 && claimsUnauthorized ? (
                                         <Link href="/login" className="mt-5 flex min-h-12 w-full items-center justify-center rounded-xl bg-emerald-400 px-4 py-3 font-bold text-slate-950">{fa?"ورود برای فعال‌سازی رایگان":"Sign in to activate free"}</Link>

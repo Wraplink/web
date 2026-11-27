@@ -242,6 +242,29 @@ html[data-wraplink-theme="titanium"]{--wl-bg:#151B24;--wl-accent:#CBD5E1;--wl-su
 .wraplink-user-zone .bg-cyan-400 {background-color:var(--wl-accent)}
 .wraplink-user-zone .bg-white\/5 {background-color:color-mix(in srgb,var(--wl-surface) 82%,white 8%)}
 
+/* User dialogs are portaled to the body and inherit the dashboard palette from html. */
+.wraplink-user-dialog {
+  --foreground: #f8fafc;
+  --background: var(--wl-bg);
+  --popover: var(--wl-surface);
+  --popover-foreground: var(--foreground);
+  --primary: var(--wl-accent);
+  --primary-foreground: #000;
+  --muted: color-mix(in srgb, var(--popover) 90%, var(--foreground));
+  --muted-foreground: color-mix(in srgb, var(--foreground) 75%, var(--popover));
+  --secondary: color-mix(in srgb, var(--popover) 80%, var(--wl-accent));
+  --secondary-foreground: var(--foreground);
+  --border: color-mix(in srgb, var(--foreground) 30%, var(--popover));
+  --input: var(--border);
+  --ring: var(--wl-accent);
+  --destructive: #fda4af;
+}
+
+html[data-wraplink-theme="arctic-frost"] .wraplink-user-dialog {
+  --foreground: #142338;
+  --destructive: #9f1239;
+}
+
 /* Persian customer area only: Vazirmatn with accessible dashboard typography. */
 .wraplink-user-zone[lang="fa"] {
   font-family: "Vazirmatn", Tahoma, sans-serif;

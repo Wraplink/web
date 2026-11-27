@@ -166,20 +166,46 @@ export async function getConnectionStatus(): Promise<ConnectionStatus> {
     };
 }
 
-export async function connect(): Promise<void> {
+export type ConnectionIpApproval = {
+    id: string;
+    clientIp: string;
+    expiresAt: string;
+};
+
+async function postConnectionChange<T>(path: string, data?: object): Promise<T> {
     try {
-        await apiClient.post<BackendEntitlement>(
-            "/api/v1/me/network/entitlement"
-        );
+        const response = await apiClient.post<T>(path, data);
+        return response.data;
     } catch (error) {
         if (axios.isAxiosError<BackendErrorResponse>(error)) {
             const code = error.response?.data?.code;
-            if (code === "NO_USABLE_SUBSCRIPTION" || code === "CLIENT_IP_IN_USE") {
+            if (code && ["NO_USABLE_SUBSCRIPTION", "CLIENT_IP_IN_USE", "INVALID_CLIENT_IP", "CLIENT_IP_MISMATCH", "PUBLIC_IPV4_REQUIRED", "IP_APPROVAL_UNAVAILABLE"].includes(code)) {
                 throw new ConnectionActivationError(code);
             }
         }
         throw new ConnectionActivationError("CONNECTION_FAILED");
     }
+}
+
+export async function connect(clientIp?: string): Promise<void> {
+    await postConnectionChange("/api/v1/me/network/entitlement", clientIp === undefined ? undefined : {clientIp});
+}
+
+export function createConnectionIpApproval(clientIp: string): Promise<ConnectionIpApproval> {
+    return postConnectionChange("/api/v1/me/network/ip-approvals", {clientIp});
+}
+
+export async function confirmConnectionIpApproval(id: string): Promise<void> {
+    await postConnectionChange("/api/v1/me/network/ip-approvals/confirm", {id});
+}
+
+export async function getSavedConnectionIps(): Promise<{ips: string[]; detectedIp?: string}> {
+    const {data} = await apiClient.get<{ips: string[]; detectedIp?: string}>("/api/v1/me/network/saved-ips");
+    return data;
+}
+
+export async function deleteSavedConnectionIp(clientIp: string): Promise<void> {
+    await apiClient.delete("/api/v1/me/network/saved-ips", {params: {clientIp}});
 }
 
 export async function disconnect(): Promise<void> {

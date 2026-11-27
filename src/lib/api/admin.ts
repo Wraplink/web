@@ -2,7 +2,17 @@ import {apiClient} from "@/lib/api/client";
 
 export type AdminUser={id:string;email:string;name:string;status:string;emailVerified:boolean;createdAt:string};
 export type AdminOrder={id:string;userId:string;email:string;status:string;amountMinor:number;currency:string;receiptStatus:string;createdAt:string};
-export type AdminPermission={userId:string;email:string;paymentReview:boolean;discountAdmin:boolean};
+export type AdminSectionPermission =
+ "users" | "orders" | "payment_methods" | "plans" | "starter_plans" |
+ "support" | "contact_messages" | "network_monitor" | "network_manage" | "domain_policies";
+export type GrantableAdminPermission = AdminSectionPermission | "payment_review" | "discount_admin";
+export type AdminCapability = GrantableAdminPermission | "access";
+export type AdminPermission={userId:string;email:string;paymentReview:boolean;discountAdmin:boolean;sections:AdminSectionPermission[]};
+
+export async function adminCapabilities(): Promise<AdminCapability[]> {
+ const {data} = await apiClient.get<{permissions: AdminCapability[]}>("/api/v1/admin/access/me");
+ return data.permissions;
+}
 
 export async function adminUsers(search=""):Promise<AdminUser[]>{
  const {data}=await apiClient.get<{users:AdminUser[]}>("/api/v1/admin/access/users",{params:{search,limit:100}});
@@ -16,7 +26,7 @@ export async function adminPermissions():Promise<AdminPermission[]>{
  const {data}=await apiClient.get<{users:AdminPermission[]}>("/api/v1/admin/access/permissions");
  return data.users;
 }
-export async function updateAdminPermission(userId:string,permission:"payment_review"|"discount_admin",enabled:boolean):Promise<void>{
+export async function updateAdminPermission(userId:string,permission:GrantableAdminPermission,enabled:boolean):Promise<void>{
  await apiClient.put(`/api/v1/admin/access/users/${encodeURIComponent(userId)}/permissions/${permission}`,{enabled});
 }
 

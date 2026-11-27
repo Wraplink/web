@@ -1,4 +1,5 @@
 "use client";
+import {useAdminCapabilities} from "./adminCapabilities";
 
 import {useEffect, useState} from "react";
 import {useLocale} from "next-intl";
@@ -10,6 +11,9 @@ type Response = {queries:Query[];total:number;page:number;pageSize:number};
 const PAGE_SIZE = 25;
 
 export default function AdminDNSQueriesContent() {
+    const permissions = useAdminCapabilities();
+    const canManage = permissions.includes("network_manage");
+    const canManageDomains = permissions.includes("domain_policies");
     const locale = useLocale();
     const fa = locale === "fa";
     const [search, setSearch] = useState("");
@@ -76,7 +80,7 @@ export default function AdminDNSQueriesContent() {
                 <p className="mt-2 text-sm text-gray-400">{fa?"درخواست‌های ثبت‌شده توسط کنترلرهای DNS":"Queries reported by registered DNS controllers"}</p></div>
             <div className="flex gap-3"><Link href="/admin/network" className="rounded-lg border border-white/20 px-4 py-2">{fa?"شبکه":"Network"}</Link>
                 <button type="button" onClick={()=>setRefresh(n=>n+1)} className="rounded-lg bg-cyan-600 px-4 py-2 text-white">{fa?"به‌روزرسانی":"Refresh"}</button>
-                <button type="button" disabled={clearing} onClick={()=>setConfirmClear(true)} className="rounded-lg border border-red-500/60 px-4 py-2 text-red-300 disabled:opacity-50">{fa?"حذف گزارش‌ها":"Clear reports"}</button></div>
+                {canManage && <button type="button" disabled={clearing} onClick={()=>setConfirmClear(true)} className="rounded-lg border border-red-500/60 px-4 py-2 text-red-300 disabled:opacity-50">{fa?"حذف گزارش‌ها":"Clear reports"}</button>}</div>
         </div>
         <form className="mt-8 flex flex-wrap items-end gap-3" onSubmit={e=>{e.preventDefault();setPage(1);setSubmitted(search.trim())}}>
             <label className="min-w-48 flex-1 text-sm">{fa?"جست‌وجوی دامنه":"Domain search"}<input className="mt-2 w-full rounded-lg border border-white/20 bg-transparent p-3" value={search} onChange={e=>setSearch(e.target.value)} maxLength={253} /></label>
@@ -110,7 +114,7 @@ export default function AdminDNSQueriesContent() {
                     <td className="p-3">{q.managedMode||"—"}</td>
                     <td className="p-3" dir="ltr">{q.managedDomain||"—"}</td>
                     <td className="p-3">{q.durationMs} ms</td>
-                    <td className="p-3"><Link href={`/admin/domain-policies?domain=${encodeURIComponent(q.managed&&q.managedDomain?q.managedDomain:q.domain)}`} className="whitespace-nowrap text-cyan-300 underline">{q.managed?(fa?"مشاهده / ویرایش":"View / Edit"):(fa?"ثبت دامنه":"Register domain")}</Link></td>
+                    <td className="p-3">{canManageDomains && <Link href={`/admin/domain-policies?domain=${encodeURIComponent(q.managed&&q.managedDomain?q.managedDomain:q.domain)}`} className="whitespace-nowrap text-cyan-300 underline">{q.managed?(fa?"مشاهده / ویرایش":"View / Edit"):(fa?"ثبت دامنه":"Register domain")}</Link>}</td>
                 </tr>)}
             </tbody></table>
             {!loading&&data.queries.length===0&&<p className="p-6 text-center text-gray-400">{fa?"درخواستی یافت نشد.":"No queries found."}</p>}
