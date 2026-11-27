@@ -481,7 +481,7 @@ export default function RegisterContent({
 
                         {/* Legal Acceptance */}
 
-                        <div className="space-y-4 rounded-2xl border border-white/10 bg-black/20 p-5">
+                        <div id="agreements" className="space-y-4 rounded-2xl border border-white/10 bg-black/20 p-5">
 
                             {/* Terms */}
 
